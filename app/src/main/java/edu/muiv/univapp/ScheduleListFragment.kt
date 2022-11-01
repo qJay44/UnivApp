@@ -44,6 +44,7 @@ class ScheduleListFragment : Fragment() {
         return view
     }
 
+    // View Holder
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
@@ -71,6 +72,7 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
+    // The object to calculate the difference on list change
     private object DiffCallBack : DiffUtil.ItemCallback<Schedule>() {
         override fun areItemsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
             return oldItem.id == newItem.id
@@ -82,6 +84,7 @@ class ScheduleListFragment : Fragment() {
 
     }
 
+    // The Adapter
     private inner class ScheduleAdapter
         : ListAdapter<Schedule, ScheduleHolder>(DiffCallBack) {
 
