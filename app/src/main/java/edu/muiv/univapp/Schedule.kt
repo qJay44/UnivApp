@@ -9,7 +9,8 @@ import java.util.UUID
 data class Schedule(
     @PrimaryKey val id: UUID = UUID.randomUUID(),
     var date: Date = Date(),
-    var time: String = "",
+    var timeStart: String = "",
+    var timeEnd: String = "",
     var subjectName: String = "",
     var roomNum: Int = 0
 )

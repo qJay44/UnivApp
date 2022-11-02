@@ -44,6 +44,20 @@ class ScheduleListFragment : Fragment() {
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
+            schedules?.let {
+                Log.i(TAG, "Got ${schedules.size} schedules")
+                updateUI(schedules)
+            }
+        }
+    }
+
+    private fun updateUI(schedules: List<Schedule>) {
+        adapter?.submitList(schedules)
+    }
+
     // View Holder
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -52,7 +66,7 @@ class ScheduleListFragment : Fragment() {
 
             private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
             private val tvTimeStartEnd: TextView = itemView.findViewById(R.id.tvTimeStartEnd)
-            private val tvAmount: TextView  = itemView.findViewById(R.id.tvAmount)
+            private val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
 
         init {
             itemView.setOnClickListener(this)
@@ -60,11 +74,15 @@ class ScheduleListFragment : Fragment() {
 
         fun bind(schedule: Schedule) {
             val df = SimpleDateFormat("dd.mm", Locale.ENGLISH)
+            val scheduleToday = scheduleListViewModel.getScheduleByDate(schedule.date).value!!
+            val timeStart = scheduleToday[0].timeStart
+            val timeEnd = scheduleToday[scheduleToday.size - 1].timeEnd
+            val timeSE = timeStart + timeEnd
 
             this.schedule = schedule
             tvDate.text = df.format(this.schedule.date)
-
-            // TODO("set text setters")
+            tvTimeStartEnd.text = timeSE
+            tvAmount.text = scheduleToday.size.toString()
         }
 
         override fun onClick(p0: View?) {
@@ -81,7 +99,6 @@ class ScheduleListFragment : Fragment() {
         override fun areContentsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
             return oldItem == newItem
         }
-
     }
 
     // The Adapter

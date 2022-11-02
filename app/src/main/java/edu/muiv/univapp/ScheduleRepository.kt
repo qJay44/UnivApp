@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import edu.muiv.univapp.database.ScheduleDatabase
-import java.util.concurrent.Executors
+import java.util.*
 
-class ScheduleRepository private constructor(ctx: Context){
+class ScheduleRepository private constructor(context: Context){
 
     companion object {
-        private const val TAG = "ScheduleRepository"
         private const val DATABASE_NAME = "schedule-database"
         private var INSTANCE: ScheduleRepository? = null
 
@@ -25,7 +24,7 @@ class ScheduleRepository private constructor(ctx: Context){
     }
 
     private val database: ScheduleDatabase = Room.databaseBuilder(
-        ctx.applicationContext,
+        context.applicationContext,
         ScheduleDatabase::class.java,
         DATABASE_NAME
     ).build()
@@ -33,4 +32,8 @@ class ScheduleRepository private constructor(ctx: Context){
     private val scheduleDAO = database.scheduleDAO()
 
     fun getSchedule(): LiveData<List<Schedule>> = scheduleDAO.getSchedule()
+
+    fun getScheduleByDay() = scheduleDAO.getScheduleByDay()
+
+    fun getScheduleByDate(date: Date) = scheduleDAO.getScheduleByDate(date)
 }
