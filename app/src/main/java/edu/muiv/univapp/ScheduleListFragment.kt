@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.system.exitProcess
 
 class ScheduleListFragment : Fragment() {
 
@@ -29,6 +30,20 @@ class ScheduleListFragment : Fragment() {
 
     private lateinit var scheduleRecyclerView: RecyclerView
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
+
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        for (i in 0..10) {
+//            val schedule = Schedule(
+//                timeStart = "0$i:3$i",
+//                timeEnd = "1$i:4$i",
+//                subjectName = "Test$i",
+//                roomNum = i + 100
+//            )
+//
+//            scheduleListViewModel.addSchedule(schedule)
+//        }
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,16 +88,21 @@ class ScheduleListFragment : Fragment() {
         }
 
         fun bind(schedule: Schedule) {
-            val df = SimpleDateFormat("dd.mm", Locale.ENGLISH)
-            val scheduleToday = scheduleListViewModel.getScheduleByDate(schedule.date).value!!
-            val timeStart = scheduleToday[0].timeStart
-            val timeEnd = scheduleToday[scheduleToday.size - 1].timeEnd
-            val timeSE = timeStart + timeEnd
-
             this.schedule = schedule
+
+            val df = SimpleDateFormat("dd.MM", Locale.ENGLISH)
+            val scheduleDay = scheduleListViewModel.getScheduleByDate(this.schedule.date)
+            // FIXME: "unknown method" ?
+
+            val timeStart = scheduleDay[0].timeStart
+            val timeEnd = scheduleDay[scheduleDay.size - 1].timeEnd
+            val timePeriod = "$timeStart - $timeEnd"
+            val subjectsAmount = scheduleDay.size.toString()
+            Log.i(TAG, "Amount: $subjectsAmount")
+
             tvDate.text = df.format(this.schedule.date)
-            tvTimeStartEnd.text = timeSE
-            tvAmount.text = scheduleToday.size.toString()
+            tvTimeStartEnd.text = timePeriod
+            tvAmount.text = subjectsAmount
         }
 
         override fun onClick(p0: View?) {

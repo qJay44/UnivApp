@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import edu.muiv.univapp.database.ScheduleDatabase
 import java.util.*
+import java.util.concurrent.Executors
 
 class ScheduleRepository private constructor(context: Context){
 
@@ -30,10 +31,17 @@ class ScheduleRepository private constructor(context: Context){
     ).build()
 
     private val scheduleDAO = database.scheduleDAO()
+    private val executor = Executors.newSingleThreadExecutor()
 
     fun getSchedule(): LiveData<List<Schedule>> = scheduleDAO.getSchedule()
 
     fun getScheduleByDay() = scheduleDAO.getScheduleByDay()
 
     fun getScheduleByDate(date: Date) = scheduleDAO.getScheduleByDate(date)
+
+    fun addSchedule(schedule: Schedule) {
+        executor.execute {
+            scheduleDAO.addSchedule(schedule)
+        }
+    }
 }
