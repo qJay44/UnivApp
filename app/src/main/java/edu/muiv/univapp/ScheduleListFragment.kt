@@ -12,9 +12,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import java.text.SimpleDateFormat
-import java.util.*
-import kotlin.system.exitProcess
 
 class ScheduleListFragment : Fragment() {
 
@@ -30,11 +27,13 @@ class ScheduleListFragment : Fragment() {
 
     private lateinit var scheduleRecyclerView: RecyclerView
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
+    private var scheduleAll: List<Schedule>? = null
 
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
-//        for (i in 0..10) {
+//        for (i in 1..9) {
 //            val schedule = Schedule(
+//                date = "0$i.11",
 //                timeStart = "0$i:3$i",
 //                timeEnd = "1$i:4$i",
 //                subjectName = "Test$i",
@@ -61,6 +60,12 @@ class ScheduleListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) { schedules ->
+            schedules?.let {
+                scheduleAll = schedules
+            }
+        }
+
         scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
             schedules?.let {
                 Log.i(TAG, "Got ${schedules.size} schedules")
@@ -77,7 +82,7 @@ class ScheduleListFragment : Fragment() {
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-            private lateinit var schedule: Schedule
+            private lateinit var scheduleDay: Schedule
 
             private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
             private val tvTimeStartEnd: TextView = itemView.findViewById(R.id.tvTimeStartEnd)
@@ -87,26 +92,40 @@ class ScheduleListFragment : Fragment() {
             itemView.setOnClickListener(this)
         }
 
-        fun bind(schedule: Schedule) {
-            this.schedule = schedule
+        fun bind(scheduleDay: Schedule) {
+            this.scheduleDay = scheduleDay
 
-            val df = SimpleDateFormat("dd.MM", Locale.ENGLISH)
-            val scheduleDay = scheduleListViewModel.getScheduleByDate(this.schedule.date)
-            // FIXME: "unknown method" ?
+            val scheduleWholeDay = object {
+                private val timeStart = this@ScheduleHolder.scheduleDay.timeStart
+                private var timeEnd = "66:66"
+                var timePeriod = "99:99"
+                var amount = "99"
 
-            val timeStart = scheduleDay[0].timeStart
-            val timeEnd = scheduleDay[scheduleDay.size - 1].timeEnd
-            val timePeriod = "$timeStart - $timeEnd"
-            val subjectsAmount = scheduleDay.size.toString()
-            Log.i(TAG, "Amount: $subjectsAmount")
+                init {
+                    var size = 0
+                    for (schedule in scheduleAll!!) {
+                        if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
+                            timeEnd = schedule.timeEnd
+                            size++
+                        }
+                    }
 
-            tvDate.text = df.format(this.schedule.date)
-            tvTimeStartEnd.text = timePeriod
-            tvAmount.text = subjectsAmount
+                    timePeriod = "$timeStart - $timeEnd"
+                    amount = when (size) {
+                        1 -> "$size пара"
+                        2, 3, 4 -> "$size пары"
+                        else -> "$size пар"
+                    }
+                }
+            }
+
+            tvDate.text = this.scheduleDay.date
+            tvTimeStartEnd.text = scheduleWholeDay.timePeriod
+            tvAmount.text = scheduleWholeDay.amount
         }
 
         override fun onClick(p0: View?) {
-            Log.i(TAG, "Clicked item ${schedule.id}")
+            Log.i(TAG, "Clicked item ${scheduleDay.id}")
         }
     }
 

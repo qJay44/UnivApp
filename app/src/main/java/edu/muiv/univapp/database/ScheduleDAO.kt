@@ -5,7 +5,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import edu.muiv.univapp.Schedule
-import java.util.Date
 
 @Dao
 interface ScheduleDAO {
@@ -14,9 +13,6 @@ interface ScheduleDAO {
 
     @Query("SELECT * FROM schedule GROUP BY date")
     fun getScheduleByDay(): LiveData<List<Schedule>>
-
-    @Query("SELECT * FROM schedule WHERE date=:date")
-    fun getScheduleByDate(date: Date): List<Schedule>
 
     @Insert
     fun addSchedule(schedule: Schedule)
