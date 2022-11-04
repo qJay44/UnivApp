@@ -37,7 +37,6 @@ class ScheduleFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val scheduleDate = arguments?.getString(ARG_SCHEDULE_DATE)!!
 
         scheduleDetailListVM.loadSchedule(scheduleDate)
@@ -70,6 +69,7 @@ class ScheduleFragment : Fragment() {
         adapter?.submitList(schedules)
     }
 
+    // View Holder
     private inner class ScheduleDetailHolder(view: View)
         : RecyclerView.ViewHolder(view) {
 
@@ -81,11 +81,12 @@ class ScheduleFragment : Fragment() {
 
         fun bind(schedule: Schedule) {
             this.schedule = schedule
-            val timePeriod = "${this.schedule.timeStart} - ${this.schedule.timeEnd}"
+            val timeText = "${this.schedule.timeStart} - ${this.schedule.timeEnd}"
+            val roomText = "ауд. ${this.schedule.roomNum}"
 
-            tvTime.text = timePeriod
+            tvTime.text = timeText
             tvSubjectName.text = this.schedule.subjectName
-            tvRoomNumber.text = this.schedule.roomNum.toString()
+            tvRoomNumber.text = roomText
         }
     }
 
