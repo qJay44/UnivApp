@@ -36,6 +36,8 @@ class ScheduleRepository private constructor(context: Context){
 
     fun getScheduleByDay(): LiveData<List<Schedule>> = scheduleDAO.getScheduleByDay()
 
+    fun getScheduleByDate(date: String): LiveData<List<Schedule>> = scheduleDAO.getScheduleByDate(date)
+
     fun addSchedule(schedule: Schedule) {
         executor.execute {
             scheduleDAO.addSchedule(schedule)

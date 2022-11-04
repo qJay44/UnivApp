@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">UnivApp</string>
     <string name="tvAmount_example">5 пар</string>
-    <string name="tvTimeStartEnd_example">11:40 - 18:35</string>
+    <string name="tvTimeStartEnd_example">11:40 – 18:35</string>
     <string name="tvDate_example">14.10</string>
+    <string name="subject_name_example">Управление данными в корпоративных информационных системах (Л)</string>
+    <string name="room_number_example">301</string>
 </resources>

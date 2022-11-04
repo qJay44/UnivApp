@@ -1,5 +1,6 @@
 package edu.muiv.univapp
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,13 +22,18 @@ class ScheduleListFragment : Fragment() {
         fun newInstance(): ScheduleListFragment = ScheduleListFragment()
     }
 
+    interface Callbacks {
+        fun onScheduleDaySelect(scheduleDate: String)
+    }
+
+    private lateinit var rvSchedule: RecyclerView
+    private var callbacks: Callbacks? = null
+    private var adapter: ScheduleAdapter? = ScheduleAdapter()
+    private var scheduleAll: List<Schedule>? = null
+
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
     }
-
-    private lateinit var scheduleRecyclerView: RecyclerView
-    private var adapter: ScheduleAdapter? = ScheduleAdapter()
-    private var scheduleAll: List<Schedule>? = null
 
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
@@ -44,6 +50,11 @@ class ScheduleListFragment : Fragment() {
 //        }
 //    }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callbacks = context as Callbacks?
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,9 +62,9 @@ class ScheduleListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_schedule_list, container, false)
 
-        scheduleRecyclerView = view.findViewById(R.id.schedule_recycler_view)
-        scheduleRecyclerView.layoutManager = LinearLayoutManager(context)
-        scheduleRecyclerView.adapter = adapter
+        rvSchedule = view.findViewById(R.id.schedule_recycler_view)
+        rvSchedule.layoutManager = LinearLayoutManager(context)
+        rvSchedule.adapter = adapter
 
         return view
     }
@@ -72,6 +83,11 @@ class ScheduleListFragment : Fragment() {
                 updateUI(schedules)
             }
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callbacks = null
     }
 
     private fun updateUI(schedules: List<Schedule>) {
@@ -125,7 +141,7 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onClick(p0: View?) {
-            Log.i(TAG, "Clicked item ${scheduleDay.id}")
+            callbacks?.onScheduleDaySelect(scheduleDay.date)
         }
     }
 
