@@ -3,7 +3,7 @@ package edu.muiv.univapp.database
 import androidx.room.TypeConverter
 import java.util.*
 
-class ScheduleTypeConverters {
+class UnivTypeConverters {
 
     @TypeConverter
     fun fromUUID(uuid: UUID?): String? {

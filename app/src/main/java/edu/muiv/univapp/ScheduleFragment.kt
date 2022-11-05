@@ -30,6 +30,7 @@ class ScheduleFragment : Fragment() {
             }
         }
     }
+
     private lateinit var rvScheduleDetail: RecyclerView
     private var adapter: ScheduleDetailAdapter? = ScheduleDetailAdapter()
 

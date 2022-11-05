@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import edu.muiv.univapp.Schedule
 
 @Database(entities = [ Schedule::class ], version = 1, exportSchema = false)
-@TypeConverters(ScheduleTypeConverters::class)
-abstract class ScheduleDatabase : RoomDatabase() {
-    abstract fun scheduleDAO(): ScheduleDAO
+@TypeConverters(UnivTypeConverters::class)
+abstract class UnivDatabase : RoomDatabase() {
+    abstract fun univDAO(): UnivDAO
 }

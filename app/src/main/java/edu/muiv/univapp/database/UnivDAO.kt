@@ -7,7 +7,7 @@ import androidx.room.Query
 import edu.muiv.univapp.Schedule
 
 @Dao
-interface ScheduleDAO {
+interface UnivDAO {
     @Query("SELECT * FROM schedule")
     fun getSchedule(): LiveData<List<Schedule>>
 
