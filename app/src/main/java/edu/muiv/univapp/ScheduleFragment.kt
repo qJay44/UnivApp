@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ScheduleFragment : Fragment() {
 
@@ -35,10 +37,15 @@ class ScheduleFragment : Fragment() {
         ViewModelProvider(this)[ScheduleDetailListVM::class.java]
     }
 
+    // Load schedule and set toolbar text to according date
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val scheduleDate = arguments?.getString(ARG_SCHEDULE_DATE)!!
+        val formatter = SimpleDateFormat("dd.MM", Locale.ENGLISH)
+        val date = formatter.parse(scheduleDate)
+        val df = SimpleDateFormat("d MMMM", Locale.forLanguageTag("RU"))
 
+        activity?.title = date?.let { df.format(it) }
         scheduleDetailListVM.loadSchedule(scheduleDate)
     }
 
@@ -63,6 +70,11 @@ class ScheduleFragment : Fragment() {
                 updateUI(schedule)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        activity?.title = "UnivApp"
     }
 
     private fun updateUI(schedules: List<Schedule>) {

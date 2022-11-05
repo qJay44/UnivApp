@@ -18,6 +18,7 @@ class ScheduleListFragment : Fragment() {
 
     companion object {
         private const val TAG = "ScheduleListFragment"
+        private const val ADD_TEST_DATA = false
 
         fun newInstance(): ScheduleListFragment = ScheduleListFragment()
     }
@@ -29,26 +30,25 @@ class ScheduleListFragment : Fragment() {
     private lateinit var rvSchedule: RecyclerView
     private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
-    private var scheduleAll: List<Schedule>? = null
+    private var scheduleAll: List<Schedule> = listOf()
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
     }
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        for (i in 1..9) {
-//            val schedule = Schedule(
-//                date = "0$i.11",
-//                timeStart = "0$i:3$i",
-//                timeEnd = "1$i:4$i",
-//                subjectName = "Test$i",
-//                roomNum = i + 100
-//            )
-//
-//            scheduleListViewModel.addSchedule(schedule)
-//        }
-//    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (ADD_TEST_DATA) {
+            for (i in 0..1) {
+                val date = "1${i}.11"
+                val randomScheduleList = TestDataBuilder.createScheduleDay(date, i)
+
+                for (schedule in randomScheduleList) {
+                    scheduleListViewModel.addSchedule(schedule)
+                }
+            }
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -79,7 +79,7 @@ class ScheduleListFragment : Fragment() {
 
         scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
             schedules?.let {
-                Log.i(TAG, "Got ${schedules.size} schedules")
+                Log.d(TAG, "Got ${schedules.size} schedules")
                 updateUI(schedules)
             }
         }
@@ -119,7 +119,7 @@ class ScheduleListFragment : Fragment() {
 
                 init {
                     var size = 0
-                    for (schedule in scheduleAll!!) {
+                    for (schedule in scheduleAll) {
                         if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
                             timeEnd = schedule.timeEnd
                             size++

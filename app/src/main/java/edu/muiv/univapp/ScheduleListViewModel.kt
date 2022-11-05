@@ -9,5 +9,5 @@ class ScheduleListViewModel : ViewModel() {
     val scheduleListLiveData = scheduleRepository.getSchedule()
     val scheduleByDayListLiveData = scheduleRepository.getScheduleByDay()
 
-//    fun addSchedule(schedule: Schedule) = scheduleRepository.addSchedule(schedule)
+    fun addSchedule(schedule: Schedule) = scheduleRepository.addSchedule(schedule)
 }

@@ -7,9 +7,10 @@ import java.util.UUID
 @Entity
 data class Schedule(
     @PrimaryKey val id: UUID = UUID.randomUUID(),
-    var date: String = "",
-    var timeStart: String = "",
-    var timeEnd: String = "",
-    var subjectName: String = "",
-    var roomNum: Int = 0
+    val date: String = "",
+    val timeStart: String = "",
+    val timeEnd: String = "",
+    val subjectName: String = "",
+    val roomNum: Int = 0,
+    val studentGroup: String = ""
 )
