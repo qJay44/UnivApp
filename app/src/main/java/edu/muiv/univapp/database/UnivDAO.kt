@@ -4,10 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import edu.muiv.univapp.Schedule
+import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.user.User
 
 @Dao
 interface UnivDAO {
+
+    @Query("SELECT * FROM user WHERE login=:login AND password=:password")
+    fun getUser(login: String, password: String): LiveData<User>?
+
     @Query("SELECT * FROM schedule")
     fun getSchedule(): LiveData<List<Schedule>>
 

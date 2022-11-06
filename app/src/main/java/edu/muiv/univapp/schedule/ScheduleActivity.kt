@@ -1,9 +1,10 @@
-package edu.muiv.univapp
+package edu.muiv.univapp.schedule
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import edu.muiv.univapp.R
 
-class MainActivity : AppCompatActivity(), ScheduleListFragment.Callbacks {
+class ScheduleActivity : AppCompatActivity(), ScheduleListFragment.Callbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

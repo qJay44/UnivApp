@@ -1,25 +1,27 @@
-package edu.muiv.univapp
+package edu.muiv.univapp.database
 
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
-import edu.muiv.univapp.database.UnivDatabase
+import edu.muiv.univapp.login.Login
+import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.user.User
 import java.util.concurrent.Executors
 
-class ScheduleRepository private constructor(context: Context){
+class UnivRepository private constructor(context: Context){
 
     companion object {
-        private const val DATABASE_NAME = "schedule-database"
-        private var INSTANCE: ScheduleRepository? = null
+        private const val DATABASE_NAME = "univ-database"
+        private var INSTANCE: UnivRepository? = null
 
         fun initialize(ctx: Context) {
             if (INSTANCE == null) {
-                INSTANCE = ScheduleRepository(ctx)
+                INSTANCE = UnivRepository(ctx)
             }
         }
 
-        fun get(): ScheduleRepository {
-            return INSTANCE ?: throw IllegalStateException("ScheduleRepository must be initialized")
+        fun get(): UnivRepository {
+            return INSTANCE ?: throw IllegalStateException("UnivRepository must be initialized")
         }
     }
 
@@ -31,6 +33,8 @@ class ScheduleRepository private constructor(context: Context){
 
     private val univDAO = database.univDAO()
     private val executor = Executors.newSingleThreadExecutor()
+
+    fun getUser(user: Login): LiveData<User>? = univDAO.getUser(user.username, user.password)
 
     fun getSchedule(): LiveData<List<Schedule>> = univDAO.getSchedule()
 

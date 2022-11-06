@@ -5,4 +5,7 @@
     <string name="tvDate_example">14.10</string>
     <string name="subject_name_example">Управление данными в корпоративных информационных системах (Л)</string>
     <string name="room_number_example">ауд. 301</string>
+    <string name="prompt_username">Логин</string>
+    <string name="prompt_password">Пароль</string>
+    <string name="action_sign_in">Sing in</string>
 </resources>

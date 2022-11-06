@@ -1,10 +1,11 @@
 package edu.muiv.univapp
 
 import android.app.Application
+import edu.muiv.univapp.database.UnivRepository
 
 class UnivApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        ScheduleRepository.initialize(this)
+        UnivRepository.initialize(this)
     }
 }

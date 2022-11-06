@@ -1,4 +1,4 @@
-package edu.muiv.univapp
+package edu.muiv.univapp.schedule
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import edu.muiv.univapp.R
 import java.text.SimpleDateFormat
 import java.util.*
 
