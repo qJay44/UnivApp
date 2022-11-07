@@ -1,12 +1,14 @@
 package edu.muiv.univapp.schedule
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -14,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
+import edu.muiv.univapp.user.User
+import java.util.*
 
 class ScheduleListFragment : Fragment() {
 
@@ -21,7 +25,11 @@ class ScheduleListFragment : Fragment() {
         private const val TAG = "ScheduleListFragment"
         private const val ADD_TEST_DATA = false
 
-        fun newInstance(): ScheduleListFragment = ScheduleListFragment()
+        fun newInstance(bundle: Bundle): ScheduleListFragment {
+            return ScheduleListFragment().apply {
+                arguments = bundle
+            }
+        }
     }
 
     interface Callbacks {
@@ -29,6 +37,7 @@ class ScheduleListFragment : Fragment() {
     }
 
     private lateinit var rvSchedule: RecyclerView
+    private lateinit var user: User
     private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
     private var scheduleAll: List<Schedule> = listOf()
@@ -40,15 +49,17 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (ADD_TEST_DATA) {
-            for (i in 0..1) {
+            for (i in 0..3) {
                 val date = "1${i}.11"
-                val randomScheduleList = TestDataBuilder.createScheduleDay(date, i)
+                val randomScheduleList = ScheduleTestDataBuilder.createScheduleDay(date)
 
                 for (schedule in randomScheduleList) {
                     scheduleListViewModel.addSchedule(schedule)
                 }
             }
         }
+
+        unpackUserBundle(arguments)
     }
 
     override fun onAttach(context: Context) {
@@ -61,6 +72,12 @@ class ScheduleListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) { schedules ->
+            schedules?.let {
+                scheduleAll = schedules
+            }
+        }
+
         val view = inflater.inflate(R.layout.fragment_schedule_list, container, false)
 
         rvSchedule = view.findViewById(R.id.schedule_recycler_view)
@@ -72,11 +89,6 @@ class ScheduleListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) { schedules ->
-            schedules?.let {
-                scheduleAll = schedules
-            }
-        }
 
         scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
             schedules?.let {
@@ -84,6 +96,8 @@ class ScheduleListFragment : Fragment() {
                 updateUI(schedules)
             }
         }
+
+        Toast.makeText(requireContext(), "${user.id}", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDetach() {
@@ -93,6 +107,26 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(schedules: List<Schedule>) {
         adapter?.submitList(schedules)
+    }
+
+    private fun unpackUserBundle(args: Bundle?) {
+        args?.getString("login")?.let { Log.w(TAG, it) }
+
+        @Suppress("DEPRECATION")
+        val unpackedId: UUID =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                args?.getSerializable("id", UUID::class.java)!!
+            else
+                args?.getSerializable("id") as UUID
+
+        user = User(
+            id = unpackedId,
+            login    = arguments?.getString("login")!!,
+            password = arguments?.getString("password")!!,
+            group    = arguments?.getString("group")!!,
+            name     = arguments?.getString("name")!!,
+            surname  = arguments?.getString("surname")!!
+        )
     }
 
     // View Holder

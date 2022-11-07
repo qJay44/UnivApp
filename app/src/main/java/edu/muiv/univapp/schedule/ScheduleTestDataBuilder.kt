@@ -1,6 +1,6 @@
 package edu.muiv.univapp.schedule
 
-object TestDataBuilder {
+object ScheduleTestDataBuilder {
 
     private val timeStart: Array<String> = arrayOf(
         "08:20", "10:00", "11:40", "13:45", "15:25", "17:05"
@@ -40,15 +40,15 @@ object TestDataBuilder {
 
     private fun randInt(a: Int, b: Int) = (a..b).shuffled().last()
 
-    fun createScheduleDay(scheduleDate: String, type: Int): List<Schedule> {
+    fun createScheduleDay(scheduleDate: String): List<Schedule> {
         val amount = randInt(1, 6)
         val scheduleList: MutableList<Schedule> = mutableListOf()
-        val minStartIndex = timeStart.size - amount
-        val startIndex = randInt(0, minStartIndex)
-        val faculty =
-            if (type == 0) subjectNames1
-            else subjectNames2
-        val groupFullName = "${groupNames[type]} 23.${randInt(1, 3)}/Б-${randInt(19, 22)}"
+        val maxStartIndex = timeStart.size - amount
+        val startIndex = randInt(0, maxStartIndex)
+        val groupNameIndex = randInt(0, 1)
+        val faculty = if (groupNameIndex == 0) subjectNames1 else subjectNames2
+        val groupFullName =
+            "${groupNames[groupNameIndex]} 23.${randInt(1, 3)}/Б-${randInt(19, 22)}"
 
         for (i in 0 until amount) {
             val schedule = Schedule(
@@ -59,6 +59,7 @@ object TestDataBuilder {
                 roomNum = randInt(100, 525),
                 studentGroup = groupFullName
             )
+
             scheduleList += schedule
         }
 

@@ -20,4 +20,8 @@ class UserViewModel : ViewModel() {
     fun loadUser(login: Login) {
         univUserLiveData.value = login
     }
+
+    fun addUser(user: User) {
+        univRepository.addUser(user)
+    }
 }

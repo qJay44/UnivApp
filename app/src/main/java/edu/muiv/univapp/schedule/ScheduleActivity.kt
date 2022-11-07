@@ -9,10 +9,11 @@ class ScheduleActivity : AppCompatActivity(), ScheduleListFragment.Callbacks {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val userBundle = intent.getBundleExtra("userBundle")!!
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
 
         if (currentFragment == null) {
-            val fragment = ScheduleListFragment.newInstance()
+            val fragment = ScheduleListFragment.newInstance(userBundle)
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.fragment_container, fragment)

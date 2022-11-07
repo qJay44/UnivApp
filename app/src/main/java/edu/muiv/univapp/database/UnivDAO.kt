@@ -24,4 +24,7 @@ interface UnivDAO {
 
     @Insert
     fun addSchedule(schedule: Schedule)
+
+    @Insert
+    fun addUser(user: User)
 }

@@ -47,4 +47,10 @@ class UnivRepository private constructor(context: Context){
             univDAO.addSchedule(schedule)
         }
     }
+
+    fun addUser(user: User) {
+        executor.execute {
+            univDAO.addUser(user)
+        }
+    }
 }
