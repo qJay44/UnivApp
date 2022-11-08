@@ -16,8 +16,8 @@ interface UnivDAO {
     @Query("SELECT * FROM schedule")
     fun getSchedule(): LiveData<List<Schedule>>
 
-    @Query("SELECT * FROM schedule GROUP BY date")
-    fun getScheduleByDay(): LiveData<List<Schedule>>
+    @Query("SELECT * FROM schedule WHERE studentGroup=:group GROUP BY date")
+    fun getScheduleByDay(group: String): LiveData<List<Schedule>>
 
     @Query("SELECT * FROM schedule WHERE date=:date")
     fun getScheduleByDate(date: String): LiveData<List<Schedule>>

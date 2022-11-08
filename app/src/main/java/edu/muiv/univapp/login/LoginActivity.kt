@@ -96,9 +96,10 @@ class LoginActivity : AppCompatActivity() {
             putSerializable("id", user.id)
             putString("login", user.login)
             putString("password", user.password)
-            putString("group", user.group)
             putString("name", user.name)
             putString("surname", user.surname)
+            putString("userGroup", user.userGroup)
+            putString("studentGroup", user.studentGroup)
         }
 
         return bundle

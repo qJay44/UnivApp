@@ -60,6 +60,10 @@ class ScheduleListFragment : Fragment() {
         }
 
         unpackUserBundle(arguments)
+        user.studentGroup?.let { scheduleListViewModel.loadSchedule(it) }
+
+        val welcomeText = "Welcome ${user.name} ${user.surname}"
+        Toast.makeText(requireContext(), welcomeText, Toast.LENGTH_SHORT).show()
     }
 
     override fun onAttach(context: Context) {
@@ -74,6 +78,7 @@ class ScheduleListFragment : Fragment() {
     ): View? {
         scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) { schedules ->
             schedules?.let {
+                Log.d(TAG, "Got ${schedules.size} schedules")
                 scheduleAll = schedules
             }
         }
@@ -92,12 +97,20 @@ class ScheduleListFragment : Fragment() {
 
         scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
             schedules?.let {
-                Log.d(TAG, "Got ${schedules.size} schedules")
+                var groups = ""
+                for (schedule in schedules) {
+                    groups += "\n${schedule.studentGroup}"
+                }
+
+                Log.i(TAG, "Schedules groups: $groups")
                 updateUI(schedules)
             }
         }
+    }
 
-        Toast.makeText(requireContext(), "${user.id}", Toast.LENGTH_SHORT).show()
+    override fun onResume() {
+        super.onResume()
+        activity?.title = "${user.name} ${user.surname}, ${user.studentGroup ?: ""}"
     }
 
     override fun onDetach() {
@@ -105,12 +118,17 @@ class ScheduleListFragment : Fragment() {
         callbacks = null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        activity?.title = "UnivApp"
+    }
+
     private fun updateUI(schedules: List<Schedule>) {
         adapter?.submitList(schedules)
+        Log.i(TAG, "Adapter has been updated")
     }
 
     private fun unpackUserBundle(args: Bundle?) {
-        args?.getString("login")?.let { Log.w(TAG, it) }
 
         @Suppress("DEPRECATION")
         val unpackedId: UUID =
@@ -119,14 +137,17 @@ class ScheduleListFragment : Fragment() {
             else
                 args?.getSerializable("id") as UUID
 
+        // Only "studentGroup" can be null
         user = User(
             id = unpackedId,
             login    = arguments?.getString("login")!!,
             password = arguments?.getString("password")!!,
-            group    = arguments?.getString("group")!!,
             name     = arguments?.getString("name")!!,
-            surname  = arguments?.getString("surname")!!
+            surname  = arguments?.getString("surname")!!,
+            userGroup = arguments?.getString("userGroup")!!,
+            studentGroup = arguments?.getString("studentGroup")
         )
+        Log.i(TAG, "Student group: ${user.userGroup}")
     }
 
     // View Holder
@@ -154,10 +175,14 @@ class ScheduleListFragment : Fragment() {
 
                 init {
                     var size = 0
-                    for (schedule in scheduleAll) {
-                        if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
-                            timeEnd = schedule.timeEnd
-                            size++
+                    if (user.studentGroup == null) {
+                        // TODO: implement teacher's schedule
+                    } else {
+                        for (schedule in scheduleAll) {
+                            if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
+                                timeEnd = schedule.timeEnd
+                                size++
+                            }
                         }
                     }
 
@@ -176,6 +201,7 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onClick(p0: View?) {
+            Log.i(TAG, "Selected schedule (date: ${scheduleDay.date})")
             callbacks?.onScheduleDaySelect(scheduleDay.date)
         }
     }

@@ -1,6 +1,7 @@
 package edu.muiv.univapp.schedule
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ class ScheduleFragment : Fragment() {
 
     companion object {
 
+        private const val TAG = "ScheduleFragment"
         private const val ARG_SCHEDULE_DATE = "schedule_date"
 
         fun newInstance(date: String): ScheduleFragment {
@@ -77,6 +79,7 @@ class ScheduleFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         activity?.title = "UnivApp"
+        Log.i(TAG, "Destroying fragment")
     }
 
     private fun updateUI(schedules: List<Schedule>) {

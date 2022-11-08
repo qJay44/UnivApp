@@ -34,8 +34,16 @@ object ScheduleTestDataBuilder {
         "Комплексный экономический анализ хозяйственной деятельности"
     )
 
-    private val groupNames: Array<String> = arrayOf(
-        "ИД", "ЭД"
+    private val groupNames1: Array<String> = arrayOf(
+        "ИД 23.1/Б1-19",
+        "ИД 23.2/Б1-19",
+        "ИД 23.3/Б1-19",
+    )
+
+    private val groupNames2: Array<String> = arrayOf(
+        "ЭД 23.1/Б1-19",
+        "ЭД 23.2/Б1-19",
+        "ЭД 23.3/Б1-19",
     )
 
     private fun randInt(a: Int, b: Int) = (a..b).shuffled().last()
@@ -47,8 +55,7 @@ object ScheduleTestDataBuilder {
         val startIndex = randInt(0, maxStartIndex)
         val groupNameIndex = randInt(0, 1)
         val faculty = if (groupNameIndex == 0) subjectNames1 else subjectNames2
-        val groupFullName =
-            "${groupNames[groupNameIndex]} 23.${randInt(1, 3)}/Б-${randInt(19, 22)}"
+        val groupName = if (groupNameIndex == 0) groupNames1 else groupNames2
 
         for (i in 0 until amount) {
             val schedule = Schedule(
@@ -57,7 +64,7 @@ object ScheduleTestDataBuilder {
                 timeEnd = timeEnd[startIndex + i],
                 subjectName = faculty[(faculty.indices).shuffled().last()],
                 roomNum = randInt(100, 525),
-                studentGroup = groupFullName
+                studentGroup = groupName[(groupName.indices).shuffled().last()]
             )
 
             scheduleList += schedule

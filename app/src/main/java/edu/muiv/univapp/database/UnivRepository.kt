@@ -38,7 +38,7 @@ class UnivRepository private constructor(context: Context){
 
     fun getSchedule(): LiveData<List<Schedule>> = univDAO.getSchedule()
 
-    fun getScheduleByDay(): LiveData<List<Schedule>> = univDAO.getScheduleByDay()
+    fun getScheduleByDay(group: String): LiveData<List<Schedule>> = univDAO.getScheduleByDay(group)
 
     fun getScheduleByDate(date: String): LiveData<List<Schedule>> = univDAO.getScheduleByDate(date)
 

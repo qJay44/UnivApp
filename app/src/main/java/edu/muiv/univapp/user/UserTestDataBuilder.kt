@@ -2,7 +2,7 @@ package edu.muiv.univapp.user
 
 object UserTestDataBuilder {
 
-    private val groups: Array<String> = arrayOf(
+    private val userGroups: Array<String> = arrayOf(
         "Student", "Teacher"
     )
 
@@ -96,18 +96,34 @@ object UserTestDataBuilder {
         "Weinstein"
     )
 
+    private val groupNames1: Array<String> = arrayOf(
+        "ИД 23.1/Б1-19",
+        "ИД 23.2/Б1-19",
+        "ИД 23.3/Б1-19",
+    )
+
+    private val groupNames2: Array<String> = arrayOf(
+        "ЭД 23.1/Б1-19",
+        "ЭД 23.2/Б1-19",
+        "ЭД 23.3/Б1-19",
+    )
+
     private fun randArrayChoice(arr: Array<String>) = arr[(arr.indices).shuffled().last()]
 
     fun createUser(amount: Int): List<User> {
         val userList: MutableList<User> = mutableListOf()
 
         for (i in 0 until amount) {
+            val groupNames = if ((0..1).shuffled().last() == 0) groupNames1 else groupNames2
+            val choseUserGroup = randArrayChoice(userGroups)
+            val choseStudentGroup = if (choseUserGroup == "Student") randArrayChoice(groupNames) else null
             val user = User(
                 login = "test${i}",
                 password = "1",
-                group = randArrayChoice(groups),
                 name = randArrayChoice(names),
-                surname = randArrayChoice(surnames)
+                surname = randArrayChoice(surnames),
+                userGroup = choseUserGroup,
+                studentGroup = choseStudentGroup
             )
 
             userList += user
