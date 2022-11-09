@@ -2,18 +2,26 @@ package edu.muiv.univapp.schedule
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import edu.muiv.univapp.R
 
 class ScheduleActivity : AppCompatActivity(), ScheduleListFragment.Callbacks {
+
+    private companion object {
+        private const val TAG = "ScheduleActivity"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Log.i(TAG, "Level 4")
         val userBundle = intent.getBundleExtra("userBundle")!!
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
 
         if (currentFragment == null) {
             val fragment = ScheduleListFragment.newInstance(userBundle)
+            Log.i(TAG, "Level 5")
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.fragment_container, fragment)

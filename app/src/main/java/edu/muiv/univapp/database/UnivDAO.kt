@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.user.Student
+import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.User
 
 @Dao
@@ -27,4 +29,10 @@ interface UnivDAO {
 
     @Insert
     fun addUser(user: User)
+
+    @Insert
+    fun addStudent(student: Student)
+
+    @Insert
+    fun addTeacher(teacher: Teacher)
 }

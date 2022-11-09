@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import edu.muiv.univapp.login.Login
 import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.user.Student
+import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.User
 import java.util.concurrent.Executors
 
@@ -51,6 +53,18 @@ class UnivRepository private constructor(context: Context){
     fun addUser(user: User) {
         executor.execute {
             univDAO.addUser(user)
+        }
+    }
+
+    fun addStudent(student: Student) {
+        executor.execute {
+            univDAO.addStudent(student)
+        }
+    }
+
+    fun addTeacher(teacher: Teacher) {
+        executor.execute {
+            univDAO.addTeacher(teacher)
         }
     }
 }

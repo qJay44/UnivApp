@@ -24,4 +24,12 @@ class UserViewModel : ViewModel() {
     fun addUser(user: User) {
         univRepository.addUser(user)
     }
+
+    fun addStudent(student: Student) {
+        univRepository.addStudent(student)
+    }
+
+    fun addTeacher(teacher: Teacher) {
+        univRepository.addTeacher(teacher)
+    }
 }

@@ -2,6 +2,7 @@ package edu.muiv.univapp.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -12,13 +13,14 @@ import androidx.lifecycle.ViewModelProvider
 import edu.muiv.univapp.R
 import edu.muiv.univapp.schedule.ScheduleActivity
 import edu.muiv.univapp.user.User
-import edu.muiv.univapp.user.UserTestDataBuilder
+import edu.muiv.univapp.user.DatabaseTestDataBuilder
 import edu.muiv.univapp.user.UserViewModel
 
 class LoginActivity : AppCompatActivity() {
 
-    companion object {
-        private const val ADD_TEST_DATA = false
+    private companion object {
+        private const val TAG = "LoginActivity"
+        private const val ADD_TEST_DATA = true
     }
 
     private lateinit var etUsername: EditText
@@ -38,10 +40,20 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        Log.i(TAG, "Level 1")
         if (ADD_TEST_DATA) {
-            val users = UserTestDataBuilder.createUser(5)
-            for (user in users) userViewModel.addUser(user)
+            DatabaseTestDataBuilder.createAll(6)
+
+            for (user in DatabaseTestDataBuilder.userList)
+                userViewModel.addUser(user)
+
+            for (student in DatabaseTestDataBuilder.studentList)
+                userViewModel.addStudent(student)
+
+            for (teacher in DatabaseTestDataBuilder.teacherList)
+                userViewModel.addTeacher(teacher)
         }
+        Log.i(TAG, "Level 2")
 
         etUsername = findViewById(R.id.etUsername)
         etPassword = findViewById(R.id.etPassword)
@@ -52,12 +64,15 @@ class LoginActivity : AppCompatActivity() {
         etPassword.addTextChangedListener(loginTW.passwordTW)
 
         userViewModel.userLiveData.observe(this) { user ->
+            Log.i(TAG, "Level 2.1")
             if (user == null) {
                 Toast.makeText(this, "user doesn't exist", Toast.LENGTH_SHORT).show()
             } else {
+                Log.i(TAG, "Level 2.2")
                 val intent = Intent(this@LoginActivity, ScheduleActivity::class.java)
                 val bundle = packUserBundle(user)
                 intent.putExtra("userBundle", bundle)
+                Log.i(TAG, "Level 3")
                 startActivity(intent)
             }
             switchVisibility()
@@ -94,12 +109,7 @@ class LoginActivity : AppCompatActivity() {
     private fun packUserBundle(user: User): Bundle {
         val bundle = Bundle().apply {
             putSerializable("id", user.id)
-            putString("login", user.login)
-            putString("password", user.password)
-            putString("name", user.name)
-            putString("surname", user.surname)
-            putString("userGroup", user.userGroup)
-            putString("studentGroup", user.studentGroup)
+            putString("userType", user.userType)
         }
 
         return bundle

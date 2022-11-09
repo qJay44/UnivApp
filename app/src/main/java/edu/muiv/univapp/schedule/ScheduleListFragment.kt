@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -16,14 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
-import edu.muiv.univapp.user.User
+import edu.muiv.univapp.user.DatabaseTestDataBuilder
 import java.util.*
 
 class ScheduleListFragment : Fragment() {
 
     companion object {
         private const val TAG = "ScheduleListFragment"
-        private const val ADD_TEST_DATA = false
+        private const val ADD_TEST_DATA = true
 
         fun newInstance(bundle: Bundle): ScheduleListFragment {
             return ScheduleListFragment().apply {
@@ -37,7 +36,6 @@ class ScheduleListFragment : Fragment() {
     }
 
     private lateinit var rvSchedule: RecyclerView
-    private lateinit var user: User
     private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
     private var scheduleAll: List<Schedule> = listOf()
@@ -49,21 +47,16 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (ADD_TEST_DATA) {
-            for (i in 0..3) {
-                val date = "1${i}.11"
-                val randomScheduleList = ScheduleTestDataBuilder.createScheduleDay(date)
-
-                for (schedule in randomScheduleList) {
-                    scheduleListViewModel.addSchedule(schedule)
-                }
-            }
+            for (schedule in DatabaseTestDataBuilder.scheduleList)
+                scheduleListViewModel.addSchedule(schedule)
+            Log.w(TAG, "Schedules were added")
         }
 
-        unpackUserBundle(arguments)
-        user.studentGroup?.let { scheduleListViewModel.loadSchedule(it) }
+        unpackUserBundle()
+//        user.studentGroup?.let { scheduleListViewModel.loadSchedule(it) }
 
-        val welcomeText = "Welcome ${user.name} ${user.surname}"
-        Toast.makeText(requireContext(), welcomeText, Toast.LENGTH_SHORT).show()
+//        val welcomeText = "Welcome ${user.name} ${user.surname}"
+//        Toast.makeText(requireContext(), welcomeText, Toast.LENGTH_SHORT).show()
     }
 
     override fun onAttach(context: Context) {
@@ -110,7 +103,7 @@ class ScheduleListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        activity?.title = "${user.name} ${user.surname}, ${user.studentGroup ?: ""}"
+//        activity?.title = "${user.name} ${user.surname}, ${user.studentGroup ?: ""}"
     }
 
     override fun onDetach() {
@@ -128,26 +121,22 @@ class ScheduleListFragment : Fragment() {
         Log.i(TAG, "Adapter has been updated")
     }
 
-    private fun unpackUserBundle(args: Bundle?) {
+    private fun unpackUserBundle() {
 
         @Suppress("DEPRECATION")
         val unpackedId: UUID =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                args?.getSerializable("id", UUID::class.java)!!
+                arguments?.getSerializable("id", UUID::class.java)!!
             else
-                args?.getSerializable("id") as UUID
+                arguments?.getSerializable("id") as UUID
 
-        // Only "studentGroup" can be null
-        user = User(
-            id = unpackedId,
-            login    = arguments?.getString("login")!!,
-            password = arguments?.getString("password")!!,
-            name     = arguments?.getString("name")!!,
-            surname  = arguments?.getString("surname")!!,
-            userGroup = arguments?.getString("userGroup")!!,
-            studentGroup = arguments?.getString("studentGroup")
-        )
-        Log.i(TAG, "Student group: ${user.userGroup}")
+        val userType = arguments?.getString("userType")
+//        currentUser = when (userType) {
+//            "Student" -> {
+//
+//            }
+//        }
+
     }
 
     // View Holder
@@ -168,21 +157,18 @@ class ScheduleListFragment : Fragment() {
             this.scheduleDay = scheduleDay
 
             val scheduleWholeDay = object {
-                private val timeStart = this@ScheduleHolder.scheduleDay.timeStart
-                private var timeEnd = "66:66"
-                var timePeriod = "99:99"
+                private var timeStart = ""
+                private var timeEnd = ""
+                var timePeriod = "00:00 - 23:59"
                 var amount = "99"
 
                 init {
                     var size = 0
-                    if (user.studentGroup == null) {
-                        // TODO: implement teacher's schedule
-                    } else {
-                        for (schedule in scheduleAll) {
-                            if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
-                                timeEnd = schedule.timeEnd
-                                size++
-                            }
+                    for (schedule in scheduleAll) {
+                        if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
+                            timeStart = if (size == 0) schedule.timeStart else timeStart
+                            timeEnd = schedule.timeEnd
+                            size++
                         }
                     }
 
