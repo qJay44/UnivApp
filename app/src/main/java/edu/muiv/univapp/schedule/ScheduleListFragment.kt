@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -16,13 +17,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.user.DatabaseTestDataBuilder
+import edu.muiv.univapp.login.LoginResult
 import java.util.*
 
 class ScheduleListFragment : Fragment() {
 
     companion object {
         private const val TAG = "ScheduleListFragment"
-        private const val ADD_TEST_DATA = true
+        private const val ADD_TEST_DATA = false
 
         fun newInstance(bundle: Bundle): ScheduleListFragment {
             return ScheduleListFragment().apply {
@@ -36,6 +38,7 @@ class ScheduleListFragment : Fragment() {
     }
 
     private lateinit var rvSchedule: RecyclerView
+    private lateinit var user: LoginResult
     private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
     private var scheduleAll: List<Schedule> = listOf()
@@ -53,10 +56,11 @@ class ScheduleListFragment : Fragment() {
         }
 
         unpackUserBundle()
-//        user.studentGroup?.let { scheduleListViewModel.loadSchedule(it) }
 
-//        val welcomeText = "Welcome ${user.name} ${user.surname}"
-//        Toast.makeText(requireContext(), welcomeText, Toast.LENGTH_SHORT).show()
+        user.groupName?.let { scheduleListViewModel.loadSchedule(it) }
+
+        val welcomeText = "Welcome ${user.name} ${user.surname}"
+        Toast.makeText(requireContext(), welcomeText, Toast.LENGTH_SHORT).show()
     }
 
     override fun onAttach(context: Context) {
@@ -88,22 +92,24 @@ class ScheduleListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
-            schedules?.let {
-                var groups = ""
-                for (schedule in schedules) {
-                    groups += "\n${schedule.studentGroup}"
+        if (user.groupName != null) {
+            scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
+                schedules?.let {
+                    updateUI(schedules)
                 }
-
-                Log.i(TAG, "Schedules groups: $groups")
-                updateUI(schedules)
+            }
+        } else {
+            scheduleListViewModel.teacherWithSchedulesLiveData.observe(viewLifecycleOwner) {
+                it?.let {
+                    updateUI(it.schedules)
+                }
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-//        activity?.title = "${user.name} ${user.surname}, ${user.studentGroup ?: ""}"
+        activity?.title = "${user.name} ${user.surname}, ${user.groupName ?: ""}"
     }
 
     override fun onDetach() {
@@ -130,13 +136,25 @@ class ScheduleListFragment : Fragment() {
             else
                 arguments?.getSerializable("id") as UUID
 
-        val userType = arguments?.getString("userType")
-//        currentUser = when (userType) {
-//            "Student" -> {
-//
-//            }
-//        }
+        val groupName: String? = arguments?.getString("groupName")
 
+        user = if (groupName != null) {
+            LoginResult(
+                unpackedId,
+                arguments?.getString("name")!!,
+                arguments?.getString("surname")!!,
+                groupName,
+            )
+        } else {
+            LoginResult(
+                unpackedId,
+                arguments?.getString("name")!!,
+                arguments?.getString("surname")!!,
+                null
+            )
+        }
+
+        Toast.makeText(requireContext(), user.name, Toast.LENGTH_SHORT).show()
     }
 
     // View Holder
@@ -195,7 +213,7 @@ class ScheduleListFragment : Fragment() {
     // The object to calculate the difference on list change
     private object DiffCallBack : DiffUtil.ItemCallback<Schedule>() {
         override fun areItemsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.scheduleID == newItem.scheduleID
         }
 
         override fun areContentsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {

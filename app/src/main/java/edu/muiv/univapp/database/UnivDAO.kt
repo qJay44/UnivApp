@@ -4,16 +4,25 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
+import edu.muiv.univapp.login.LoginResult
 import edu.muiv.univapp.schedule.Schedule
-import edu.muiv.univapp.user.Student
-import edu.muiv.univapp.user.Teacher
-import edu.muiv.univapp.user.User
+import edu.muiv.univapp.user.*
 
 @Dao
 interface UnivDAO {
 
-    @Query("SELECT * FROM user WHERE login=:login AND password=:password")
-    fun getUser(login: String, password: String): LiveData<User>?
+    @Query(
+        "SELECT * FROM student WHERE " +
+        "student.login=:login AND student.password=:password UNION " +
+        "SELECT * FROM teacher WHERE " +
+        "teacher.login=:login AND teacher.password=:password"
+    )
+    fun getUser(login: String, password: String): LiveData<LoginResult>
+
+    @Transaction
+    @Query("SELECT * FROM teacher")
+    fun getTeacherWithSchedules(): LiveData<TeacherWithSchedules>
 
     @Query("SELECT * FROM schedule")
     fun getSchedule(): LiveData<List<Schedule>>
@@ -26,9 +35,6 @@ interface UnivDAO {
 
     @Insert
     fun addSchedule(schedule: Schedule)
-
-    @Insert
-    fun addUser(user: User)
 
     @Insert
     fun addStudent(student: Student)

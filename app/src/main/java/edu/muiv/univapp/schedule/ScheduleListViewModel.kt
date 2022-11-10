@@ -12,6 +12,7 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleDateLiveData = MutableLiveData<String>()
 
     val scheduleListLiveData = univRepository.getSchedule()
+    val teacherWithSchedulesLiveData = univRepository.getTeacherWithSchedules()
 
     val scheduleByDayListLiveData: LiveData<List<Schedule>> =
         Transformations.switchMap(scheduleDateLiveData) { scheduleGroup ->

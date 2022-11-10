@@ -15,13 +15,12 @@ class ScheduleActivity : AppCompatActivity(), ScheduleListFragment.Callbacks {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Log.i(TAG, "Level 4")
         val userBundle = intent.getBundleExtra("userBundle")!!
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
 
         if (currentFragment == null) {
+            Log.i(TAG, "Creating fragment list...")
             val fragment = ScheduleListFragment.newInstance(userBundle)
-            Log.i(TAG, "Level 5")
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.fragment_container, fragment)

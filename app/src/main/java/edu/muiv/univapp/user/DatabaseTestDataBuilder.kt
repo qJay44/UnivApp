@@ -146,7 +146,6 @@ object DatabaseTestDataBuilder {
         "Комплексный экономический анализ хозяйственной деятельности"
     )
 
-    val userList: MutableList<User> = mutableListOf()
     val studentList: MutableList<Student> = mutableListOf()
     val teacherList: MutableList<Teacher> = mutableListOf()
     val scheduleList: MutableList<Schedule> = mutableListOf()
@@ -163,12 +162,14 @@ object DatabaseTestDataBuilder {
 
         for (i in 0 until amount) {
             val schedule = Schedule(
+                scheduleID = UUID.randomUUID(),
                 date = scheduleDate,
                 timeStart = timeStart[startIndex + i],
                 timeEnd = timeEnd[startIndex + i],
                 subjectName = faculty[(faculty.indices).shuffled().last()],
                 roomNum = randInt(100, 525),
-                studentGroup = groupName[(groupName.indices).shuffled().last()]
+                studentGroup = groupName[(groupName.indices).shuffled().last()],
+                teacherID = teacherList[(teacherList.indices).shuffled().last()].id
             )
 
             scheduleList += schedule
@@ -180,49 +181,41 @@ object DatabaseTestDataBuilder {
     fun createAll(amount: Int) {
 
         for (i in 0 until amount) {
-            val isFirstHalf = i < amount / 2
-            val choseUserGroup = if (isFirstHalf) userGroups[0] else userGroups[1]
-            val id = UUID.randomUUID()
-            val user = User(
-                id = id,
-                login = "test${i}",
-                password = "1",
-                userType = choseUserGroup
-            )
-            userList += user
-            if (userList.size == 0) Log.w(TAG, "User list is empty")
+            val isHalf = i > amount / 2
 
-            when (choseUserGroup) {
+            when (if (isHalf) userGroups[0] else userGroups[1]) {
                 "Student" -> {
                     val student =
                         Student(
+                            id = UUID.randomUUID(),
                             name = randArrayElement(names),
                             surname = randArrayElement(surnames),
-                            groupName = if (isFirstHalf) groupNames1[i] else groupNames2[i],
-                            userID = id
+                            login = "stud${studentList.size + 1}",
+                            password = "1",
+                            groupName = if (isHalf) groupNames1[0] else groupNames2[1],
                         )
                     studentList += student
-                    if (studentList.size == 0) Log.w(TAG, "Student list is empty")
                 }
                 "Teacher" -> {
-                    createScheduleDay("0${i}.11")
-                    for (schedule in scheduleList) {
-                        val teacher =
-                            Teacher(
-                                name = randArrayElement(names),
-                                surname = randArrayElement(surnames),
-                                scheduleID = schedule.id,
-                                userID = id
-                            )
-                        teacherList += teacher
+                    val teacher =
+                        Teacher(
+                            id = UUID.randomUUID(),
+                            name = randArrayElement(names),
+                            surname = randArrayElement(surnames),
+                            login = "teach${teacherList.size + 1}",
+                            password = "1",
+                        )
+                    teacherList += teacher
 
-                        if (teacherList.size == 0) Log.w(TAG, "Teacher list is empty")
-                    }
                 }
                 else -> {
-                    throw IllegalStateException("Wrong user group")
+                    Log.e(TAG, "Wrong user group")
                 }
             }
+            createScheduleDay("0${i}.11")
         }
+        if (studentList.isEmpty()) Log.w(TAG, "Student list is empty")
+        if (teacherList.isEmpty()) Log.w(TAG, "Teacher list is empty")
+        if (scheduleList.isEmpty()) Log.w(TAG, "Schedule list is empty")
     }
 }

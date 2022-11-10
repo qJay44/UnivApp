@@ -1,25 +1,16 @@
 package edu.muiv.univapp.user
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.util.UUID
 
-@Entity(
-    foreignKeys = [ForeignKey(
-        entity = User::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("userID"),
-        onDelete = ForeignKey.CASCADE
-    )]
-)
+@Entity
 data class Student(
     @PrimaryKey
-    val studentID: UUID = UUID.randomUUID(),
+    val id       : UUID,
     val name     : String,
     val surname  : String,
     val groupName: String,
-    @ColumnInfo(index = true)
-    val userID   : UUID = UUID.randomUUID()
+    val login    : String,
+    val password : String
 )

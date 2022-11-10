@@ -7,11 +7,12 @@ import java.util.UUID
 @Entity
 data class Schedule(
     @PrimaryKey
-    val id          : UUID = UUID.randomUUID(),
-    val date        : String = "",
-    val timeStart   : String = "",
-    val timeEnd     : String = "",
-    val subjectName : String = "",
-    val roomNum     : Int = 0,
-    val studentGroup: String = ""
+    val scheduleID  : UUID,
+    val date        : String,
+    val timeStart   : String,
+    val timeEnd     : String,
+    val subjectName : String,
+    val roomNum     : Int,
+    val studentGroup: String,
+    val teacherID   : UUID
 )

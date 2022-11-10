@@ -6,23 +6,21 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.login.Login
+import edu.muiv.univapp.login.LoginResult
 
 class UserViewModel : ViewModel() {
 
     private val univRepository = UnivRepository.get()
-    private val univUserLiveData = MutableLiveData<Login>()
+    private val userLoginLiveData = MutableLiveData<Login>()
 
-    var userLiveData: LiveData<User> =
-        Transformations.switchMap(univUserLiveData) { user ->
-            univRepository.getUser(user)
-        }
 
-    fun loadUser(login: Login) {
-        univUserLiveData.value = login
+    var userLiveData: LiveData<LoginResult> =
+        Transformations.switchMap(userLoginLiveData) { login ->
+            univRepository.getUser(login)
     }
 
-    fun addUser(user: User) {
-        univRepository.addUser(user)
+    fun loadUser(login: Login) {
+        userLoginLiveData.value = login
     }
 
     fun addStudent(student: Student) {

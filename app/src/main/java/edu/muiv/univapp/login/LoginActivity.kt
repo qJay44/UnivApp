@@ -12,15 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import edu.muiv.univapp.R
 import edu.muiv.univapp.schedule.ScheduleActivity
-import edu.muiv.univapp.user.User
-import edu.muiv.univapp.user.DatabaseTestDataBuilder
-import edu.muiv.univapp.user.UserViewModel
+import edu.muiv.univapp.user.*
 
 class LoginActivity : AppCompatActivity() {
 
     private companion object {
         private const val TAG = "LoginActivity"
-        private const val ADD_TEST_DATA = true
+        private const val ADD_TEST_DATA = false
     }
 
     private lateinit var etUsername: EditText
@@ -40,12 +38,9 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        Log.i(TAG, "Level 1")
         if (ADD_TEST_DATA) {
-            DatabaseTestDataBuilder.createAll(6)
 
-            for (user in DatabaseTestDataBuilder.userList)
-                userViewModel.addUser(user)
+            DatabaseTestDataBuilder.createAll(6)
 
             for (student in DatabaseTestDataBuilder.studentList)
                 userViewModel.addStudent(student)
@@ -53,7 +48,6 @@ class LoginActivity : AppCompatActivity() {
             for (teacher in DatabaseTestDataBuilder.teacherList)
                 userViewModel.addTeacher(teacher)
         }
-        Log.i(TAG, "Level 2")
 
         etUsername = findViewById(R.id.etUsername)
         etPassword = findViewById(R.id.etPassword)
@@ -64,18 +58,14 @@ class LoginActivity : AppCompatActivity() {
         etPassword.addTextChangedListener(loginTW.passwordTW)
 
         userViewModel.userLiveData.observe(this) { user ->
-            Log.i(TAG, "Level 2.1")
             if (user == null) {
                 Toast.makeText(this, "user doesn't exist", Toast.LENGTH_SHORT).show()
             } else {
-                Log.i(TAG, "Level 2.2")
                 val intent = Intent(this@LoginActivity, ScheduleActivity::class.java)
                 val bundle = packUserBundle(user)
                 intent.putExtra("userBundle", bundle)
-                Log.i(TAG, "Level 3")
                 startActivity(intent)
             }
-            switchVisibility()
         }
 
         btnSingIn.setOnClickListener {
@@ -91,8 +81,10 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            Log.i(TAG, "Searching a user...")
             switchVisibility()
             userViewModel.loadUser(login)
+            switchVisibility()
         }
     }
 
@@ -106,11 +98,14 @@ class LoginActivity : AppCompatActivity() {
         btnSingIn.visibility = visibility
     }
 
-    private fun packUserBundle(user: User): Bundle {
+    private fun packUserBundle(user: LoginResult): Bundle {
         val bundle = Bundle().apply {
             putSerializable("id", user.id)
-            putString("userType", user.userType)
+            putString("name", user.name)
+            putString("surname", user.surname)
+            putString("groupName", user.groupName)
         }
+        Log.i(TAG, bundle.toString())
 
         return bundle
     }
