@@ -105,7 +105,7 @@ class LoginActivity : AppCompatActivity() {
             putString("surname", user.surname)
             putString("groupName", user.groupName)
         }
-        Log.i(TAG, bundle.toString())
+        Log.i(TAG, user.toString())
 
         return bundle
     }

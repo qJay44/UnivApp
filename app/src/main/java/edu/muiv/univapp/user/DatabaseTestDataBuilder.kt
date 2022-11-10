@@ -162,7 +162,7 @@ object DatabaseTestDataBuilder {
 
         for (i in 0 until amount) {
             val schedule = Schedule(
-                scheduleID = UUID.randomUUID(),
+                id = UUID.randomUUID(),
                 date = scheduleDate,
                 timeStart = timeStart[startIndex + i],
                 timeEnd = timeEnd[startIndex + i],

@@ -7,7 +7,7 @@ import java.util.UUID
 @Entity
 data class Schedule(
     @PrimaryKey
-    val scheduleID  : UUID,
+    val id          : UUID,
     val date        : String,
     val timeStart   : String,
     val timeEnd     : String,

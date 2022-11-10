@@ -13,10 +13,9 @@ import edu.muiv.univapp.user.*
 interface UnivDAO {
 
     @Query(
-        "SELECT * FROM student WHERE " +
-        "student.login=:login AND student.password=:password UNION " +
-        "SELECT * FROM teacher WHERE " +
-        "teacher.login=:login AND teacher.password=:password"
+        "SELECT * FROM(" +
+        "SELECT * FROM student UNION ALL SELECT *, NULL FROM teacher) " +
+        "WHERE login=:login AND password=:password"
     )
     fun getUser(login: String, password: String): LiveData<LoginResult>
 

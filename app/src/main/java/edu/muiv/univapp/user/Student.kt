@@ -10,7 +10,7 @@ data class Student(
     val id       : UUID,
     val name     : String,
     val surname  : String,
-    val groupName: String,
     val login    : String,
-    val password : String
+    val password : String,
+    val groupName: String
 )

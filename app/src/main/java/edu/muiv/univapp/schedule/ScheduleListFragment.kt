@@ -52,7 +52,7 @@ class ScheduleListFragment : Fragment() {
         if (ADD_TEST_DATA) {
             for (schedule in DatabaseTestDataBuilder.scheduleList)
                 scheduleListViewModel.addSchedule(schedule)
-            Log.w(TAG, "Schedules were added")
+            Log.i(TAG, "Schedules were added: ${DatabaseTestDataBuilder.scheduleList.size}")
         }
 
         unpackUserBundle()
@@ -99,9 +99,11 @@ class ScheduleListFragment : Fragment() {
                 }
             }
         } else {
+            Log.i(TAG, "Got submitting teacher schedules")
             scheduleListViewModel.teacherWithSchedulesLiveData.observe(viewLifecycleOwner) {
                 it?.let {
                     updateUI(it.schedules)
+                    Log.i(TAG, "Got ${it.schedules.size}schedules")
                 }
             }
         }
@@ -213,7 +215,7 @@ class ScheduleListFragment : Fragment() {
     // The object to calculate the difference on list change
     private object DiffCallBack : DiffUtil.ItemCallback<Schedule>() {
         override fun areItemsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
-            return oldItem.scheduleID == newItem.scheduleID
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
