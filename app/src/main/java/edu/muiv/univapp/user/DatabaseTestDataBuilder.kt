@@ -212,7 +212,7 @@ object DatabaseTestDataBuilder {
                     Log.e(TAG, "Wrong user group")
                 }
             }
-            createScheduleDay("0${i}.11")
+            createScheduleDay("0${i+1}.11")
         }
         if (studentList.isEmpty()) Log.w(TAG, "Student list is empty")
         if (teacherList.isEmpty()) Log.w(TAG, "Teacher list is empty")

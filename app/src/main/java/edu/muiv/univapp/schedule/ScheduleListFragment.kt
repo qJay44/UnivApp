@@ -41,7 +41,6 @@ class ScheduleListFragment : Fragment() {
     private lateinit var user: LoginResult
     private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
-    private var scheduleAll: List<Schedule> = listOf()
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -57,7 +56,10 @@ class ScheduleListFragment : Fragment() {
 
         unpackUserBundle()
 
-        user.groupName?.let { scheduleListViewModel.loadSchedule(it) }
+        if (user.groupName != null)
+            scheduleListViewModel.loadScheduleForStudent(user.groupName!!)
+        else
+            scheduleListViewModel.loadScheduleForTeacher(user.id)
 
         val welcomeText = "Welcome ${user.name} ${user.surname}"
         Toast.makeText(requireContext(), welcomeText, Toast.LENGTH_SHORT).show()
@@ -73,12 +75,7 @@ class ScheduleListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) { schedules ->
-            schedules?.let {
-                Log.d(TAG, "Got ${schedules.size} schedules")
-                scheduleAll = schedules
-            }
-        }
+        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) {}
 
         val view = inflater.inflate(R.layout.fragment_schedule_list, container, false)
 
@@ -93,17 +90,17 @@ class ScheduleListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (user.groupName != null) {
-            scheduleListViewModel.scheduleByDayListLiveData.observe(viewLifecycleOwner) { schedules ->
+            scheduleListViewModel.studentScheduleListLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
+                    Log.i(TAG, "Got ${schedules.size} schedules for student")
                     updateUI(schedules)
                 }
             }
         } else {
-            Log.i(TAG, "Got submitting teacher schedules")
-            scheduleListViewModel.teacherWithSchedulesLiveData.observe(viewLifecycleOwner) {
-                it?.let {
-                    updateUI(it.schedules)
-                    Log.i(TAG, "Got ${it.schedules.size}schedules")
+            scheduleListViewModel.teacherScheduleLiveData.observe(viewLifecycleOwner) { schedules ->
+                schedules?.let {
+                    Log.i(TAG, "Got ${schedules.size} schedules for teacher")
+                    updateUI(schedules)
                 }
             }
         }
@@ -184,6 +181,7 @@ class ScheduleListFragment : Fragment() {
 
                 init {
                     var size = 0
+                    val scheduleAll = scheduleListViewModel.scheduleListLiveData.value ?: emptyList()
                     for (schedule in scheduleAll) {
                         if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
                             timeStart = if (size == 0) schedule.timeStart else timeStart
@@ -235,6 +233,7 @@ class ScheduleListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ScheduleHolder, position: Int) {
             val schedule = currentList[position]
+            Log.d(TAG, schedule.toString())
             holder.bind(schedule)
         }
 

@@ -7,6 +7,7 @@ import edu.muiv.univapp.login.Login
 import edu.muiv.univapp.login.LoginResult
 import edu.muiv.univapp.schedule.Schedule
 import edu.muiv.univapp.user.*
+import java.util.UUID
 import java.util.concurrent.Executors
 
 class UnivRepository private constructor(context: Context){
@@ -36,11 +37,11 @@ class UnivRepository private constructor(context: Context){
     private val executor = Executors.newSingleThreadExecutor()
 
     fun getUser(login: Login): LiveData<LoginResult> = univDAO.getUser(login.username, login.password)
-    fun getTeacherWithSchedules(): LiveData<TeacherWithSchedules> = univDAO.getTeacherWithSchedules()
 
     fun getSchedule(): LiveData<List<Schedule>> = univDAO.getSchedule()
-    fun getScheduleByDay(group: String): LiveData<List<Schedule>> = univDAO.getScheduleByDay(group)
     fun getScheduleByDate(date: String): LiveData<List<Schedule>> = univDAO.getScheduleByDate(date)
+    fun getScheduleForStudent(group: String): LiveData<List<Schedule>> = univDAO.getScheduleForStudent(group)
+    fun getScheduleForTeacher(teacherID: UUID): LiveData<List<Schedule>> = univDAO.getScheduleForTeacher(teacherID)
 
     fun addSchedule(schedule: Schedule) {
         executor.execute {
