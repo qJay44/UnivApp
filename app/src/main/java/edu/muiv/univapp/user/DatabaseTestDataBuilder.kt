@@ -181,7 +181,7 @@ object DatabaseTestDataBuilder {
     fun createAll(amount: Int) {
 
         for (i in 0 until amount) {
-            val isHalf = i > amount / 2
+            val isHalf = i > amount / 2 - 1
 
             when (if (isHalf) userGroups[0] else userGroups[1]) {
                 "Student" -> {
@@ -212,7 +212,8 @@ object DatabaseTestDataBuilder {
                     Log.e(TAG, "Wrong user group")
                 }
             }
-            createScheduleDay("0${i+1}.11")
+            val day = if (i + 1 < 10) "0${i + 1}" else "${i + 1}"
+            createScheduleDay("${day}.11")
         }
         if (studentList.isEmpty()) Log.w(TAG, "Student list is empty")
         if (teacherList.isEmpty()) Log.w(TAG, "Teacher list is empty")

@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (ADD_TEST_DATA) {
 
-            DatabaseTestDataBuilder.createAll(6)
+            DatabaseTestDataBuilder.createAll(12)
 
             for (student in DatabaseTestDataBuilder.studentList)
                 userViewModel.addStudent(student)

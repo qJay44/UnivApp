@@ -108,7 +108,7 @@ class ScheduleListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        activity?.title = "${user.name} ${user.surname}, ${user.groupName ?: ""}"
+        activity?.title = "${user.name} ${user.surname} ${user.groupName ?: ""}"
     }
 
     override fun onDetach() {
@@ -152,8 +152,6 @@ class ScheduleListFragment : Fragment() {
                 null
             )
         }
-
-        Toast.makeText(requireContext(), user.name, Toast.LENGTH_SHORT).show()
     }
 
     // View Holder
@@ -173,35 +171,30 @@ class ScheduleListFragment : Fragment() {
         fun bind(scheduleDay: Schedule) {
             this.scheduleDay = scheduleDay
 
-            val scheduleWholeDay = object {
-                private var timeStart = ""
-                private var timeEnd = ""
-                var timePeriod = "00:00 - 23:59"
-                var amount = "99"
+            scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) { scheduleAll ->
+                var timeStart = ""
+                var timeEnd = ""
+                var size = 0
 
-                init {
-                    var size = 0
-                    val scheduleAll = scheduleListViewModel.scheduleListLiveData.value ?: emptyList()
-                    for (schedule in scheduleAll) {
-                        if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
-                            timeStart = if (size == 0) schedule.timeStart else timeStart
-                            timeEnd = schedule.timeEnd
-                            size++
-                        }
-                    }
-
-                    timePeriod = "$timeStart - $timeEnd"
-                    amount = when (size) {
-                        1 -> "$size пара"
-                        2, 3, 4 -> "$size пары"
-                        else -> "$size пар"
+                for (schedule in scheduleAll) {
+                    if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
+                        timeStart = if (size == 0) schedule.timeStart else timeStart
+                        timeEnd = schedule.timeEnd
+                        size++
                     }
                 }
-            }
 
-            tvDate.text = this.scheduleDay.date
-            tvTimeStartEnd.text = scheduleWholeDay.timePeriod
-            tvAmount.text = scheduleWholeDay.amount
+                val timePeriod = "$timeStart - $timeEnd"
+                val amount = when (size) {
+                    1 -> "$size пара"
+                    2, 3, 4 -> "$size пары"
+                    else -> "$size пар"
+                }
+
+                tvDate.text = this@ScheduleHolder.scheduleDay.date
+                tvTimeStartEnd.text = timePeriod
+                tvAmount.text = amount
+            }
         }
 
         override fun onClick(p0: View?) {
@@ -233,7 +226,6 @@ class ScheduleListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ScheduleHolder, position: Int) {
             val schedule = currentList[position]
-            Log.d(TAG, schedule.toString())
             holder.bind(schedule)
         }
 
