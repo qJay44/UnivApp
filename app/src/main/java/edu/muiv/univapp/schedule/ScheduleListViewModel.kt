@@ -10,23 +10,23 @@ import java.util.*
 class ScheduleListViewModel : ViewModel() {
 
     private val univRepository = UnivRepository.get()
-    private val scheduleDateLiveData = MutableLiveData<String>()
+    private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
 
     val scheduleListLiveData = univRepository.getSchedule()
 
-    val studentScheduleListLiveData: LiveData<List<Schedule>> =
-        Transformations.switchMap(scheduleDateLiveData) { scheduleGroup ->
+    val studentSchedulesLiveData: LiveData<List<Schedule>> =
+        Transformations.switchMap(scheduleForStudent) { scheduleGroup ->
             univRepository.getScheduleForStudent(scheduleGroup)
         }
 
-    val teacherScheduleLiveData: LiveData<List<Schedule>> =
+    val teacherSchedulesLiveData: LiveData<List<Schedule>> =
         Transformations.switchMap(scheduleForTeacher) { teacherID ->
             univRepository.getScheduleForTeacher(teacherID)
         }
 
     fun loadScheduleForStudent(scheduleGroup: String) {
-        scheduleDateLiveData.value = scheduleGroup
+        scheduleForStudent.value = scheduleGroup
     }
 
     fun loadScheduleForTeacher(teacherID: UUID) {

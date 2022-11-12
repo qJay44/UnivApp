@@ -3,12 +3,15 @@ package edu.muiv.univapp.schedule
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -41,6 +44,7 @@ class ScheduleListFragment : Fragment() {
     private lateinit var user: LoginResult
     private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
+    private var pressedOnce = false
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -55,14 +59,8 @@ class ScheduleListFragment : Fragment() {
         }
 
         unpackUserBundle()
-
-        if (user.groupName != null)
-            scheduleListViewModel.loadScheduleForStudent(user.groupName!!)
-        else
-            scheduleListViewModel.loadScheduleForTeacher(user.id)
-
-        val welcomeText = "Welcome ${user.name} ${user.surname}"
-        Toast.makeText(requireContext(), welcomeText, Toast.LENGTH_SHORT).show()
+        loadSchedule()
+        doubleBackExit()
     }
 
     override fun onAttach(context: Context) {
@@ -75,7 +73,9 @@ class ScheduleListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) {}
+        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) {
+            Log.d(TAG, "schedulesAll observe")
+        }
 
         val view = inflater.inflate(R.layout.fragment_schedule_list, container, false)
 
@@ -90,14 +90,14 @@ class ScheduleListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (user.groupName != null) {
-            scheduleListViewModel.studentScheduleListLiveData.observe(viewLifecycleOwner) { schedules ->
+            scheduleListViewModel.studentSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
                     Log.i(TAG, "Got ${schedules.size} schedules for student")
                     updateUI(schedules)
                 }
             }
         } else {
-            scheduleListViewModel.teacherScheduleLiveData.observe(viewLifecycleOwner) { schedules ->
+            scheduleListViewModel.teacherSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
                     Log.i(TAG, "Got ${schedules.size} schedules for teacher")
                     updateUI(schedules)
@@ -154,6 +154,34 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
+    private fun loadSchedule() {
+        if (user.groupName != null)
+            scheduleListViewModel.loadScheduleForStudent(user.groupName!!)
+        else
+            scheduleListViewModel.loadScheduleForTeacher(user.id)
+    }
+
+    private fun doubleBackExit() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this, object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+                    if (pressedOnce) requireActivity().finish()
+
+                    pressedOnce = true
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Click BACK again to exit",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    Handler(Looper.myLooper()!!).postDelayed({ pressedOnce = false }, 2000)
+                }
+            }
+        )
+    }
+
     // View Holder
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -171,12 +199,16 @@ class ScheduleListFragment : Fragment() {
         fun bind(scheduleDay: Schedule) {
             this.scheduleDay = scheduleDay
 
-            scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) { scheduleAll ->
+            // FIXME: getting all schedules latency
+
+            val schedulesAll = scheduleListViewModel.scheduleListLiveData.value
+            Log.i(TAG, "General schedules: ${schedulesAll?.size}")
+            schedulesAll?.let {
                 var timeStart = ""
                 var timeEnd = ""
                 var size = 0
 
-                for (schedule in scheduleAll) {
+                for (schedule in it) {
                     if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
                         timeStart = if (size == 0) schedule.timeStart else timeStart
                         timeEnd = schedule.timeEnd

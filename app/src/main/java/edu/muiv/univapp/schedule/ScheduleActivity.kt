@@ -25,6 +25,7 @@ class ScheduleActivity : AppCompatActivity(), ScheduleListFragment.Callbacks {
                 .beginTransaction()
                 .add(R.id.fragment_container, fragment)
                 .commit()
+
         }
     }
 
@@ -33,7 +34,7 @@ class ScheduleActivity : AppCompatActivity(), ScheduleListFragment.Callbacks {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
+            .addToBackStack("scheduleDay")
             .commit()
     }
 }
