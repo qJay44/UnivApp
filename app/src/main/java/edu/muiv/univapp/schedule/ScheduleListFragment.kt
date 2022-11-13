@@ -1,7 +1,6 @@
 package edu.muiv.univapp.schedule
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,8 +19,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.user.DatabaseTestDataBuilder
-import edu.muiv.univapp.login.LoginResult
-import java.util.*
 
 class ScheduleListFragment : Fragment() {
 
@@ -41,7 +38,6 @@ class ScheduleListFragment : Fragment() {
     }
 
     private lateinit var rvSchedule: RecyclerView
-    private lateinit var user: LoginResult
     private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
     private var pressedOnce = false
@@ -58,8 +54,7 @@ class ScheduleListFragment : Fragment() {
             Log.i(TAG, "Schedules were added: ${DatabaseTestDataBuilder.scheduleList.size}")
         }
 
-        unpackUserBundle()
-        loadSchedule()
+        scheduleListViewModel.loadUser(arguments)
         doubleBackExit()
     }
 
@@ -89,17 +84,17 @@ class ScheduleListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (user.groupName != null) {
-            scheduleListViewModel.studentSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
+        if (scheduleListViewModel.isTeacher) {
+            scheduleListViewModel.teacherSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
-                    Log.i(TAG, "Got ${schedules.size} schedules for student")
+                    Log.i(TAG, "Got ${schedules.size} schedules for teacher")
                     updateUI(schedules)
                 }
             }
         } else {
-            scheduleListViewModel.teacherSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
+            scheduleListViewModel.studentSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
-                    Log.i(TAG, "Got ${schedules.size} schedules for teacher")
+                    Log.i(TAG, "Got ${schedules.size} schedules for student")
                     updateUI(schedules)
                 }
             }
@@ -108,7 +103,7 @@ class ScheduleListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        activity?.title = "${user.name} ${user.surname} ${user.groupName ?: ""}"
+        activity?.title = scheduleListViewModel.title
     }
 
     override fun onDetach() {
@@ -124,41 +119,6 @@ class ScheduleListFragment : Fragment() {
     private fun updateUI(schedules: List<Schedule>) {
         adapter?.submitList(schedules)
         Log.i(TAG, "Adapter has been updated")
-    }
-
-    private fun unpackUserBundle() {
-
-        @Suppress("DEPRECATION")
-        val unpackedId: UUID =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                arguments?.getSerializable("id", UUID::class.java)!!
-            else
-                arguments?.getSerializable("id") as UUID
-
-        val groupName: String? = arguments?.getString("groupName")
-
-        user = if (groupName != null) {
-            LoginResult(
-                unpackedId,
-                arguments?.getString("name")!!,
-                arguments?.getString("surname")!!,
-                groupName,
-            )
-        } else {
-            LoginResult(
-                unpackedId,
-                arguments?.getString("name")!!,
-                arguments?.getString("surname")!!,
-                null
-            )
-        }
-    }
-
-    private fun loadSchedule() {
-        if (user.groupName != null)
-            scheduleListViewModel.loadScheduleForStudent(user.groupName!!)
-        else
-            scheduleListViewModel.loadScheduleForTeacher(user.id)
     }
 
     private fun doubleBackExit() {
