@@ -36,7 +36,13 @@ class UnivRepository private constructor(context: Context){
     private val univDAO = database.univDAO()
     private val executor = Executors.newSingleThreadExecutor()
 
-    fun getUser(login: Login): LiveData<LoginResult> = univDAO.getUser(login.username, login.password)
+    fun getUser(login: Login): LiveData<LoginResult> {
+        return if (login.isTeacher) {
+            univDAO.getTeacher(login.username, login.password)
+        } else {
+            univDAO.getStudent(login.username, login.password)
+        }
+    }
 
     fun getSchedule(): LiveData<List<Schedule>> = univDAO.getSchedule()
     fun getScheduleByDate(date: String): LiveData<List<Schedule>> = univDAO.getScheduleByDate(date)

@@ -12,12 +12,11 @@ import java.util.UUID
 @Dao
 interface UnivDAO {
 
-    @Query(
-        "SELECT * FROM(" +
-        "SELECT * FROM student UNION ALL SELECT *, NULL FROM teacher) " +
-        "WHERE login=:login AND password=:password"
-    )
-    fun getUser(login: String, password: String): LiveData<LoginResult>
+    @Query("SELECT * FROM student WHERE login=:username AND password=:password")
+    fun getStudent(username: String, password: String): LiveData<LoginResult>
+
+    @Query("SELECT * FROM teacher WHERE login=:username AND password=:password")
+    fun getTeacher(username: String, password: String): LiveData<LoginResult>
 
     @Query("SELECT * FROM schedule")
     fun getSchedule(): LiveData<List<Schedule>>

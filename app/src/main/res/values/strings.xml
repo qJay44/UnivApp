@@ -8,4 +8,8 @@
     <string name="prompt_username">Логин</string>
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">Sing in</string>
+    <string name="enter_as_example">Enter as</string>
+    <string name="student_btn_text_example">Student</string>
+    <string name="teacher_btn_text_example">Teacher</string>
+    <string name="muiv_logo_image">muivLogo</string>
 </resources>
