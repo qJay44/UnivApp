@@ -1,4 +1,4 @@
-package edu.muiv.univapp.login
+package edu.muiv.univapp.ui.login
 
 import android.content.Context
 import android.os.Bundle

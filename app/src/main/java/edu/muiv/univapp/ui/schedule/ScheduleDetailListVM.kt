@@ -1,4 +1,4 @@
-package edu.muiv.univapp.schedule
+package edu.muiv.univapp.ui.schedule
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

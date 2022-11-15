@@ -1,7 +1,7 @@
 package edu.muiv.univapp.user
 
 import android.util.Log
-import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.ui.schedule.Schedule
 import java.util.UUID
 
 object DatabaseTestDataBuilder {

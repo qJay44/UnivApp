@@ -1,4 +1,4 @@
-package edu.muiv.univapp.login
+package edu.muiv.univapp.ui.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,8 +13,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import edu.muiv.univapp.R
-import edu.muiv.univapp.schedule.ScheduleActivity
 import edu.muiv.univapp.user.DatabaseTestDataBuilder
+import edu.muiv.univapp.user.UserActivity
 
 class LoginFragment : Fragment() {
 
@@ -75,17 +75,19 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Sign-in process //
+
         loginViewModel.userLiveData.observe(viewLifecycleOwner) { user ->
             if (user == null) {
                 Toast.makeText(requireContext(), "user doesn't exist", Toast.LENGTH_SHORT).show()
             } else {
-                Log.i(TAG, "Starting new activity...")
-                val intent = Intent(activity, ScheduleActivity::class.java)
-                val bundle = loginViewModel.getUserBundle(user)
-                intent.putExtra("userBundle", bundle)
+                loginViewModel.createUserDataHolderInstance(user)
+                val intent = Intent(activity, UserActivity::class.java)
                 startActivity(intent)
             }
         }
+
+        /////////////////////
 
         etUsername.addTextChangedListener(loginViewModel.usernameTW)
         etPassword.addTextChangedListener(loginViewModel.passwordTW)
@@ -94,6 +96,7 @@ class LoginFragment : Fragment() {
             switchVisibility()
 
             val inputErrorText = loginViewModel.inputValidation()
+            Log.i(TAG, "Searching for user...")
 
             try {
                 if (inputErrorText == "") {

@@ -3,9 +3,9 @@ package edu.muiv.univapp.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
-import edu.muiv.univapp.login.Login
-import edu.muiv.univapp.login.LoginResult
-import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.ui.login.Login
+import edu.muiv.univapp.ui.login.LoginResult
+import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.user.*
 import java.util.UUID
 import java.util.concurrent.Executors

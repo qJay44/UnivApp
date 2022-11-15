@@ -1,6 +1,5 @@
-package edu.muiv.univapp.schedule
+package edu.muiv.univapp.ui.schedule
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
+import edu.muiv.univapp.databinding.FragmentScheduleListBinding
 import edu.muiv.univapp.user.DatabaseTestDataBuilder
 
 class ScheduleListFragment : Fragment() {
@@ -25,20 +25,12 @@ class ScheduleListFragment : Fragment() {
     companion object {
         private const val TAG = "ScheduleListFragment"
         private const val ADD_TEST_DATA = false
-
-        fun newInstance(bundle: Bundle): ScheduleListFragment {
-            return ScheduleListFragment().apply {
-                arguments = bundle
-            }
-        }
     }
 
-    interface Callbacks {
-        fun onScheduleDaySelect(scheduleDate: String)
-    }
+    private var _binding: FragmentScheduleListBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var rvSchedule: RecyclerView
-    private var callbacks: Callbacks? = null
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
     private var pressedOnce = false
 
@@ -54,31 +46,23 @@ class ScheduleListFragment : Fragment() {
             Log.i(TAG, "Schedules were added: ${DatabaseTestDataBuilder.scheduleList.size}")
         }
 
-        scheduleListViewModel.loadUser(arguments)
+        scheduleListViewModel.loadUser()
         doubleBackExit()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        callbacks = context as Callbacks?
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        scheduleListViewModel.scheduleListLiveData.observe(viewLifecycleOwner) {
-            Log.d(TAG, "schedulesAll observe")
-        }
+    ): View {
+        _binding = FragmentScheduleListBinding.inflate(inflater, container, false)
+        val root: View = binding.root
 
-        val view = inflater.inflate(R.layout.fragment_schedule_list, container, false)
-
-        rvSchedule = view.findViewById(R.id.schedule_recycler_view)
+        rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
         rvSchedule.adapter = adapter
 
-        return view
+        return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,9 +90,9 @@ class ScheduleListFragment : Fragment() {
         activity?.title = scheduleListViewModel.title
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        callbacks = null
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onDestroy() {
@@ -190,8 +174,8 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onClick(p0: View?) {
+            // TODO: Open a schedule day
             Log.i(TAG, "Selected schedule (date: ${scheduleDay.date})")
-            callbacks?.onScheduleDaySelect(scheduleDay.date)
         }
     }
 

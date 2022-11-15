@@ -1,4 +1,4 @@
-package edu.muiv.univapp.schedule
+package edu.muiv.univapp.ui.schedule
 
 import android.os.Bundle
 import android.util.Log

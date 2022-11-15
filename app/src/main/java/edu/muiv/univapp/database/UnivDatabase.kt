@@ -3,7 +3,7 @@ package edu.muiv.univapp.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.user.Student
 import edu.muiv.univapp.user.Teacher
 

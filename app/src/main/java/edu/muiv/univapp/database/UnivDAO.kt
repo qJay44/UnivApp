@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import edu.muiv.univapp.login.LoginResult
-import edu.muiv.univapp.schedule.Schedule
+import edu.muiv.univapp.ui.login.LoginResult
+import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.user.*
 import java.util.UUID
 

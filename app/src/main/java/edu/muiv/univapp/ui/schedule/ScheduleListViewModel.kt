@@ -1,13 +1,12 @@
-package edu.muiv.univapp.schedule
+package edu.muiv.univapp.ui.schedule
 
-import android.os.Build
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.login.LoginResult
+import edu.muiv.univapp.ui.login.LoginResult
+import edu.muiv.univapp.user.UserDataHolder
 import java.util.*
 
 class ScheduleListViewModel : ViewModel() {
@@ -50,38 +49,18 @@ class ScheduleListViewModel : ViewModel() {
     }
 
     private fun loadScheduleForTeacher(teacherID: UUID) {
+        // FIXME: Schedules not grouping
         scheduleForTeacher.value = teacherID
     }
 
     ////////////////////////////
 
-    fun loadUser(args: Bundle?) {
-        @Suppress("DEPRECATION")
-        val unpackedId: UUID =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                args?.getSerializable("id", UUID::class.java)!!
-            else
-                args?.getSerializable("id") as UUID
+    fun loadUser() {
+        user = UserDataHolder.get().user
 
-        val groupName: String? = args.getString("groupName")
-
-        if (groupName != null) {
-            user = LoginResult(
-                unpackedId,
-                args.getString("name")!!,
-                args.getString("surname")!!,
-                groupName,
-            )
-
+        if (user.groupName != null) {
             loadScheduleForStudent(user.groupName!!)
         } else {
-            user = LoginResult(
-                unpackedId,
-                args.getString("name")!!,
-                args.getString("surname")!!,
-                null
-            )
-
             loadScheduleForTeacher(user.id)
         }
     }

@@ -1,4 +1,4 @@
-package edu.muiv.univapp.login
+package edu.muiv.univapp.ui.login
 
 data class Login(
     var username: String = "",

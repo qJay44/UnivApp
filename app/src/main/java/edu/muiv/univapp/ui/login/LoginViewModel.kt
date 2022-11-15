@@ -1,6 +1,5 @@
-package edu.muiv.univapp.login
+package edu.muiv.univapp.ui.login
 
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -8,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.user.Student
 import edu.muiv.univapp.user.Teacher
+import edu.muiv.univapp.user.UserDataHolder
 
 class LoginViewModel : ViewModel() {
 
@@ -35,15 +35,8 @@ class LoginViewModel : ViewModel() {
         return inputErrorText
     }
 
-    fun getUserBundle(user: LoginResult): Bundle {
-        val bundle = Bundle().apply {
-            putSerializable("id", user.id)
-            putString("name", user.name)
-            putString("surname", user.surname)
-            putString("groupName", user.groupName)
-        }
-
-        return bundle
+    fun createUserDataHolderInstance(user: LoginResult) {
+        UserDataHolder.initialize(user)
     }
 
     fun loadUser(isTeacher: Boolean) {
