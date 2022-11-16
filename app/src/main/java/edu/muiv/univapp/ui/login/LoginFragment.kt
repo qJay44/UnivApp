@@ -54,6 +54,9 @@ class LoginFragment : Fragment() {
 
             for (teacher in DatabaseTestDataBuilder.teacherList)
                 loginViewModel.addTeacher(teacher)
+
+            for (schedule in DatabaseTestDataBuilder.scheduleList)
+                loginViewModel.addSchedule(schedule)
         }
     }
 

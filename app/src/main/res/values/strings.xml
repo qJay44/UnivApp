@@ -17,4 +17,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_schedule">Schedule</string>
+    <string name="week_days_example">24.10 – 30.10</string>
+    <string name="previous_week_btn">previous week button</string>
+    <string name="next_week_btn">next week button</string>
 </resources>

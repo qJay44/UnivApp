@@ -44,10 +44,9 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
-    fun getSchedule(): LiveData<List<Schedule>> = univDAO.getSchedule()
     fun getScheduleByDate(date: String): LiveData<List<Schedule>> = univDAO.getScheduleByDate(date)
-    fun getScheduleForStudent(group: String): LiveData<List<Schedule>> = univDAO.getScheduleForStudent(group)
-    fun getScheduleForTeacher(teacherID: UUID): LiveData<List<Schedule>> = univDAO.getScheduleForTeacher(teacherID)
+    fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForStudent(group, days)
+    fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForTeacher(teacherID, days)
 
     fun addSchedule(schedule: Schedule) {
         executor.execute {

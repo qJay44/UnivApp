@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.user.UserDataHolder
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ScheduleListViewModel : ViewModel() {
@@ -15,6 +16,7 @@ class ScheduleListViewModel : ViewModel() {
     private val univRepository = UnivRepository.get()
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
+    private var days: Array<String> = Array(7) { it.toString() }
 
     // Primitive properties //
 
@@ -24,20 +26,20 @@ class ScheduleListViewModel : ViewModel() {
     val isTeacher: Boolean
         get() = user.groupName == null
 
+    val dayFromTo get() = "${days[0]} - ${days.last()}"
+
     //////////////////////////
 
     // LiveData properties //
 
-    val scheduleListLiveData = univRepository.getSchedule()
-
     val studentSchedulesLiveData: LiveData<List<Schedule>> =
         Transformations.switchMap(scheduleForStudent) { scheduleGroup ->
-            univRepository.getScheduleForStudent(scheduleGroup)
+            univRepository.getScheduleForStudent(scheduleGroup, days)
         }
 
     val teacherSchedulesLiveData: LiveData<List<Schedule>> =
         Transformations.switchMap(scheduleForTeacher) { teacherID ->
-            univRepository.getScheduleForTeacher(teacherID)
+            univRepository.getScheduleForTeacher(teacherID, days)
         }
 
     /////////////////////////
@@ -55,6 +57,19 @@ class ScheduleListViewModel : ViewModel() {
 
     ////////////////////////////
 
+    fun loadCalendar() {
+        val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
+        val calendar = Calendar.getInstance(Locale.FRANCE)
+
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+
+        for (i in 0 until 7) {
+            days[i] = format.format(calendar.time)
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+    }
+
     fun loadUser() {
         user = UserDataHolder.get().user
 
@@ -63,9 +78,5 @@ class ScheduleListViewModel : ViewModel() {
         } else {
             loadScheduleForTeacher(user.id)
         }
-    }
-
-    fun addSchedule(schedule: Schedule) {
-        univRepository.addSchedule(schedule)
     }
 }

@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -18,19 +19,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
-import edu.muiv.univapp.user.DatabaseTestDataBuilder
 
 class ScheduleListFragment : Fragment() {
 
     companion object {
         private const val TAG = "ScheduleListFragment"
-        private const val ADD_TEST_DATA = false
     }
 
     private var _binding: FragmentScheduleListBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var rvSchedule: RecyclerView
+    private lateinit var tvWeedDays: TextView
+    private lateinit var ibPrevWeek: ImageButton
+    private lateinit var ibNextWeek: ImageButton
     private var adapter: ScheduleAdapter? = ScheduleAdapter()
     private var pressedOnce = false
 
@@ -40,12 +42,8 @@ class ScheduleListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (ADD_TEST_DATA) {
-            for (schedule in DatabaseTestDataBuilder.scheduleList)
-                scheduleListViewModel.addSchedule(schedule)
-            Log.i(TAG, "Schedules were added: ${DatabaseTestDataBuilder.scheduleList.size}")
-        }
 
+        scheduleListViewModel.loadCalendar()
         scheduleListViewModel.loadUser()
         doubleBackExit()
     }
@@ -57,6 +55,19 @@ class ScheduleListFragment : Fragment() {
     ): View {
         _binding = FragmentScheduleListBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        tvWeedDays = binding.tvWeekDays
+        tvWeedDays.text = scheduleListViewModel.dayFromTo
+
+        ibPrevWeek = binding.ibPrevWeek
+        ibPrevWeek.setOnClickListener {
+            Toast.makeText(requireContext(), "Prev", Toast.LENGTH_SHORT).show()
+        }
+
+        ibNextWeek = binding.ibNextWeek
+        ibNextWeek.setOnClickListener {
+            Toast.makeText(requireContext(), "Next", Toast.LENGTH_SHORT).show()
+        }
 
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
@@ -133,8 +144,8 @@ class ScheduleListFragment : Fragment() {
             private lateinit var scheduleDay: Schedule
 
             private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
-            private val tvTimeStartEnd: TextView = itemView.findViewById(R.id.tvTimeStartEnd)
-            private val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
+//            private val tvTimeStartEnd: TextView = itemView.findViewById(R.id.tvTimeStartEnd)
+//            private val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
 
         init {
             itemView.setOnClickListener(this)
@@ -143,34 +154,11 @@ class ScheduleListFragment : Fragment() {
         fun bind(scheduleDay: Schedule) {
             this.scheduleDay = scheduleDay
 
-            // FIXME: getting all schedules latency
 
-            val schedulesAll = scheduleListViewModel.scheduleListLiveData.value
-            Log.i(TAG, "General schedules: ${schedulesAll?.size}")
-            schedulesAll?.let {
-                var timeStart = ""
-                var timeEnd = ""
-                var size = 0
-
-                for (schedule in it) {
-                    if (schedule.date == this@ScheduleHolder.scheduleDay.date) {
-                        timeStart = if (size == 0) schedule.timeStart else timeStart
-                        timeEnd = schedule.timeEnd
-                        size++
-                    }
-                }
-
-                val timePeriod = "$timeStart - $timeEnd"
-                val amount = when (size) {
-                    1 -> "$size пара"
-                    2, 3, 4 -> "$size пары"
-                    else -> "$size пар"
-                }
-
-                tvDate.text = this@ScheduleHolder.scheduleDay.date
-                tvTimeStartEnd.text = timePeriod
-                tvAmount.text = amount
-            }
+            // TODO: Recreate recycler item layout
+            tvDate.text = this@ScheduleHolder.scheduleDay.date
+//            tvTimeStartEnd.text = "timePeriod"
+//            tvAmount.text = "amount4"
         }
 
         override fun onClick(p0: View?) {

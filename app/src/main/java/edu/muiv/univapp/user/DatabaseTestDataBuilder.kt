@@ -192,7 +192,7 @@ object DatabaseTestDataBuilder {
                             surname = randArrayElement(surnames),
                             login = "stud${studentList.size + 1}",
                             password = "1",
-                            groupName = if (isHalf) groupNames1[0] else groupNames2[1],
+                            groupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(groupNames2),
                         )
                     studentList += student
                 }
@@ -212,8 +212,7 @@ object DatabaseTestDataBuilder {
                     Log.e(TAG, "Wrong user group")
                 }
             }
-            val day = if (i + 1 < 10) "0${i + 1}" else "${i + 1}"
-            createScheduleDay("${day}.11")
+            createScheduleDay("${13 + i}.11")
         }
         if (studentList.isEmpty()) Log.w(TAG, "Student list is empty")
         if (teacherList.isEmpty()) Log.w(TAG, "Teacher list is empty")

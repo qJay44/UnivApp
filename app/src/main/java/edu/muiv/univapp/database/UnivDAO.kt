@@ -18,21 +18,18 @@ interface UnivDAO {
     @Query("SELECT * FROM teacher WHERE login=:username AND password=:password")
     fun getTeacher(username: String, password: String): LiveData<LoginResult>
 
-    @Query("SELECT * FROM schedule")
-    fun getSchedule(): LiveData<List<Schedule>>
-
     @Query("SELECT * FROM schedule WHERE date=:date")
     fun getScheduleByDate(date: String): LiveData<List<Schedule>>
 
-    @Query("SELECT * FROM schedule WHERE studentGroup=:group GROUP BY date")
-    fun getScheduleForStudent(group: String): LiveData<List<Schedule>>
+    @Query("SELECT * FROM schedule WHERE studentGroup=:group AND date IN (:days)")
+    fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>>
 
     @Query(
         "SELECT schedule.* FROM teacher " +
         "INNER JOIN schedule ON teacher.id=schedule.teacherID " +
-        "WHERE teacher.id=:teacherID GROUP BY date"
+        "WHERE teacher.id=:teacherID AND date IN (:days)"
     )
-    fun getScheduleForTeacher(teacherID: UUID): LiveData<List<Schedule>>
+    fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>>
 
     @Insert
     fun addSchedule(schedule: Schedule)
