@@ -13,12 +13,11 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
+import edu.muiv.univapp.user.UserDataHolder
 
 class ScheduleListFragment : Fragment() {
 
@@ -33,7 +32,7 @@ class ScheduleListFragment : Fragment() {
     private lateinit var tvWeedDays: TextView
     private lateinit var ibPrevWeek: ImageButton
     private lateinit var ibNextWeek: ImageButton
-    private var adapter: ScheduleAdapter? = ScheduleAdapter()
+    private var adapter: ScheduleAdapter? = ScheduleAdapter(emptyList())
     private var pressedOnce = false
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
@@ -112,7 +111,8 @@ class ScheduleListFragment : Fragment() {
     }
 
     private fun updateUI(schedules: List<Schedule>) {
-        adapter?.submitList(schedules)
+        adapter = ScheduleAdapter(schedules)
+        rvSchedule.adapter = adapter
         Log.i(TAG, "Adapter has been updated")
     }
 
@@ -121,7 +121,10 @@ class ScheduleListFragment : Fragment() {
             this, object : OnBackPressedCallback(true) {
 
                 override fun handleOnBackPressed() {
-                    if (pressedOnce) requireActivity().finish()
+                    if (pressedOnce) {
+                        UserDataHolder.uninitialize()
+                        requireActivity().finish()
+                    }
 
                     pressedOnce = true
 
@@ -137,62 +140,103 @@ class ScheduleListFragment : Fragment() {
         )
     }
 
+
+    // The Adapter
+    private inner class ScheduleAdapter(val currentList: List<Schedule>)
+        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+        private val typeHeader = 0
+        private val typeList = 1
+        private var lastDay = ""
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            val view = if (viewType == typeHeader) {
+                ScheduleHolderHeader(layoutInflater.inflate(R.layout.schedule_list_item_header, parent, false))
+            } else {
+                ScheduleHolder(layoutInflater.inflate(R.layout.schedule_list_item, parent, false))
+            }
+            Log.i(TAG, "viewType: $viewType")
+
+            return view
+        }
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            val schedule = currentList[position]
+            when (holder) {
+                is ScheduleHolderHeader -> {
+                    holder.bind(schedule, lastDay)
+                }
+                is ScheduleHolder -> {
+                    holder.bind(schedule)
+                }
+                else -> {
+                    Log.e(TAG, "onBindViewHolder: unknown holder")
+                }
+            }
+        }
+
+        override fun getItemCount(): Int = currentList.size
+
+        override fun getItemViewType(position: Int): Int {
+            val scheduleDate = currentList[position].date
+            val dayIndex = scheduleListViewModel.days.indexOf(scheduleDate)
+            val currentDay = ScheduleDay.values()[dayIndex].dayName
+
+            // Create header view holder
+            return if (lastDay != currentDay) {
+                lastDay = currentDay
+                typeHeader
+            } else {
+                typeList
+            }
+        }
+    }
+
+    private inner class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
+
+        private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
+        private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
+        private val tvTimeStart  : TextView = itemView.findViewById(R.id.tvTimeStart)
+        private val tvTimeEnd    : TextView = itemView.findViewById(R.id.tvTimeEnd)
+        private val tvSubjectName: TextView = itemView.findViewById(R.id.tvSubjectName)
+//        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
+
+        fun bind(schedule: Schedule, weekDayName: String) {
+            tvDay.text = schedule.date
+            tvWeekDayName.text = weekDayName
+            tvTimeStart.text = schedule.timeStart
+            tvTimeEnd.text = schedule.timeEnd
+            tvSubjectName.text = schedule.subjectName
+        }
+    }
+
     // View Holder
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-            private lateinit var scheduleDay: Schedule
+        private lateinit var schedule: Schedule
 
-            private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
-//            private val tvTimeStartEnd: TextView = itemView.findViewById(R.id.tvTimeStartEnd)
-//            private val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
+        private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
+        private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
+        private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
+//        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
+        // FIXME: Recycler scroll
 
         init {
             itemView.setOnClickListener(this)
         }
 
         fun bind(scheduleDay: Schedule) {
-            this.scheduleDay = scheduleDay
+            this.schedule = scheduleDay
 
-
-            // TODO: Recreate recycler item layout
-            tvDate.text = this@ScheduleHolder.scheduleDay.date
-//            tvTimeStartEnd.text = "timePeriod"
-//            tvAmount.text = "amount4"
+            tvTimeStart.text = scheduleDay.timeStart
+            tvTimeEnd.text = scheduleDay.timeEnd
+            tvSubjectName.text = scheduleDay.subjectName
         }
 
         override fun onClick(p0: View?) {
             // TODO: Open a schedule day
-            Log.i(TAG, "Selected schedule (date: ${scheduleDay.date})")
+            Log.i(TAG, "Selected schedule (date: ${schedule.date})")
         }
-    }
-
-    // The object to calculate the difference on list change
-    private object DiffCallBack : DiffUtil.ItemCallback<Schedule>() {
-        override fun areItemsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: Schedule, newItem: Schedule): Boolean {
-            return oldItem == newItem
-        }
-    }
-
-    // The Adapter
-    private inner class ScheduleAdapter
-        : ListAdapter<Schedule, ScheduleHolder>(DiffCallBack) {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleHolder {
-            val view = layoutInflater.inflate(R.layout.schedule_list_item, parent, false)
-
-            return ScheduleHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ScheduleHolder, position: Int) {
-            val schedule = currentList[position]
-            holder.bind(schedule)
-        }
-
-        override fun getItemCount(): Int = currentList.size
     }
 }

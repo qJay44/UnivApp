@@ -16,7 +16,7 @@ class ScheduleListViewModel : ViewModel() {
     private val univRepository = UnivRepository.get()
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
-    private var days: Array<String> = Array(7) { it.toString() }
+    var days: Array<String> = Array(7) { it.toString() }
 
     // Primitive properties //
 
@@ -51,7 +51,6 @@ class ScheduleListViewModel : ViewModel() {
     }
 
     private fun loadScheduleForTeacher(teacherID: UUID) {
-        // FIXME: Schedules not grouping
         scheduleForTeacher.value = teacherID
     }
 

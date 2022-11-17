@@ -20,5 +20,9 @@ class UserDataHolder private constructor(val user: LoginResult){
         fun get(): UserDataHolder {
             return INSTANCE ?: throw IllegalStateException("UserDataHolder must be initialized")
         }
+
+        fun uninitialize() {
+            INSTANCE = null
+        }
     }
 }

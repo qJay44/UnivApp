@@ -2,7 +2,31 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp">
+
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tvDate_example"
+        android:textSize="10pt"
+        app:layout_constraintBottom_toBottomOf="@+id/tvWeekDayName"
+        app:layout_constraintEnd_toStartOf="@+id/guidelineVertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvWeekDayName" />
+
+    <TextView
+        android:id="@+id/tvWeekDayName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/week_day_border"
+        android:gravity="center"
+        android:text="@string/week_day_example"
+        android:textSize="10pt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guidelineVertical"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvTimeStart"
@@ -10,8 +34,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:text="@string/tv_time_start_example"
+        app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal" />
+        app:layout_constraintTop_toBottomOf="@id/tvWeekDayName" />
 
     <TextView
         android:id="@+id/tvTimeEnd"
@@ -34,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintGuide_percent="0.7" />
 
     <TextView
         android:id="@+id/tvSubjectName"
@@ -44,9 +69,9 @@
         android:textAlignment="center"
         android:textSize="18sp"
         app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvWeekDayName" />
 
     <TextView
         android:id="@+id/tvScheduleInfo"
@@ -55,7 +80,7 @@
         android:text="@string/subject_details_example"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/guidelineVertical"
+        app:layout_constraintStart_toStartOf="@+id/guidelineVertical"
         app:layout_constraintTop_toBottomOf="@+id/tvSubjectName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
