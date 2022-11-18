@@ -13,6 +13,7 @@ class LoginActivity : AppCompatActivity(), LoginFragmentChoice.Callbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_login)
 
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container_login)

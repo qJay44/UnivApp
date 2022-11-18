@@ -1,8 +1,6 @@
 package edu.muiv.univapp.ui.schedule
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +8,12 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
-import edu.muiv.univapp.user.UserDataHolder
 
 class ScheduleListFragment : Fragment() {
 
@@ -33,7 +29,6 @@ class ScheduleListFragment : Fragment() {
     private lateinit var ibPrevWeek: ImageButton
     private lateinit var ibNextWeek: ImageButton
     private var adapter: ScheduleAdapter? = ScheduleAdapter(emptyList())
-    private var pressedOnce = false
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -44,7 +39,6 @@ class ScheduleListFragment : Fragment() {
 
         scheduleListViewModel.loadCalendar()
         scheduleListViewModel.loadUser()
-        doubleBackExit()
     }
 
     override fun onCreateView(
@@ -95,19 +89,9 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        activity?.title = scheduleListViewModel.title
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        activity?.title = "UnivApp"
     }
 
     private fun updateUI(schedules: List<Schedule>) {
@@ -115,31 +99,6 @@ class ScheduleListFragment : Fragment() {
         rvSchedule.adapter = adapter
         Log.i(TAG, "Adapter has been updated")
     }
-
-    private fun doubleBackExit() {
-        requireActivity().onBackPressedDispatcher.addCallback(
-            this, object : OnBackPressedCallback(true) {
-
-                override fun handleOnBackPressed() {
-                    if (pressedOnce) {
-                        UserDataHolder.uninitialize()
-                        requireActivity().finish()
-                    }
-
-                    pressedOnce = true
-
-                    Toast.makeText(
-                        requireContext(),
-                        "Click BACK again to exit",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    Handler(Looper.myLooper()!!).postDelayed({ pressedOnce = false }, 2000)
-                }
-            }
-        )
-    }
-
 
     // The Adapter
     private inner class ScheduleAdapter(val currentList: List<Schedule>)
@@ -192,6 +151,8 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
+    // Header view holder //
+
     private inner class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
 
         private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
@@ -209,16 +170,18 @@ class ScheduleListFragment : Fragment() {
             tvSubjectName.text = schedule.subjectName
         }
     }
+    ////////////////////////
 
-    // View Holder
+    // Main view holder //
+
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private lateinit var schedule: Schedule
 
-        private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
-        private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
-        private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
+        private val tvTimeStart  : TextView = itemView.findViewById(R.id.tvTimeStart)
+        private val tvTimeEnd    : TextView = itemView.findViewById(R.id.tvTimeEnd)
+        private val tvSubjectName: TextView = itemView.findViewById(R.id.tvSubjectName)
 //        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
         // FIXME: Recycler scroll
 
@@ -239,4 +202,6 @@ class ScheduleListFragment : Fragment() {
             Log.i(TAG, "Selected schedule (date: ${schedule.date})")
         }
     }
+
+    //////////////////////
 }
