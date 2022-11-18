@@ -20,9 +20,6 @@ class ScheduleListViewModel : ViewModel() {
 
     // Primitive properties //
 
-    val title: String
-        get() = "${user.name} ${user.surname} ${user.groupName ?: ""}"
-
     val isTeacher: Boolean
         get() = user.groupName == null
 

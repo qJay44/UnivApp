@@ -35,8 +35,7 @@
         android:layout_marginStart="10dp"
         android:text="@string/tv_time_start_example"
         app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvWeekDayName" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tvTimeEnd"
