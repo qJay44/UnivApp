@@ -12,6 +12,7 @@ class UserDataHolder private constructor(val user: LoginResult){
         fun initialize(user: LoginResult) {
             if (INSTANCE == null) {
                 INSTANCE = UserDataHolder(user)
+                Log.i(TAG, user.toString())
             } else {
                 Log.w(TAG, "UserDataHolder already initialized")
             }

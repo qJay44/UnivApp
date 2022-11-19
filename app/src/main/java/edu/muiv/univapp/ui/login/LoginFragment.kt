@@ -47,7 +47,7 @@ class LoginFragment : Fragment() {
 
         if (ADD_TEST_DATA) {
 
-            DatabaseTestDataBuilder.createAll(12)
+            DatabaseTestDataBuilder.createAll(50)
 
             for (student in DatabaseTestDataBuilder.studentList)
                 loginViewModel.addStudent(student)

@@ -5,9 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,11 +22,10 @@ class ScheduleListFragment : Fragment() {
     private var _binding: FragmentScheduleListBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var tvWeekDays: TextView
+
     private lateinit var rvSchedule: RecyclerView
-    private lateinit var tvWeedDays: TextView
-    private lateinit var ibPrevWeek: ImageButton
-    private lateinit var ibNextWeek: ImageButton
-    private var adapter: ScheduleAdapter? = ScheduleAdapter(emptyList())
+    private var adapter: ScheduleAdapter = ScheduleAdapter(emptyList())
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -49,18 +46,8 @@ class ScheduleListFragment : Fragment() {
         _binding = FragmentScheduleListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        tvWeedDays = binding.tvWeekDays
-        tvWeedDays.text = scheduleListViewModel.dayFromTo
-
-        ibPrevWeek = binding.ibPrevWeek
-        ibPrevWeek.setOnClickListener {
-            Toast.makeText(requireContext(), "Prev", Toast.LENGTH_SHORT).show()
-        }
-
-        ibNextWeek = binding.ibNextWeek
-        ibNextWeek.setOnClickListener {
-            Toast.makeText(requireContext(), "Next", Toast.LENGTH_SHORT).show()
-        }
+        tvWeekDays = binding.tvWeekDays
+        tvWeekDays.text = scheduleListViewModel.dayFromTo
 
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
@@ -97,16 +84,25 @@ class ScheduleListFragment : Fragment() {
     private fun updateUI(schedules: List<Schedule>) {
         adapter = ScheduleAdapter(schedules)
         rvSchedule.adapter = adapter
-        Log.i(TAG, "Adapter has been updated")
     }
 
     // The Adapter
-    private inner class ScheduleAdapter(val currentList: List<Schedule>)
+    private inner class ScheduleAdapter(private val currentList: List<Schedule>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val typeHeader = 0
         private val typeList = 1
-        private var lastDay = ""
+        private val viewTypeIsHeader: Array<Boolean> = Array(currentList.size) { false }
+
+        init {
+            var currentWeekDay = ""
+            for (i in currentList.indices) {
+                if (currentList[i].date != currentWeekDay) {
+                    currentWeekDay = currentList[i].date
+                    viewTypeIsHeader[i] = true
+                }
+            }
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val view = if (viewType == typeHeader) {
@@ -114,18 +110,20 @@ class ScheduleListFragment : Fragment() {
             } else {
                 ScheduleHolder(layoutInflater.inflate(R.layout.schedule_list_item, parent, false))
             }
-            Log.i(TAG, "viewType: $viewType")
 
             return view
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val schedule = currentList[position]
             when (holder) {
                 is ScheduleHolderHeader -> {
-                    holder.bind(schedule, lastDay)
+                    val schedule = currentList[position]
+                    val dayIndex = scheduleListViewModel.days.indexOf(schedule.date)
+                    val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
+                    holder.bind(schedule, weekDayName)
                 }
                 is ScheduleHolder -> {
+                    val schedule = currentList[position]
                     holder.bind(schedule)
                 }
                 else -> {
@@ -137,13 +135,7 @@ class ScheduleListFragment : Fragment() {
         override fun getItemCount(): Int = currentList.size
 
         override fun getItemViewType(position: Int): Int {
-            val scheduleDate = currentList[position].date
-            val dayIndex = scheduleListViewModel.days.indexOf(scheduleDate)
-            val currentDay = ScheduleDay.values()[dayIndex].dayName
-
-            // Create header view holder
-            return if (lastDay != currentDay) {
-                lastDay = currentDay
+            return if (viewTypeIsHeader[position]) {
                 typeHeader
             } else {
                 typeList
@@ -151,28 +143,37 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
-    // Header view holder //
+    // View holder with header //
 
-    private inner class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
+    private inner class ScheduleHolderHeader(view: View)
+        : RecyclerView.ViewHolder(view), View.OnClickListener {
+
+        private lateinit var schedule: Schedule
 
         private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
         private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
         private val tvTimeStart  : TextView = itemView.findViewById(R.id.tvTimeStart)
         private val tvTimeEnd    : TextView = itemView.findViewById(R.id.tvTimeEnd)
         private val tvSubjectName: TextView = itemView.findViewById(R.id.tvSubjectName)
-//        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
 
         fun bind(schedule: Schedule, weekDayName: String) {
+            this.schedule = schedule
+
             tvDay.text = schedule.date
             tvWeekDayName.text = weekDayName
             tvTimeStart.text = schedule.timeStart
             tvTimeEnd.text = schedule.timeEnd
             tvSubjectName.text = schedule.subjectName
         }
+
+        override fun onClick(p0: View?) {
+            // TODO: Open a schedule day
+            Log.i(TAG, "Selected schedule (date: ${schedule.date})")
+        }
     }
     ////////////////////////
 
-    // Body view holder //
+    // Main view holder //
 
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {

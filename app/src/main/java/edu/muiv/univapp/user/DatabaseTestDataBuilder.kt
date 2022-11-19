@@ -159,6 +159,7 @@ object DatabaseTestDataBuilder {
         val groupNameIndex = randInt(0, 1)
         val faculty = if (groupNameIndex == 0) subjectNames1 else subjectNames2
         val groupName = if (groupNameIndex == 0) groupNames1 else groupNames2
+        val currentGroup = groupName[(groupName.indices).shuffled().last()]
 
         for (i in 0 until amount) {
             val schedule = Schedule(
@@ -168,7 +169,7 @@ object DatabaseTestDataBuilder {
                 timeEnd = timeEnd[startIndex + i],
                 subjectName = faculty[(faculty.indices).shuffled().last()],
                 roomNum = randInt(100, 525),
-                studentGroup = groupName[(groupName.indices).shuffled().last()],
+                studentGroup = currentGroup,
                 teacherID = teacherList[(teacherList.indices).shuffled().last()].id
             )
 
