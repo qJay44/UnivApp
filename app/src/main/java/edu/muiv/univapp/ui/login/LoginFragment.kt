@@ -101,17 +101,14 @@ class LoginFragment : Fragment() {
             val inputErrorText = loginViewModel.inputValidation()
             Log.i(TAG, "Searching for user...")
 
-            try {
-                if (inputErrorText == "") {
-                    val isTeacher = arguments?.getBoolean("isTeacher")!!
-                    loginViewModel.loadUser(isTeacher)
-                } else {
-                    Toast.makeText(requireContext(), inputErrorText, Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-            } finally {
-                switchVisibility()
+            if (inputErrorText == "") {
+                val isTeacher = arguments?.getBoolean("isTeacher")!!
+                loginViewModel.loadUser(isTeacher)
+            } else {
+                Toast.makeText(requireContext(), inputErrorText, Toast.LENGTH_SHORT).show()
             }
+
+            switchVisibility()
         }
     }
 

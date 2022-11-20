@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
+import edu.muiv.univapp.user.Teacher
 
 class ScheduleListFragment : Fragment() {
 
@@ -70,6 +71,7 @@ class ScheduleListFragment : Fragment() {
             scheduleListViewModel.studentSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
                     Log.i(TAG, "Got ${schedules.size} schedules for student")
+                    scheduleListViewModel.loadScheduleTeachers(schedules)
                     updateUI(schedules)
                 }
             }
@@ -92,6 +94,7 @@ class ScheduleListFragment : Fragment() {
 
         private val typeHeader = 0
         private val typeList = 1
+        // TODO: Try as setOf
         private val viewTypeIsHeader: Array<Boolean> = Array(currentList.size) { false }
 
         init {
@@ -115,15 +118,14 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            val schedule = currentList[position]
             when (holder) {
                 is ScheduleHolderHeader -> {
-                    val schedule = currentList[position]
                     val dayIndex = scheduleListViewModel.days.indexOf(schedule.date)
                     val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
                     holder.bind(schedule, weekDayName)
                 }
                 is ScheduleHolder -> {
-                    val schedule = currentList[position]
                     holder.bind(schedule)
                 }
                 else -> {
@@ -144,26 +146,43 @@ class ScheduleListFragment : Fragment() {
     }
 
     // View holder with header //
+    // TODO: Cut header from schedule part
+    // TODO: Load teachers without loop
 
     private inner class ScheduleHolderHeader(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private lateinit var schedule: Schedule
+        private lateinit var teacher: Teacher
 
-        private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
-        private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
-        private val tvTimeStart  : TextView = itemView.findViewById(R.id.tvTimeStart)
-        private val tvTimeEnd    : TextView = itemView.findViewById(R.id.tvTimeEnd)
-        private val tvSubjectName: TextView = itemView.findViewById(R.id.tvSubjectName)
+        private val tvDay         : TextView = itemView.findViewById(R.id.tvDay)
+        private val tvWeekDayName : TextView = itemView.findViewById(R.id.tvWeekDayName)
+        private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
+        private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
+        private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
+        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
+
+        init {
+            itemView.setOnClickListener(this)
+        }
 
         fun bind(schedule: Schedule, weekDayName: String) {
             this.schedule = schedule
+            scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
+                for (teacher in teachers) {
+                    if (teacher.id == schedule.teacherID) this.teacher = teacher
+                }
+                val teacherField = "${teacher.surname} ${teacher.name[0]}. ${teacher.patronymic[0]}."
+                val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
 
-            tvDay.text = schedule.date
+                tvScheduleInfo.text = details
+            }
+
+            tvDay.text = this.schedule.date
             tvWeekDayName.text = weekDayName
-            tvTimeStart.text = schedule.timeStart
-            tvTimeEnd.text = schedule.timeEnd
-            tvSubjectName.text = schedule.subjectName
+            tvTimeStart.text = this.schedule.timeStart
+            tvTimeEnd.text = this.schedule.timeEnd
+            tvSubjectName.text = this.schedule.subjectName
         }
 
         override fun onClick(p0: View?) {
@@ -179,22 +198,33 @@ class ScheduleListFragment : Fragment() {
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private lateinit var schedule: Schedule
+        private lateinit var teacher: Teacher
 
-        private val tvTimeStart  : TextView = itemView.findViewById(R.id.tvTimeStart)
-        private val tvTimeEnd    : TextView = itemView.findViewById(R.id.tvTimeEnd)
-        private val tvSubjectName: TextView = itemView.findViewById(R.id.tvSubjectName)
-//        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
+        private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
+        private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
+        private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
+        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
 
         init {
             itemView.setOnClickListener(this)
         }
 
-        fun bind(scheduleDay: Schedule) {
-            this.schedule = scheduleDay
+        fun bind(schedule: Schedule) {
+            this.schedule = schedule
+            scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
+                for (teacher in teachers) {
+                    if (teacher.id == schedule.teacherID) this.teacher = teacher
+                }
 
-            tvTimeStart.text = scheduleDay.timeStart
-            tvTimeEnd.text = scheduleDay.timeEnd
-            tvSubjectName.text = scheduleDay.subjectName
+                val teacherField = "${teacher.surname} ${teacher.name[0]}. ${teacher.patronymic[0]}."
+                val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
+
+                tvScheduleInfo.text = details
+            }
+
+            tvTimeStart.text = schedule.timeStart
+            tvTimeEnd.text = schedule.timeEnd
+            tvSubjectName.text = schedule.subjectName
         }
 
         override fun onClick(p0: View?) {

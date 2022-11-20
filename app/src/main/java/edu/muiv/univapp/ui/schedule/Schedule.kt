@@ -13,6 +13,7 @@ data class Schedule(
     val timeEnd     : String,
     val subjectName : String,
     val roomNum     : Int,
+    val type        : String,
     val studentGroup: String,
     val teacherID   : UUID
 )

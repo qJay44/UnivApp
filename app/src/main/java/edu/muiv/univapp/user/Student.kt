@@ -7,10 +7,11 @@ import java.util.UUID
 @Entity
 data class Student(
     @PrimaryKey
-    val id       : UUID,
-    val name     : String,
-    val surname  : String,
-    val login    : String,
-    val password : String,
-    val groupName: String
+    val id        : UUID,
+    val name      : String,
+    val surname   : String,
+    val login     : String,
+    val patronymic: String,
+    val password  : String,
+    val groupName : String
 )

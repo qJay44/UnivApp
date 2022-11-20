@@ -18,6 +18,9 @@ interface UnivDAO {
     @Query("SELECT * FROM teacher WHERE login=:username AND password=:password")
     fun getTeacher(username: String, password: String): LiveData<LoginResult>
 
+    @Query("SELECT * FROM teacher WHERE id IN (:IDs)")
+    fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>>
+
     @Query("SELECT * FROM schedule WHERE date=:date")
     fun getScheduleByDate(date: String): LiveData<List<Schedule>>
 

@@ -102,6 +102,34 @@ object DatabaseTestDataBuilder {
         "Weinstein"
     )
 
+    @Suppress("SpellCheckingInspection")
+    private val patronymics: Array<String> = arrayOf(
+        "Aalbers",
+        "Aantjes",
+        "Aarons (surname)",
+        "Aaronson",
+        "Aarts",
+        "Aartsen",
+        "Abbasov",
+        "Abdulayev",
+        "Abdullahi",
+        "Abdullayev",
+        "Abrahami",
+        "Abrahamowicz",
+        "Abrahams",
+        "Abrahamsen",
+        "Abrahamson",
+        "Abrahamsson",
+        "Abrahamyan",
+        "Abramashvili",
+        "Abramavičius",
+        "Abramczyk",
+        "Abramenko",
+        "Abramishvili",
+        "Abramović",
+        "Abramowicz"
+    )
+
     private val groupNames1: Array<String> = arrayOf(
         "ИД 23.1/Б1-19",
         "ИД 23.2/Б1-19",
@@ -146,6 +174,10 @@ object DatabaseTestDataBuilder {
         "Комплексный экономический анализ хозяйственной деятельности"
     )
 
+    private val scheduleTypes: Array<String> = arrayOf(
+        "Лекция", "СПЗ"
+    )
+
     val studentList: MutableList<Student> = mutableListOf()
     val teacherList: MutableList<Teacher> = mutableListOf()
     val scheduleList: MutableList<Schedule> = mutableListOf()
@@ -169,6 +201,7 @@ object DatabaseTestDataBuilder {
                 timeEnd = timeEnd[startIndex + i],
                 subjectName = faculty[(faculty.indices).shuffled().last()],
                 roomNum = randInt(100, 525),
+                type = randArrayElement(scheduleTypes),
                 studentGroup = currentGroup,
                 teacherID = teacherList[(teacherList.indices).shuffled().last()].id
             )
@@ -191,6 +224,7 @@ object DatabaseTestDataBuilder {
                             id = UUID.randomUUID(),
                             name = randArrayElement(names),
                             surname = randArrayElement(surnames),
+                            patronymic = randArrayElement(patronymics),
                             login = "stud${studentList.size + 1}",
                             password = "1",
                             groupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(groupNames2),
@@ -203,6 +237,7 @@ object DatabaseTestDataBuilder {
                             id = UUID.randomUUID(),
                             name = randArrayElement(names),
                             surname = randArrayElement(surnames),
+                            patronymic = randArrayElement(patronymics),
                             login = "teach${teacherList.size + 1}",
                             password = "1",
                         )

@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.login.LoginResult
+import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -14,6 +15,7 @@ class ScheduleListViewModel : ViewModel() {
 
     private lateinit var user: LoginResult
     private val univRepository = UnivRepository.get()
+    private val weekTeachers = MutableLiveData<Array<UUID>>()
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
     var days: Array<String> = Array(7) { it.toString() }
@@ -23,7 +25,8 @@ class ScheduleListViewModel : ViewModel() {
     val isTeacher: Boolean
         get() = user.groupName == null
 
-    val dayFromTo get() = "${days[0]} - ${days.last()}"
+    val dayFromTo: String
+        get() = "${days[0]} - ${days.last()}"
 
     //////////////////////////
 
@@ -39,6 +42,10 @@ class ScheduleListViewModel : ViewModel() {
             univRepository.getScheduleForTeacher(teacherID, days)
         }
 
+    val weekTeachersLiveData: LiveData<Array<Teacher>> =
+        Transformations.switchMap(weekTeachers) { IDs ->
+            univRepository.getTeachersByIDs(IDs)
+        }
     /////////////////////////
 
     // LiveData value setters //
@@ -49,6 +56,13 @@ class ScheduleListViewModel : ViewModel() {
 
     private fun loadScheduleForTeacher(teacherID: UUID) {
         scheduleForTeacher.value = teacherID
+    }
+
+    fun loadScheduleTeachers(schedules: List<Schedule>) {
+        val teacherIDs: Array<UUID> = Array(schedules.size) {
+            schedules[it].teacherID
+        }
+        weekTeachers.value = teacherIDs
     }
 
     ////////////////////////////
