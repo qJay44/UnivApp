@@ -15,9 +15,10 @@ class ScheduleListViewModel : ViewModel() {
 
     private lateinit var user: LoginResult
     private val univRepository = UnivRepository.get()
-    private val weekTeachers = MutableLiveData<Array<UUID>>()
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
+    private val weekTeachers = MutableLiveData<Array<UUID>>()
+    val teachersByIdLiveData = MutableLiveData<Map<UUID, Teacher>>()
     var days: Array<String> = Array(7) { it.toString() }
 
     // Primitive properties //
@@ -46,6 +47,7 @@ class ScheduleListViewModel : ViewModel() {
         Transformations.switchMap(weekTeachers) { IDs ->
             univRepository.getTeachersByIDs(IDs)
         }
+
     /////////////////////////
 
     // LiveData value setters //

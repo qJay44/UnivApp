@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
-import edu.muiv.univapp.user.Teacher
 
 class ScheduleListFragment : Fragment() {
 
@@ -24,9 +23,7 @@ class ScheduleListFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var tvWeekDays: TextView
-
     private lateinit var rvSchedule: RecyclerView
-    private var adapter: ScheduleAdapter = ScheduleAdapter(emptyList())
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -52,7 +49,7 @@ class ScheduleListFragment : Fragment() {
 
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
-        rvSchedule.adapter = adapter
+        rvSchedule.adapter = ScheduleAdapter(emptyList())
 
         return root
     }
@@ -76,6 +73,7 @@ class ScheduleListFragment : Fragment() {
                 }
             }
         }
+        updateUI(emptyList())
     }
 
     override fun onDestroyView() {
@@ -84,26 +82,46 @@ class ScheduleListFragment : Fragment() {
     }
 
     private fun updateUI(schedules: List<Schedule>) {
-        adapter = ScheduleAdapter(schedules)
-        rvSchedule.adapter = adapter
+        rvSchedule.adapter = ScheduleAdapter(schedules)
     }
 
     // The Adapter
-    private inner class ScheduleAdapter(private val currentList: List<Schedule>)
+    private inner class ScheduleAdapter(currentList: List<Schedule>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val typeHeader = 0
         private val typeList = 1
-        // TODO: Try as setOf
-        private val viewTypeIsHeader: Array<Boolean> = Array(currentList.size) { false }
+        private val scheduleAll: List<Schedule>
+        private val scheduleAllBooleans: List<Boolean>
 
         init {
             var currentWeekDay = ""
-            for (i in currentList.indices) {
-                if (currentList[i].date != currentWeekDay) {
-                    currentWeekDay = currentList[i].date
-                    viewTypeIsHeader[i] = true
+            val listWithSchedules: MutableList<Schedule> = mutableListOf()
+            val listWithBooleans: MutableList<Boolean> = mutableListOf()
+
+            for (schedule in currentList) {
+                if (schedule.date != currentWeekDay) {
+                    // Create schedule holder as header
+                    listWithSchedules += schedule
+                    listWithBooleans += true
+
+                    // and then the same schedule as default holder
+                    listWithSchedules += schedule
+                    listWithBooleans += false
+                } else {
+                    // Create only default holder
+                    listWithSchedules += schedule
+                    listWithBooleans += false
                 }
+
+                currentWeekDay = schedule.date
+            }
+
+            scheduleAll = listWithSchedules.toList()
+            scheduleAllBooleans = listWithBooleans.toList()
+
+            scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
+                scheduleListViewModel.teachersByIdLiveData.value = teachers.associateBy { it.id }
             }
         }
 
@@ -118,7 +136,7 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val schedule = currentList[position]
+            val schedule = scheduleAll.elementAt(position)
             when (holder) {
                 is ScheduleHolderHeader -> {
                     val dayIndex = scheduleListViewModel.days.indexOf(schedule.date)
@@ -134,10 +152,10 @@ class ScheduleListFragment : Fragment() {
             }
         }
 
-        override fun getItemCount(): Int = currentList.size
+        override fun getItemCount(): Int = scheduleAll.size
 
         override fun getItemViewType(position: Int): Int {
-            return if (viewTypeIsHeader[position]) {
+            return if (scheduleAllBooleans.elementAt(position)) {
                 typeHeader
             } else {
                 typeList
@@ -146,21 +164,14 @@ class ScheduleListFragment : Fragment() {
     }
 
     // View holder with header //
-    // TODO: Cut header from schedule part
-    // TODO: Load teachers without loop
 
     private inner class ScheduleHolderHeader(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private lateinit var schedule: Schedule
-        private lateinit var teacher: Teacher
 
-        private val tvDay         : TextView = itemView.findViewById(R.id.tvDay)
-        private val tvWeekDayName : TextView = itemView.findViewById(R.id.tvWeekDayName)
-        private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
-        private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
-        private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
-        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
+        private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
+        private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
 
         init {
             itemView.setOnClickListener(this)
@@ -168,21 +179,9 @@ class ScheduleListFragment : Fragment() {
 
         fun bind(schedule: Schedule, weekDayName: String) {
             this.schedule = schedule
-            scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
-                for (teacher in teachers) {
-                    if (teacher.id == schedule.teacherID) this.teacher = teacher
-                }
-                val teacherField = "${teacher.surname} ${teacher.name[0]}. ${teacher.patronymic[0]}."
-                val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
-
-                tvScheduleInfo.text = details
-            }
 
             tvDay.text = this.schedule.date
             tvWeekDayName.text = weekDayName
-            tvTimeStart.text = this.schedule.timeStart
-            tvTimeEnd.text = this.schedule.timeEnd
-            tvSubjectName.text = this.schedule.subjectName
         }
 
         override fun onClick(p0: View?) {
@@ -198,7 +197,6 @@ class ScheduleListFragment : Fragment() {
         : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private lateinit var schedule: Schedule
-        private lateinit var teacher: Teacher
 
         private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
         private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
@@ -211,14 +209,11 @@ class ScheduleListFragment : Fragment() {
 
         fun bind(schedule: Schedule) {
             this.schedule = schedule
-            scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
-                for (teacher in teachers) {
-                    if (teacher.id == schedule.teacherID) this.teacher = teacher
-                }
 
-                val teacherField = "${teacher.surname} ${teacher.name[0]}. ${teacher.patronymic[0]}."
+            scheduleListViewModel.teachersByIdLiveData.observe(viewLifecycleOwner) {
+                val teacher = it[this.schedule.teacherID]
+                val teacherField = "${teacher?.surname} ${teacher?.name?.get(0)}. ${teacher?.patronymic?.get(0)}."
                 val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
-
                 tvScheduleInfo.text = details
             }
 
