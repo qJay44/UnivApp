@@ -14,6 +14,7 @@ import java.util.*
 class ScheduleListViewModel : ViewModel() {
 
     private lateinit var user: LoginResult
+    private lateinit var calendar: Calendar
     private val univRepository = UnivRepository.get()
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
@@ -69,26 +70,52 @@ class ScheduleListViewModel : ViewModel() {
 
     ////////////////////////////
 
-    fun loadCalendar() {
-        val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
-        val calendar = Calendar.getInstance(Locale.FRANCE)
+    private fun loadSchedule() {
+        if (isTeacher) {
+            loadScheduleForTeacher(user.id)
+        } else {
+            loadScheduleForStudent(user.groupName!!)
+        }
+    }
 
-        calendar.firstDayOfWeek = Calendar.MONDAY
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+    private fun loadDays() {
+        val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
 
         for (i in 0 until 7) {
             days[i] = format.format(calendar.time)
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
+        // Subtract extra added day
+        calendar.add(Calendar.DAY_OF_MONTH, -1)
+
+        loadSchedule()
     }
 
     fun loadUser() {
         user = UserDataHolder.get().user
+    }
 
-        if (user.groupName != null) {
-            loadScheduleForStudent(user.groupName!!)
-        } else {
-            loadScheduleForTeacher(user.id)
-        }
+    fun loadCalendar() {
+        calendar = Calendar.getInstance(Locale.FRANCE)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+
+        loadDays()
+    }
+
+    fun prevWeek() {
+        // Set current day to Monday
+        calendar.add(Calendar.DAY_OF_MONTH, -6)
+        // Subtract one week
+        calendar.add(Calendar.WEEK_OF_MONTH, -1)
+        loadDays()
+    }
+
+    fun nextWeek() {
+        // Set current day to Monday
+        calendar.add(Calendar.DAY_OF_MONTH, -6)
+        // Add one week
+        calendar.add(Calendar.WEEK_OF_MONTH, 1)
+        loadDays()
     }
 }

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +25,8 @@ class ScheduleListFragment : Fragment() {
 
     private lateinit var tvWeekDays: TextView
     private lateinit var rvSchedule: RecyclerView
+    private lateinit var ibPrevWeek: ImageButton
+    private lateinit var ibNextWeek: ImageButton
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -32,8 +35,8 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        scheduleListViewModel.loadCalendar()
         scheduleListViewModel.loadUser()
+        scheduleListViewModel.loadCalendar()
     }
 
     override fun onCreateView(
@@ -46,6 +49,18 @@ class ScheduleListFragment : Fragment() {
 
         tvWeekDays = binding.tvWeekDays
         tvWeekDays.text = scheduleListViewModel.dayFromTo
+
+        ibPrevWeek = binding.ibPrevWeek
+        ibPrevWeek.setOnClickListener {
+            scheduleListViewModel.prevWeek()
+            tvWeekDays.text = scheduleListViewModel.dayFromTo
+        }
+
+        ibNextWeek = binding.ibNextWeek
+        ibNextWeek.setOnClickListener {
+            scheduleListViewModel.nextWeek()
+            tvWeekDays.text = scheduleListViewModel.dayFromTo
+        }
 
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
@@ -191,7 +206,7 @@ class ScheduleListFragment : Fragment() {
     }
     ////////////////////////
 
-    // Main view holder //
+    // Default view holder //
 
     private inner class ScheduleHolder(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {
