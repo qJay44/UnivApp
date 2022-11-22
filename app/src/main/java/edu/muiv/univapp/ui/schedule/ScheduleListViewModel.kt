@@ -15,14 +15,20 @@ class ScheduleListViewModel : ViewModel() {
 
     private lateinit var user: LoginResult
     private lateinit var calendar: Calendar
+
     private val univRepository = UnivRepository.get()
+    private val days: Array<String> = Array(7) { it.toString() }
+
+    // LiveData variables //
+
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val weekTeachers = MutableLiveData<Array<UUID>>()
     val teachersByIdLiveData = MutableLiveData<Map<UUID, Teacher>>()
-    var days: Array<String> = Array(7) { it.toString() }
 
-    // Primitive properties //
+    ////////////////////////
+
+    // Simple properties //
 
     val isTeacher: Boolean
         get() = user.groupName == null
@@ -30,9 +36,12 @@ class ScheduleListViewModel : ViewModel() {
     val dayFromTo: String
         get() = "${days[0]} - ${days.last()}"
 
+    val week: Set<String>
+        get() = days.toSet()
+
     //////////////////////////
 
-    // LiveData properties //
+    // LiveData repository observables //
 
     val studentSchedulesLiveData: LiveData<List<Schedule>> =
         Transformations.switchMap(scheduleForStudent) { scheduleGroup ->
@@ -49,7 +58,7 @@ class ScheduleListViewModel : ViewModel() {
             univRepository.getTeachersByIDs(IDs)
         }
 
-    /////////////////////////
+    /////////////////////////////////////
 
     // LiveData value setters //
 
@@ -81,13 +90,12 @@ class ScheduleListViewModel : ViewModel() {
     private fun loadDays() {
         val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
 
-        for (i in 0 until 7) {
+        for (i in days.indices) {
             days[i] = format.format(calendar.time)
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
         // Subtract extra added day
         calendar.add(Calendar.DAY_OF_MONTH, -1)
-
         loadSchedule()
     }
 

@@ -1,8 +1,6 @@
 package edu.muiv.univapp.user
 
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView

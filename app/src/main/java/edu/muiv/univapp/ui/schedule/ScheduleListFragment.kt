@@ -35,8 +35,10 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        scheduleListViewModel.loadUser()
-        scheduleListViewModel.loadCalendar()
+        if (savedInstanceState == null) {
+            scheduleListViewModel.loadUser()
+            scheduleListViewModel.loadCalendar()
+        }
     }
 
     override fun onCreateView(
@@ -154,7 +156,7 @@ class ScheduleListFragment : Fragment() {
             val schedule = scheduleAll.elementAt(position)
             when (holder) {
                 is ScheduleHolderHeader -> {
-                    val dayIndex = scheduleListViewModel.days.indexOf(schedule.date)
+                    val dayIndex = scheduleListViewModel.week.indexOf(schedule.date)
                     val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
                     holder.bind(schedule, weekDayName)
                 }
@@ -178,7 +180,7 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
-    // View holder with header //
+    // Header view holder //
 
     private inner class ScheduleHolderHeader(view: View)
         : RecyclerView.ViewHolder(view), View.OnClickListener {

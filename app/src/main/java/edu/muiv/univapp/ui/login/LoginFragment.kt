@@ -110,6 +110,13 @@ class LoginFragment : Fragment() {
 
             switchVisibility()
         }
+
+        // temp
+        val u = "stud1"
+        val p = "1"
+        etUsername.setText(u)
+        etPassword.setText(p)
+        //
     }
 
     private fun switchVisibility() {
