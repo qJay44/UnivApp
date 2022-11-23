@@ -24,4 +24,18 @@
     <string name="tv_time_start_example">08:20</string>
     <string name="tv_time_end_example">18:35</string>
     <string name="subject_details_example">Блощук А.А. | Лекция | Ауд. 505</string>
+    <string name="info_icon">info icon</string>
+    <string name="info_title">ИНФОРМАЦИЯ</string>
+    <string name="student_name_example">Иванов\nАлександр</string>
+    <string name="student_group_example">ИД 23.2/Б1–19</string>
+    <string name="student_course_and_semester_example">4 курс | 1 семестр</string>
+    <string name="subject_type_example">ЛЕКЦИЯ</string>
+    <string name="icon_date">icon date</string>
+    <string name="teacher_name_example">Блощук Андрей Алексеевич</string>
+    <string name="date_example">24 ноября, Понедельник 8:20 – 9:50</string>
+    <string name="attendance_text">Присутствие на паре</string>
+    <string name="notes_text">Заметки</string>
+    <string name="notes_hint">Введите текст</string>
+    <string name="attendance_button">attendance at the class</string>
+    <string name="topic_example">Разобрать тему лекции \"Общие принциаы реализации запросов\" \n\nПодготовиться к СПЗ"</string>
 </resources>

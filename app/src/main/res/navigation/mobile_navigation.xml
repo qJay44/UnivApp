@@ -9,13 +9,26 @@
         android:id="@+id/navigation_notifications"
         android:name="edu.muiv.univapp.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" >
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_schedule_list"
+        android:name="edu.muiv.univapp.ui.schedule.ScheduleListFragment"
+        android:label="ScheduleList"
+        tools:layout="@layout/fragment_schedule_list" >
+        <action
+            android:id="@+id/action_navigation_schedule_list_to_navigation_schedule"
+            app:destination="@id/navigation_schedule" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_schedule"
-        android:name="edu.muiv.univapp.ui.schedule.ScheduleListFragment"
+        android:name="edu.muiv.univapp.ui.schedule.ScheduleFragment"
         android:label="Schedule"
-        tools:layout="@layout/fragment_schedule_list" />
+        tools:layout="@layout/fragment_schedule" >
+        <argument
+            android:name="schedule_date"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

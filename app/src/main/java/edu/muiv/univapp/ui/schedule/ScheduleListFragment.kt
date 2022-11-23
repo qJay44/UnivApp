@@ -9,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
@@ -203,6 +204,9 @@ class ScheduleListFragment : Fragment() {
 
         override fun onClick(p0: View?) {
             // TODO: Open a schedule day
+            val action = ScheduleListFragmentDirections
+                .actionNavigationScheduleListToNavigationSchedule(schedule.date)
+            p0?.findNavController()?.navigate(action)
             Log.i(TAG, "Selected schedule (date: ${schedule.date})")
         }
     }
@@ -240,7 +244,10 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onClick(p0: View?) {
-            // TODO: Open a schedule day
+            val action = ScheduleListFragmentDirections
+                .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
+            p0?.findNavController()?.navigate(action)
+
             Log.i(TAG, "Selected schedule (date: ${schedule.date})")
         }
     }

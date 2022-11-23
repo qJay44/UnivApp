@@ -1,8 +1,7 @@
 package edu.muiv.univapp.user
 
 import android.os.*
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
+import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -14,8 +13,12 @@ import edu.muiv.univapp.databinding.ActivityUserBinding
 
 class UserActivity : AppCompatActivity() {
 
+    private lateinit var tvStudentName: TextView
+    private lateinit var tvStudentGroup: TextView
+    // private lateinit var tvStudentCourseAndSemester: TextView
+
     private lateinit var binding: ActivityUserBinding
-    private var pressedOnce = false
+    // private var pressedOnce = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +26,16 @@ class UserActivity : AppCompatActivity() {
         binding = ActivityUserBinding.inflate(layoutInflater)
         supportActionBar?.hide()
         setContentView(binding.root)
+
+        tvStudentName = binding.tvStudentName
+        tvStudentGroup = binding.tvStudentGroup
+        // tvStudentCourseAndSemester = binding.tvStudentCourseAndSemester
+
+        val user = UserDataHolder.get().user
+        val nameField = "${user.name}\n${user.surname}"
+
+        tvStudentName.text = nameField
+        tvStudentGroup.text = user.groupName
 
         val navView: BottomNavigationView = binding.navView
         val navHostFragment = supportFragmentManager
@@ -33,7 +46,7 @@ class UserActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_notifications, R.id.navigation_schedule
+                R.id.navigation_notifications, R.id.navigation_schedule_list
             )
         )
 
@@ -42,24 +55,24 @@ class UserActivity : AppCompatActivity() {
 
         // Logout on double back //
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (pressedOnce) {
-                    UserDataHolder.uninitialize()
-                    finish()
-                }
-                pressedOnce = true
-
-                Toast.makeText(
-                    this@UserActivity,
-                    "Click BACK again to exit",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                Handler(Looper.myLooper()!!).postDelayed({ pressedOnce = false }, 2000)
-            }
-        }
-        )
+//        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                if (pressedOnce) {
+//                    UserDataHolder.uninitialize()
+//                    finish()
+//                }
+//                pressedOnce = true
+//
+//                Toast.makeText(
+//                    this@UserActivity,
+//                    "Click BACK again to exit",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//
+//                Handler(Looper.myLooper()!!).postDelayed({ pressedOnce = false }, 2000)
+//            }
+//        }
+//        )
 
         ///////////////////////////
     }

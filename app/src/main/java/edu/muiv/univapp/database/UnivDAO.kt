@@ -21,8 +21,8 @@ interface UnivDAO {
     @Query("SELECT * FROM teacher WHERE id IN (:IDs)")
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>>
 
-    @Query("SELECT * FROM schedule WHERE date=:date")
-    fun getScheduleByDate(date: String): LiveData<List<Schedule>>
+    @Query("SELECT * FROM schedule WHERE id=:id")
+    fun getScheduleById(id: String): LiveData<Schedule>
 
     @Query("SELECT * FROM schedule WHERE studentGroup=:group AND date IN (:days)")
     fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>>
