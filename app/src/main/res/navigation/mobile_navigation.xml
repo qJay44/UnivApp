@@ -27,7 +27,7 @@
         android:label="Schedule"
         tools:layout="@layout/fragment_schedule" >
         <argument
-            android:name="schedule_date"
+            android:name="schedule_id"
             app:argType="string" />
     </fragment>
 

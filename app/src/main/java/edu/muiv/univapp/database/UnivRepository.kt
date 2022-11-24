@@ -6,6 +6,7 @@ import androidx.room.Room
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.schedule.Schedule
+import edu.muiv.univapp.ui.schedule.ScheduleAttendance
 import edu.muiv.univapp.user.*
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -45,9 +46,16 @@ class UnivRepository private constructor(context: Context){
     }
 
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>> = univDAO.getTeachersByIDs(IDs)
-    fun getScheduleById(id: String): LiveData<Schedule> = univDAO.getScheduleById(id)
+    fun getScheduleById(id: UUID): LiveData<Schedule> = univDAO.getScheduleById(id)
     fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForStudent(group, days)
     fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForTeacher(teacherID, days)
+    fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?> = univDAO.getScheduleAttendance(scheduleID, studentID)
+
+    fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
+        executor.execute {
+            univDAO.upsertScheduleAttendance(scheduleAttendance)
+        }
+    }
 
     fun addSchedule(schedule: Schedule) {
         executor.execute {

@@ -2,7 +2,8 @@ package edu.muiv.univapp.user
 
 import android.util.Log
 import edu.muiv.univapp.ui.schedule.Schedule
-import java.util.UUID
+import java.text.SimpleDateFormat
+import java.util.*
 
 object DatabaseTestDataBuilder {
 
@@ -213,6 +214,10 @@ object DatabaseTestDataBuilder {
     private fun randArrayElement(arr: Array<String>) = arr[(arr.indices).shuffled().last()]
 
     fun createAll(amount: Int) {
+        val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
+        val calendar = Calendar.getInstance(Locale.FRANCE)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
 
         for (i in 0 until amount) {
             val isHalf = i > amount / 2 - 1
@@ -248,7 +253,8 @@ object DatabaseTestDataBuilder {
                     Log.e(TAG, "Wrong user group")
                 }
             }
-            createScheduleDay("${13 + i}.11")
+            createScheduleDay(format.format(calendar.time))
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
         if (studentList.isEmpty()) Log.w(TAG, "Student list is empty")
         if (teacherList.isEmpty()) Log.w(TAG, "Teacher list is empty")

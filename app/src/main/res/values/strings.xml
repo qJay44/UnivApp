@@ -38,4 +38,7 @@
     <string name="notes_hint">Введите текст</string>
     <string name="attendance_button">attendance at the class</string>
     <string name="topic_example">Разобрать тему лекции \"Общие принциаы реализации запросов\" \n\nПодготовиться к СПЗ"</string>
+    <string name="attendance_as_text">Н</string>
+    <string name="dialog_tv_question">Вы присутствуете на данной паре?</string>
+    <string name="dialog_btn_yes">Да</string>
 </resources>

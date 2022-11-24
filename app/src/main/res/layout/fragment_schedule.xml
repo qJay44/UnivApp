@@ -44,7 +44,7 @@
         android:id="@+id/tvSubjectName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:text="@string/subject_name_example"
         android:textAlignment="center"
         android:textSize="18sp"
@@ -58,7 +58,7 @@
         android:id="@+id/tvSubjectType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:text="@string/subject_type_example"
         android:textSize="25sp"
         android:textStyle="bold"
@@ -71,8 +71,8 @@
         android:id="@+id/iconDate"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
         android:contentDescription="@string/icon_date"
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical1"
@@ -92,7 +92,7 @@
         android:id="@+id/iconTeacherName"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="50dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:contentDescription="@string/icon_date"
         android:src="@drawable/ic_launcher_foreground"
@@ -113,7 +113,7 @@
         android:id="@+id/iconLocation"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="50dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:contentDescription="@string/icon_date"
         android:src="@drawable/ic_launcher_foreground"
@@ -130,12 +130,15 @@
         app:layout_constraintStart_toEndOf="@id/iconLocation"
         app:layout_constraintTop_toTopOf="@id/iconLocation" />
 
-    <ImageButton
-        android:id="@+id/ibAttendance"
+    <TextView
+        android:id="@+id/tvAttendance"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="60dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/attendance_as_text"
+        android:textSize="29sp"
+        android:gravity="center"
         android:background="@drawable/round_button"
         app:layout_constraintTop_toBottomOf="@id/iconLocation"
         app:layout_constraintEnd_toStartOf="@id/guidelineVertical2"
@@ -149,10 +152,10 @@
         android:textSize="25sp"
         android:textAlignment="center"
         app:layout_constrainedWidth="true"
-        app:layout_constraintTop_toTopOf="@id/ibAttendance"
+        app:layout_constraintTop_toTopOf="@id/tvAttendance"
         app:layout_constraintStart_toStartOf="@id/iconLocation"
-        app:layout_constraintEnd_toStartOf="@id/ibAttendance"
-        app:layout_constraintBottom_toBottomOf="@id/ibAttendance"/>
+        app:layout_constraintEnd_toStartOf="@id/tvAttendance"
+        app:layout_constraintBottom_toBottomOf="@id/tvAttendance"/>
 
     <TextView
         android:id="@+id/notesTitle"
@@ -162,7 +165,7 @@
         android:layout_marginStart="10dp"
         android:text="@string/notes_text"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/ibAttendance"
+        app:layout_constraintTop_toBottomOf="@id/tvAttendance"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical1"/>
 
     <EditText

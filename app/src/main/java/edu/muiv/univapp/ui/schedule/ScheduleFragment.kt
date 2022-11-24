@@ -1,17 +1,23 @@
 package edu.muiv.univapp.ui.schedule
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
+import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleBinding
+import edu.muiv.univapp.user.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,13 +30,13 @@ class ScheduleFragment : Fragment() {
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
 
-    // TODO: implement ibAttendance, etNotes
+    // TODO: implement etNotes
     private lateinit var tvSubjectName: TextView
     private lateinit var tvSubjectType: TextView
     private lateinit var tvDate       : TextView
     private lateinit var tvTeacherName: TextView
     private lateinit var tvRoom       : TextView
-    private lateinit var ibAttendance : ImageButton
+    private lateinit var tvAttendance : TextView
     private lateinit var etNotes      : EditText
 
     private val scheduleDetailListVM: ScheduleDetailListVM by lazy {
@@ -40,9 +46,8 @@ class ScheduleFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val args: ScheduleFragmentArgs by navArgs()
-        val scheduleDate = args.scheduleDate
 
-        scheduleDetailListVM.loadSchedule(scheduleDate)
+        scheduleDetailListVM.scheduleID = UUID.fromString(args.scheduleId)
     }
 
     override fun onCreateView(
@@ -58,8 +63,12 @@ class ScheduleFragment : Fragment() {
         tvDate = binding.tvDate
         tvTeacherName = binding.tvTeacherName
         tvRoom = binding.tvRoom
-        ibAttendance = binding.ibAttendance
+        tvAttendance = binding.tvAttendance
         etNotes = binding.etNotes
+
+        tvAttendance.setOnClickListener {
+            showDialog()
+        }
 
         return root
     }
@@ -83,7 +92,7 @@ class ScheduleFragment : Fragment() {
     private fun updateUI(schedule: Schedule) {
         val formatIn = SimpleDateFormat("dd.MM", Locale.getDefault())
         val date = formatIn.parse(schedule.date)!!
-        val formatOut = SimpleDateFormat("dd MMM, EE", Locale.getDefault())
+        val formatOut = SimpleDateFormat("dd MMMM, EEEE", Locale.getDefault())
         val formattedDate = formatOut.format(date)
 
         val dateField = "$formattedDate ${schedule.timeStart} - ${schedule.timeEnd}"
@@ -98,5 +107,46 @@ class ScheduleFragment : Fragment() {
             val nameField = "${teacher.surname} ${teacher.name} ${teacher.patronymic}"
             tvTeacherName.text = nameField
         }
+
+        scheduleDetailListVM.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
+            scheduleDetailListVM.scheduleAttendance = it
+            val willAttend = it?.willAttend ?: false
+
+            tvAttendance.text = if (willAttend) "+" else ("Н")
+        }
+    }
+
+    private fun showDialog() {
+        val dialog = Dialog(requireActivity()).apply {
+            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            setContentView(R.layout.dialog_attendance)
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+
+        val dialogBtn = dialog.findViewById<Button>(R.id.btnDialogYes)
+        dialogBtn.setOnClickListener {
+            val attendance = if (scheduleDetailListVM.scheduleAttendance != null) {
+                with(scheduleDetailListVM.scheduleAttendance!!) {
+                    ScheduleAttendance(
+                        id,
+                        scheduleID,
+                        studentID,
+                        willAttend
+                    )
+                }
+            } else {
+                ScheduleAttendance(
+                    UUID.randomUUID(),
+                    scheduleDetailListVM.scheduleID!!,
+                    UserDataHolder.get().user.id,
+                    true
+                )
+            }
+
+            scheduleDetailListVM.upsertAttendance(attendance)
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

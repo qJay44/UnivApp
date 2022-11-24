@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Upsert
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.schedule.Schedule
+import edu.muiv.univapp.ui.schedule.ScheduleAttendance
 import edu.muiv.univapp.user.*
 import java.util.UUID
 
@@ -22,7 +24,7 @@ interface UnivDAO {
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>>
 
     @Query("SELECT * FROM schedule WHERE id=:id")
-    fun getScheduleById(id: String): LiveData<Schedule>
+    fun getScheduleById(id: UUID): LiveData<Schedule>
 
     @Query("SELECT * FROM schedule WHERE studentGroup=:group AND date IN (:days)")
     fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>>
@@ -33,6 +35,12 @@ interface UnivDAO {
         "WHERE teacher.id=:teacherID AND date IN (:days)"
     )
     fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>>
+
+    @Query("SELECT * FROM ScheduleAttendance WHERE scheduleID=:scheduleID AND studentID=:studentID")
+    fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?>
+
+    @Upsert(entity = ScheduleAttendance::class)
+    fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance)
 
     @Insert
     fun addSchedule(schedule: Schedule)
