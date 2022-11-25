@@ -9,7 +9,7 @@ import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.UserDataHolder
 import java.util.UUID
 
-class ScheduleDetailListVM : ViewModel() {
+class ScheduleViewModel : ViewModel() {
 
     private val univRepository = UnivRepository.get()
     private val scheduleDateLiveData = MutableLiveData<UUID>()

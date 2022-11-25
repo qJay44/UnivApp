@@ -41,15 +41,15 @@ class ScheduleFragment : Fragment() {
     private lateinit var tvAttendance : TextView
     private lateinit var etNotes      : EditText
 
-    private val scheduleDetailListVM: ScheduleDetailListVM by lazy {
-        ViewModelProvider(this)[ScheduleDetailListVM::class.java]
+    private val scheduleViewModel: ScheduleViewModel by lazy {
+        ViewModelProvider(this)[ScheduleViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val args: ScheduleFragmentArgs by navArgs()
 
-        scheduleDetailListVM.scheduleID = UUID.fromString(args.scheduleId)
+        scheduleViewModel.scheduleID = UUID.fromString(args.scheduleId)
     }
 
     override fun onCreateView(
@@ -79,31 +79,31 @@ class ScheduleFragment : Fragment() {
         }
 
         // Update schedule info
-        scheduleDetailListVM.scheduleLiveData.observe(viewLifecycleOwner) { schedule ->
+        scheduleViewModel.scheduleLiveData.observe(viewLifecycleOwner) { schedule ->
             schedule?.let {
                 Log.i(TAG, schedule.toString())
                 updateUI(schedule)
-                scheduleDetailListVM.loadTeacher(schedule.teacherID)
+                scheduleViewModel.loadTeacher(schedule.teacherID)
             }
         }
 
         // Update teacher's name
-        scheduleDetailListVM.teacherLiveData.observe(viewLifecycleOwner) {
+        scheduleViewModel.teacherLiveData.observe(viewLifecycleOwner) {
             val teacher = it[0]
             val nameField = "${teacher.surname} ${teacher.name} ${teacher.patronymic}"
             tvTeacherName.text = nameField
         }
 
         // Update attendance status
-        scheduleDetailListVM.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
-            scheduleDetailListVM.scheduleAttendance = it
+        scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
+            scheduleViewModel.scheduleAttendance = it
             val willAttend = it?.willAttend ?: false
             tvAttendance.text = if (willAttend) "+" else ("Н")
         }
 
         // Update notes
-        scheduleDetailListVM.scheduleUserNotesLiveData.observe(viewLifecycleOwner) {
-            scheduleDetailListVM.scheduleUserNotes = it
+        scheduleViewModel.scheduleUserNotesLiveData.observe(viewLifecycleOwner) {
+            scheduleViewModel.scheduleUserNotes = it
             etNotes.setText(it?.notes)
         }
 
@@ -121,8 +121,8 @@ class ScheduleFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        val notes = if (scheduleDetailListVM.scheduleUserNotes != null) {
-            with(scheduleDetailListVM.scheduleUserNotes!!) {
+        val notes = if (scheduleViewModel.scheduleUserNotes != null) {
+            with(scheduleViewModel.scheduleUserNotes!!) {
                 val changedNotes = if(notes != notesText) notesText else notes
                 ScheduleUserNotes(
                     id,
@@ -134,13 +134,13 @@ class ScheduleFragment : Fragment() {
         } else {
             ScheduleUserNotes(
                 UUID.randomUUID(),
-                scheduleDetailListVM.scheduleID!!,
+                scheduleViewModel.scheduleID!!,
                 UserDataHolder.get().user.id,
                 notesText
             )
         }
 
-        scheduleDetailListVM.upsertScheduleUserNotes(notes)
+        scheduleViewModel.upsertScheduleUserNotes(notes)
     }
 
     override fun onDestroyView() {
@@ -171,8 +171,8 @@ class ScheduleFragment : Fragment() {
 
         val dialogBtn = dialog.findViewById<Button>(R.id.btnDialogYes)
         dialogBtn.setOnClickListener {
-            val attendance = if (scheduleDetailListVM.scheduleAttendance != null) {
-                with(scheduleDetailListVM.scheduleAttendance!!) {
+            val attendance = if (scheduleViewModel.scheduleAttendance != null) {
+                with(scheduleViewModel.scheduleAttendance!!) {
                     ScheduleAttendance(
                         id,
                         scheduleID,
@@ -183,13 +183,13 @@ class ScheduleFragment : Fragment() {
             } else {
                 ScheduleAttendance(
                     UUID.randomUUID(),
-                    scheduleDetailListVM.scheduleID!!,
+                    scheduleViewModel.scheduleID!!,
                     UserDataHolder.get().user.id,
                     true
                 )
             }
 
-            scheduleDetailListVM.upsertAttendance(attendance)
+            scheduleViewModel.upsertAttendance(attendance)
             dialog.dismiss()
         }
 
