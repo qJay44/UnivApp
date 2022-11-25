@@ -8,6 +8,7 @@ import androidx.room.Upsert
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.ui.schedule.ScheduleAttendance
+import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
 import edu.muiv.univapp.user.*
 import java.util.UUID
 
@@ -39,8 +40,14 @@ interface UnivDAO {
     @Query("SELECT * FROM ScheduleAttendance WHERE scheduleID=:scheduleID AND studentID=:studentID")
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?>
 
+    @Query("SELECT * FROM ScheduleUserNotes WHERE scheduleID=:scheduleID AND studentID=:studentID")
+    fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?>
+
     @Upsert(entity = ScheduleAttendance::class)
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance)
+
+    @Upsert(entity = ScheduleUserNotes::class)
+    fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes)
 
     @Insert
     fun addSchedule(schedule: Schedule)

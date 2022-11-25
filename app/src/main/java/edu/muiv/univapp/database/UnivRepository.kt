@@ -7,6 +7,7 @@ import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.ui.schedule.ScheduleAttendance
+import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
 import edu.muiv.univapp.user.*
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -50,10 +51,17 @@ class UnivRepository private constructor(context: Context){
     fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForStudent(group, days)
     fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForTeacher(teacherID, days)
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?> = univDAO.getScheduleAttendance(scheduleID, studentID)
+    fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?> = univDAO.getScheduleUserNotes(scheduleID, studentID)
 
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
             univDAO.upsertScheduleAttendance(scheduleAttendance)
+        }
+    }
+
+    fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes) {
+        executor.execute {
+            univDAO.upsertScheduleUserNotes(scheduleUserNotes)
         }
     }
 

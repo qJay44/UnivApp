@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -29,8 +31,8 @@ class ScheduleFragment : Fragment() {
 
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
+    private var notesText: String? = null
 
-    // TODO: implement etNotes
     private lateinit var tvSubjectName: TextView
     private lateinit var tvSubjectType: TextView
     private lateinit var tvDate       : TextView
@@ -66,22 +68,79 @@ class ScheduleFragment : Fragment() {
         tvAttendance = binding.tvAttendance
         etNotes = binding.etNotes
 
-        tvAttendance.setOnClickListener {
-            showDialog()
-        }
-
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        tvAttendance.setOnClickListener {
+            showDialog()
+        }
+
+        // Update schedule info
         scheduleDetailListVM.scheduleLiveData.observe(viewLifecycleOwner) { schedule ->
             schedule?.let {
-                Log.i(TAG, "Updating UI...")
+                Log.i(TAG, schedule.toString())
                 updateUI(schedule)
                 scheduleDetailListVM.loadTeacher(schedule.teacherID)
             }
         }
+
+        // Update teacher's name
+        scheduleDetailListVM.teacherLiveData.observe(viewLifecycleOwner) {
+            val teacher = it[0]
+            val nameField = "${teacher.surname} ${teacher.name} ${teacher.patronymic}"
+            tvTeacherName.text = nameField
+        }
+
+        // Update attendance status
+        scheduleDetailListVM.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
+            scheduleDetailListVM.scheduleAttendance = it
+            val willAttend = it?.willAttend ?: false
+            tvAttendance.text = if (willAttend) "+" else ("Н")
+        }
+
+        // Update notes
+        scheduleDetailListVM.scheduleUserNotesLiveData.observe(viewLifecycleOwner) {
+            scheduleDetailListVM.scheduleUserNotes = it
+            etNotes.setText(it?.notes)
+        }
+
+        val notesTextWatcher = object : TextWatcher {
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                notesText = p0.toString()
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) {}
+        }
+
+        etNotes.addTextChangedListener(notesTextWatcher)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        val notes = if (scheduleDetailListVM.scheduleUserNotes != null) {
+            with(scheduleDetailListVM.scheduleUserNotes!!) {
+                val changedNotes = if(notes != notesText) notesText else notes
+                ScheduleUserNotes(
+                    id,
+                    scheduleID,
+                    studentID,
+                    changedNotes
+                )
+            }
+        } else {
+            ScheduleUserNotes(
+                UUID.randomUUID(),
+                scheduleDetailListVM.scheduleID!!,
+                UserDataHolder.get().user.id,
+                notesText
+            )
+        }
+
+        scheduleDetailListVM.upsertScheduleUserNotes(notes)
     }
 
     override fun onDestroyView() {
@@ -101,19 +160,6 @@ class ScheduleFragment : Fragment() {
         tvSubjectName.text = schedule.subjectName
         tvDate.text = dateField
         tvRoom.text = roomField
-
-        scheduleDetailListVM.teacherLiveData.observe(viewLifecycleOwner) {
-            val teacher = it[0]
-            val nameField = "${teacher.surname} ${teacher.name} ${teacher.patronymic}"
-            tvTeacherName.text = nameField
-        }
-
-        scheduleDetailListVM.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
-            scheduleDetailListVM.scheduleAttendance = it
-            val willAttend = it?.willAttend ?: false
-
-            tvAttendance.text = if (willAttend) "+" else ("Н")
-        }
     }
 
     private fun showDialog() {

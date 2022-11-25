@@ -14,8 +14,9 @@ class ScheduleDetailListVM : ViewModel() {
     private val univRepository = UnivRepository.get()
     private val scheduleDateLiveData = MutableLiveData<UUID>()
     private val teacherIdLiveData = MutableLiveData<Array<UUID>>()
-    private val scheduleMapLiveData = MutableLiveData<Map<UUID, UUID>>()
+    private val scheduleToStudentLiveData = MutableLiveData<Map<UUID, UUID>>()
     var scheduleAttendance: ScheduleAttendance? = null
+    var scheduleUserNotes: ScheduleUserNotes? = null
 
     var scheduleID: UUID? = null
         set(value) {
@@ -24,19 +25,26 @@ class ScheduleDetailListVM : ViewModel() {
             loadAttendance(value, UserDataHolder.get().user.id)
         }
 
-    var scheduleLiveData: LiveData<Schedule> =
+    val scheduleLiveData: LiveData<Schedule> =
         Transformations.switchMap(scheduleDateLiveData) { id ->
             univRepository.getScheduleById(id)
         }
 
-    var teacherLiveData: LiveData<Array<Teacher>> =
+    val teacherLiveData: LiveData<Array<Teacher>> =
         Transformations.switchMap(teacherIdLiveData) { IDs ->
             univRepository.getTeachersByIDs(IDs)
         }
 
-    var scheduleAttendanceLiveData: LiveData<ScheduleAttendance?> =
-        Transformations.switchMap(scheduleMapLiveData) { MapId ->
+    val scheduleAttendanceLiveData: LiveData<ScheduleAttendance?> =
+        Transformations.switchMap(scheduleToStudentLiveData) { MapId ->
             univRepository.getScheduleAttendance(
+                MapId.keys.elementAt(0), MapId.values.elementAt(0)
+            )
+        }
+
+    val scheduleUserNotesLiveData: LiveData<ScheduleUserNotes?> =
+        Transformations.switchMap(scheduleToStudentLiveData) { MapId ->
+            univRepository.getScheduleUserNotes(
                 MapId.keys.elementAt(0), MapId.values.elementAt(0)
             )
         }
@@ -47,7 +55,7 @@ class ScheduleDetailListVM : ViewModel() {
 
     private fun loadAttendance(scheduleID: UUID, studentID: UUID) {
         val idMap = mapOf(scheduleID to studentID)
-        scheduleMapLiveData.value = idMap
+        scheduleToStudentLiveData.value = idMap
     }
 
     fun loadTeacher(id: UUID) {
@@ -57,5 +65,9 @@ class ScheduleDetailListVM : ViewModel() {
 
     fun upsertAttendance(scheduleAttendance: ScheduleAttendance) {
         univRepository.upsertScheduleAttendance(scheduleAttendance)
+    }
+
+    fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes) {
+        univRepository.upsertScheduleUserNotes(scheduleUserNotes)
     }
 }
