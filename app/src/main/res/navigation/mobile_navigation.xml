@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="edu.muiv.univapp.ui.notifications.NotificationsFragment"
+        android:name="edu.muiv.univapp.ui.notifications.NotificationListFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_notifications_list" />
 
     <fragment
         android:id="@+id/navigation_schedule_list"

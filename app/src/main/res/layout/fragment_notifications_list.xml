@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    tools:context=".ui.notifications.NotificationListFragment">
+
+    <ImageView
+        android:id="@+id/info_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/round_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_launcher_foreground"
+        android:contentDescription="@string/info_icon" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_border"
+        android:backgroundTint="@color/muiv_primary"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/notifications_title"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="@id/info_icon"
+        app:layout_constraintStart_toEndOf="@id/info_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/info_icon" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="15dp"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/info_icon"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

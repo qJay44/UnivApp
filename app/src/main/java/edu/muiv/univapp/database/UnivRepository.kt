@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.login.LoginResult
+import edu.muiv.univapp.ui.notifications.Notification
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.ui.schedule.ScheduleAttendance
 import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
@@ -52,6 +53,7 @@ class UnivRepository private constructor(context: Context){
     fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForTeacher(teacherID, days)
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?> = univDAO.getScheduleAttendance(scheduleID, studentID)
     fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?> = univDAO.getScheduleUserNotes(scheduleID, studentID)
+    fun getNotifications(): LiveData<List<Notification>> = univDAO.getNotifications()
 
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
@@ -80,6 +82,12 @@ class UnivRepository private constructor(context: Context){
     fun addTeacher(teacher: Teacher) {
         executor.execute {
             univDAO.addTeacher(teacher)
+        }
+    }
+
+    fun addNotification(notification: Notification) {
+        executor.execute {
+            univDAO.addNotification(notification)
         }
     }
 }

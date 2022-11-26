@@ -41,4 +41,7 @@
     <string name="attendance_as_text">Н</string>
     <string name="dialog_tv_question">Вы присутствуете на данной паре?</string>
     <string name="dialog_btn_yes">Да</string>
+    <string name="notifications_title">УВЕДОМЛЕНИЯ</string>
+    <string name="notification_title_example">Изменение в расписании!</string>
+    <string name="notification_text_example">Уважаемые студенты! Произошли изменения в расписание на следующей неделе!</string>
 </resources>

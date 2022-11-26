@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import edu.muiv.univapp.ui.login.LoginResult
+import edu.muiv.univapp.ui.notifications.Notification
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.ui.schedule.ScheduleAttendance
 import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
@@ -49,6 +50,9 @@ interface UnivDAO {
     @Upsert(entity = ScheduleUserNotes::class)
     fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes)
 
+    @Query("SELECT * FROM Notification")
+    fun getNotifications(): LiveData<List<Notification>>
+
     @Insert
     fun addSchedule(schedule: Schedule)
 
@@ -57,4 +61,7 @@ interface UnivDAO {
 
     @Insert
     fun addTeacher(teacher: Teacher)
+
+    @Insert
+    fun addNotification(notification: Notification)
 }

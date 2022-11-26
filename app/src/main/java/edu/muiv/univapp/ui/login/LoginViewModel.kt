@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
+import edu.muiv.univapp.ui.notifications.Notification
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.user.Student
 import edu.muiv.univapp.user.Teacher
@@ -55,5 +56,9 @@ class LoginViewModel : ViewModel() {
 
     fun addSchedule(schedule: Schedule) {
         univRepository.addSchedule(schedule)
+    }
+
+    fun addNotification(notification: Notification) {
+        univRepository.addNotification(notification)
     }
 }

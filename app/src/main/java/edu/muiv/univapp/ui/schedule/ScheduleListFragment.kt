@@ -203,7 +203,6 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onClick(p0: View?) {
-            // TODO: Open a schedule day
             val action = ScheduleListFragmentDirections
                 .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
             p0?.findNavController()?.navigate(action)
@@ -247,7 +246,6 @@ class ScheduleListFragment : Fragment() {
             val action = ScheduleListFragmentDirections
                 .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
             p0?.findNavController()?.navigate(action)
-
             Log.i(TAG, "Selected schedule (date: ${schedule.date})")
         }
     }

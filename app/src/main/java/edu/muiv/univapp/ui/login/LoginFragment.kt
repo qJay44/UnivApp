@@ -47,7 +47,7 @@ class LoginFragment : Fragment() {
 
         if (ADD_TEST_DATA) {
 
-            DatabaseTestDataBuilder.createAll(50)
+            DatabaseTestDataBuilder.createAll(25)
 
             for (student in DatabaseTestDataBuilder.studentList)
                 loginViewModel.addStudent(student)
@@ -57,6 +57,9 @@ class LoginFragment : Fragment() {
 
             for (schedule in DatabaseTestDataBuilder.scheduleList)
                 loginViewModel.addSchedule(schedule)
+
+            for (notification in DatabaseTestDataBuilder.notificationList)
+                loginViewModel.addNotification(notification)
         }
     }
 
