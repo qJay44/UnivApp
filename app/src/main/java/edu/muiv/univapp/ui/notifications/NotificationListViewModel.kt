@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 
 class NotificationListViewModel : ViewModel() {
-
     private val repository = UnivRepository.get()
     private val _notifications = repository.getNotifications()
 

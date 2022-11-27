@@ -2,6 +2,7 @@ package edu.muiv.univapp.user
 
 import android.util.Log
 import edu.muiv.univapp.ui.notifications.Notification
+import edu.muiv.univapp.ui.profile.ProfileAttendance
 import edu.muiv.univapp.ui.schedule.Schedule
 import java.text.SimpleDateFormat
 import java.util.*
@@ -152,6 +153,23 @@ object DatabaseTestDataBuilder {
         "09:50", "11:30", "13:10", "15:15", "16:55", "18:35"
     )
 
+    private val scheduleTypes: Array<String> = arrayOf(
+        "Лекция", "СПЗ"
+    )
+
+    @Suppress("SpellCheckingInspection")
+    private const val SENTENCE =
+        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque " +
+        "laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi " +
+        "architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas " +
+        "sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione " +
+        "voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit " +
+        "amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut " +
+        "labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis " +
+        "nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea " +
+        "commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit" +
+        "esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
+
     private val subjectNames1: Array<String> = arrayOf(
         "Адаптация типовых конфигураций корпоративных информационных систем",
         "Библиотеки стандартных подсистем",
@@ -176,27 +194,18 @@ object DatabaseTestDataBuilder {
         "Комплексный экономический анализ хозяйственной деятельности"
     )
 
-    private val scheduleTypes: Array<String> = arrayOf(
-        "Лекция", "СПЗ"
+    private var examTypes: Array<String> = arrayOf(
+        "Зачет", "Экзамен"
     )
 
-    @Suppress("SpellCheckingInspection")
-    private const val SENTENCE =
-        "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque " +
-        "laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi " +
-        "architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas " +
-        "sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione " +
-        "voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit " +
-        "amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut " +
-        "labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis " +
-        "nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea " +
-        "commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit" +
-        "esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
+    private var currentGroupName = ""
 
     val studentList: MutableList<Student> = mutableListOf()
     val teacherList: MutableList<Teacher> = mutableListOf()
     val scheduleList: MutableList<Schedule> = mutableListOf()
     val notificationList: MutableList<Notification> = mutableListOf()
+    val profileAttendanceList: MutableList<ProfileAttendance> = mutableListOf()
+    val subjectList: MutableList<Subject> = mutableListOf()
 
     private fun randInt(a: Int, b: Int) = (a..b).shuffled().last()
 
@@ -205,9 +214,7 @@ object DatabaseTestDataBuilder {
         val maxStartIndex = timeStart.size - amount
         val startIndex = randInt(0, maxStartIndex)
         val groupNameIndex = randInt(0, 1)
-        val faculty = if (groupNameIndex == 0) subjectNames1 else subjectNames2
-        val groupName = if (groupNameIndex == 0) groupNames1 else groupNames2
-        val currentGroup = groupName[(groupName.indices).shuffled().last()]
+        val currentSubjectList = if (groupNameIndex == 0) subjectNames1 else subjectNames2
 
         for (i in 0 until amount) {
             val schedule = Schedule(
@@ -215,10 +222,10 @@ object DatabaseTestDataBuilder {
                 date = scheduleDate,
                 timeStart = timeStart[startIndex + i],
                 timeEnd = timeEnd[startIndex + i],
-                subjectName = faculty[(faculty.indices).shuffled().last()],
+                subjectName = currentSubjectList[(currentSubjectList.indices).shuffled().last()],
                 roomNum = randInt(100, 525),
                 type = randArrayElement(scheduleTypes),
-                studentGroup = currentGroup,
+                studentGroup = currentGroupName,
                 teacherID = teacherList[(teacherList.indices).shuffled().last()].id
             )
 
@@ -239,6 +246,7 @@ object DatabaseTestDataBuilder {
 
             when (if (isHalf) userGroups[0] else userGroups[1]) {
                 "Student" -> {
+                    currentGroupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(groupNames2)
                     val student =
                         Student(
                             id = UUID.randomUUID(),
@@ -247,7 +255,7 @@ object DatabaseTestDataBuilder {
                             patronymic = randArrayElement(patronymics),
                             login = "stud${studentList.size + 1}",
                             password = "1",
-                            groupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(groupNames2),
+                            groupName = currentGroupName
                         )
                     studentList += student
                 }
@@ -284,8 +292,43 @@ object DatabaseTestDataBuilder {
             ///////////////////
 
             createScheduleDay(format.format(calendar.time))
+
+            // Profile //
+
+            val boolList = listOf(false, true)
+            if (studentList.isNotEmpty()) {
+                val profileAttendance = ProfileAttendance(
+                    id = UUID.randomUUID(),
+                    scheduleID = scheduleList.shuffled().last().id,
+                    userID = studentList.shuffled().last().id,
+                    visited = boolList.shuffled().last()
+                )
+                profileAttendanceList += profileAttendance
+            }
+
+            /////////////
+
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
+
+        // Subjects //
+
+        subjectNames1.zip(subjectNames2).forEach { (a, b) ->
+            val whichToChoose = randInt(0, 1)
+            val currentName = if (whichToChoose == 0) a else b
+            val examTypeIndex = randInt(0, 1)
+            val subject = Subject(
+                id = UUID.randomUUID(),
+                subjectName = currentName,
+                groupName = currentGroupName,
+                teacherID = teacherList.shuffled().last().id,
+                examType = examTypes[examTypeIndex]
+            )
+            subjectList += subject
+        }
+
+        //////////////
+
         if (studentList.isEmpty()) Log.w(TAG, "Student list is empty")
         if (teacherList.isEmpty()) Log.w(TAG, "Teacher list is empty")
         if (scheduleList.isEmpty()) Log.w(TAG, "Schedule list is empty")

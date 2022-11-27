@@ -22,6 +22,13 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_profile_list"
+        android:name="edu.muiv.univapp.ui.profile.ProfileListFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile_list" >
+    </fragment>
+
+    <fragment
         android:id="@+id/navigation_schedule"
         android:name="edu.muiv.univapp.ui.schedule.ScheduleFragment"
         android:label="Schedule"

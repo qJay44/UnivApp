@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.notifications.Notification
+import edu.muiv.univapp.ui.profile.ProfileAttendance
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.ui.schedule.ScheduleAttendance
 import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
@@ -53,6 +54,12 @@ interface UnivDAO {
     @Query("SELECT * FROM Notification")
     fun getNotifications(): LiveData<List<Notification>>
 
+    @Query("SELECT * FROM Subject WHERE groupName=:groupName")
+    fun getSubjectsByGroupName(groupName: String): LiveData<List<Subject>>
+
+    @Query("SELECT * FROM ProfileAttendance WHERE userID=:userID")
+    fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>>
+
     @Insert
     fun addSchedule(schedule: Schedule)
 
@@ -64,4 +71,10 @@ interface UnivDAO {
 
     @Insert
     fun addNotification(notification: Notification)
+
+    @Insert
+    fun addProfileAttendance(profileAttendance: ProfileAttendance)
+
+    @Insert
+    fun addSubject(subject: Subject)
 }

@@ -60,6 +60,12 @@ class LoginFragment : Fragment() {
 
             for (notification in DatabaseTestDataBuilder.notificationList)
                 loginViewModel.addNotification(notification)
+
+            for (profileAttendance in DatabaseTestDataBuilder.profileAttendanceList)
+                loginViewModel.addProfileAttendance(profileAttendance)
+
+            for (subject in DatabaseTestDataBuilder.subjectList)
+                loginViewModel.addSubject(subject)
         }
     }
 

@@ -6,8 +6,10 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.notifications.Notification
+import edu.muiv.univapp.ui.profile.ProfileAttendance
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.user.Student
+import edu.muiv.univapp.user.Subject
 import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.UserDataHolder
 
@@ -60,5 +62,13 @@ class LoginViewModel : ViewModel() {
 
     fun addNotification(notification: Notification) {
         univRepository.addNotification(notification)
+    }
+
+    fun addProfileAttendance(profileAttendance: ProfileAttendance) {
+        univRepository.addProfileAttendance(profileAttendance)
+    }
+
+    fun addSubject(subject: Subject) {
+        univRepository.addSubject(subject)
     }
 }

@@ -4,10 +4,12 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import edu.muiv.univapp.ui.notifications.Notification
+import edu.muiv.univapp.ui.profile.ProfileAttendance
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.ui.schedule.ScheduleAttendance
 import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
 import edu.muiv.univapp.user.Student
+import edu.muiv.univapp.user.Subject
 import edu.muiv.univapp.user.Teacher
 
 @Database(
@@ -17,7 +19,9 @@ import edu.muiv.univapp.user.Teacher
         Teacher::class,
         ScheduleAttendance::class,
         ScheduleUserNotes::class,
-        Notification::class
+        Notification::class,
+        ProfileAttendance::class,
+        Subject::class
    ],
     version = 1,
     exportSchema = false

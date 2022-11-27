@@ -6,6 +6,7 @@ import androidx.room.Room
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.notifications.Notification
+import edu.muiv.univapp.ui.profile.ProfileAttendance
 import edu.muiv.univapp.ui.schedule.Schedule
 import edu.muiv.univapp.ui.schedule.ScheduleAttendance
 import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
@@ -54,6 +55,8 @@ class UnivRepository private constructor(context: Context){
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?> = univDAO.getScheduleAttendance(scheduleID, studentID)
     fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?> = univDAO.getScheduleUserNotes(scheduleID, studentID)
     fun getNotifications(): LiveData<List<Notification>> = univDAO.getNotifications()
+    fun getSubjectsByGroupName(groupName: String): LiveData<List<Subject>> = univDAO.getSubjectsByGroupName(groupName)
+    fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>> = univDAO.getProfileAttendance(userID)
 
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
@@ -88,6 +91,18 @@ class UnivRepository private constructor(context: Context){
     fun addNotification(notification: Notification) {
         executor.execute {
             univDAO.addNotification(notification)
+        }
+    }
+
+    fun addProfileAttendance(profileAttendance: ProfileAttendance) {
+        executor.execute {
+            univDAO.addProfileAttendance(profileAttendance)
+        }
+    }
+
+    fun addSubject(subject: Subject) {
+        executor.execute {
+            univDAO.addSubject(subject)
         }
     }
 }
