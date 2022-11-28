@@ -37,6 +37,17 @@ class ProfileListFragment : Fragment() {
     private lateinit var tvAttendanceAmount: TextView
     private lateinit var adapter: SubjectAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            profileListViewModel.loadSubjects()
+            profileListViewModel.loadProfileAttendance()
+        } else {
+            profileListViewModel.resetVisitAmount()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,9 +64,6 @@ class ProfileListFragment : Fragment() {
         rvSubject.layoutManager = LinearLayoutManager(context)
         rvSubject.adapter = adapter
 
-        profileListViewModel.loadSubjects()
-        profileListViewModel.loadProfileAttendance()
-
         return view
     }
 
@@ -69,38 +77,34 @@ class ProfileListFragment : Fragment() {
         }
 
         profileListViewModel.profileAttendance.observe(viewLifecycleOwner) { userProfile ->
-            profileListViewModel.scheduleAllSize = userProfile.size
-            for (scheduleVisit in userProfile) {
-                if (scheduleVisit.visited) profileListViewModel.visitAmount++
-            }
+            profileListViewModel.loadProfileProperties(userProfile)
 
             val attendancePercent = profileListViewModel.attendancePercent
-            val attendancePercentString = resources.getString(R.string.user_attendance_percent)
-            val attendancePercentText = attendancePercentString + getSpannableString(attendancePercent)
+            val attendancePercentBaseString = resources.getString(R.string.user_attendance_percent)
+            val attendancePercentText =
+                createSpannableString(attendancePercentBaseString + attendancePercent)
 
             val attendanceAmount = profileListViewModel.attendanceAmount
-            val attendanceAmountString = resources.getString(R.string.user_attendance_amount)
-            val attendanceAmountText = attendanceAmountString + getSpannableString(attendanceAmount)
+            val attendanceAmountBaseString = resources.getString(R.string.user_attendance_amount)
+            val attendanceAmountText =
+                createSpannableString(attendanceAmountBaseString + attendanceAmount)
 
             tvAttendancePercent.text = attendancePercentText
             tvAttendanceAmount.text = attendanceAmountText
         }
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        profileListViewModel.scheduleAllSize = 0
-        profileListViewModel.visitAmount = 0
-    }
-
     private fun updateUI(subjects: List<Subject>) {
         adapter.submitList(subjects)
     }
 
-    private fun getSpannableString(text: String): SpannableString {
+    private fun createSpannableString(text: String): SpannableString {
         val spannableString = SpannableString(text)
+        val startIndex = text.indexOf(":") + 2
+        val endIndex = spannableString.length
         val foregroundSpan = ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.muiv_primary))
-        spannableString.setSpan(foregroundSpan, 0, spannableString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        spannableString.setSpan(foregroundSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         return spannableString
     }

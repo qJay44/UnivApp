@@ -23,8 +23,8 @@ class ProfileListViewModel : ViewModel() {
 
     ////////////////////////
 
-    var scheduleAllSize = 0
-    var visitAmount = 0
+    private var scheduleAllSize = 0
+    private var visitAmount = 0
 
     val attendanceAmount: String
         get() = " $visitAmount / $scheduleAllSize"
@@ -32,7 +32,7 @@ class ProfileListViewModel : ViewModel() {
     val attendancePercent: String
         get() {
             return try {
-                " ${visitAmount / scheduleAllSize * 100}%"
+                " ${(visitAmount.toFloat() / scheduleAllSize * 100).toInt()}%"
             } catch (e: ArithmeticException) {
                 " 100%"
             }
@@ -72,5 +72,17 @@ class ProfileListViewModel : ViewModel() {
             subjects[it].teacherID
         }
         _teachers.value = teacherIDs
+    }
+
+    fun loadProfileProperties(profileAttendanceList: List<ProfileAttendance>) {
+        scheduleAllSize = profileAttendanceList.size
+
+        for (scheduleVisit in profileAttendanceList) {
+            if (scheduleVisit.visited) visitAmount++
+        }
+    }
+
+    fun resetVisitAmount() {
+        visitAmount = 0
     }
 }

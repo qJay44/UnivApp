@@ -296,14 +296,17 @@ object DatabaseTestDataBuilder {
             // Profile //
 
             val boolList = listOf(false, true)
-            if (studentList.isNotEmpty()) {
-                val profileAttendance = ProfileAttendance(
-                    id = UUID.randomUUID(),
-                    scheduleID = scheduleList.shuffled().last().id,
-                    userID = studentList.shuffled().last().id,
-                    visited = boolList.shuffled().last()
-                )
-                profileAttendanceList += profileAttendance
+            val currentSchedule = scheduleList.last()
+            for (student in studentList) {
+                if (student.groupName == currentSchedule.studentGroup) {
+                    val profileAttendance = ProfileAttendance(
+                        id = UUID.randomUUID(),
+                        scheduleID = currentSchedule.id,
+                        userID = student.id,
+                        visited = boolList.shuffled().last()
+                    )
+                    profileAttendanceList += profileAttendance
+                }
             }
 
             /////////////
@@ -313,24 +316,30 @@ object DatabaseTestDataBuilder {
 
         // Subjects //
 
-        subjectNames1.zip(subjectNames2).forEach { (a, b) ->
-            val whichToChoose = randInt(0, 1)
-            val currentName = if (whichToChoose == 0) a else b
-            val examTypeIndex = randInt(0, 1)
-            val subject = Subject(
-                id = UUID.randomUUID(),
-                subjectName = currentName,
-                groupName = currentGroupName,
-                teacherID = teacherList.shuffled().last().id,
-                examType = examTypes[examTypeIndex]
-            )
-            subjectList += subject
+        groupNames1.zip(groupNames2).forEach { (a, b) ->
+            subjectNames1.zip(subjectNames2).forEach { (x, y) ->
+                var examTypeIndex = randInt(0, 1)
+                var subject = Subject(
+                    id = UUID.randomUUID(),
+                    subjectName = x,
+                    groupName = a,
+                    teacherID = teacherList.shuffled().last().id,
+                    examType = examTypes[examTypeIndex]
+                )
+                subjectList += subject
+
+                examTypeIndex = randInt(0, 1)
+                subject = Subject(
+                    id = UUID.randomUUID(),
+                    subjectName = y,
+                    groupName = b,
+                    teacherID = teacherList.shuffled().last().id,
+                    examType = examTypes[examTypeIndex]
+                )
+                subjectList += subject
+            }
         }
 
         //////////////
-
-        if (studentList.isEmpty()) Log.w(TAG, "Student list is empty")
-        if (teacherList.isEmpty()) Log.w(TAG, "Teacher list is empty")
-        if (scheduleList.isEmpty()) Log.w(TAG, "Schedule list is empty")
     }
 }
