@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.transition.TransitionInflater
 import edu.muiv.univapp.R
 
 class LoginFragmentChoice : Fragment() {
@@ -22,6 +23,12 @@ class LoginFragmentChoice : Fragment() {
     private lateinit var btnAsStudent: Button
     private lateinit var btnAsTeacher: Button
     private var callbacks: Callbacks? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val inflater = TransitionInflater.from(requireContext())
+        exitTransition = inflater.inflateTransition(R.transition.fade)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

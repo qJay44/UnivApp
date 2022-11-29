@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.TransitionInflater
 import edu.muiv.univapp.R
 import edu.muiv.univapp.user.DatabaseTestDataBuilder
 import edu.muiv.univapp.user.UserActivity
@@ -67,6 +68,9 @@ class LoginFragment : Fragment() {
             for (subject in DatabaseTestDataBuilder.subjectList)
                 loginViewModel.addSubject(subject)
         }
+
+        val inflater = TransitionInflater.from(requireContext())
+        enterTransition = inflater.inflateTransition(R.transition.slide_right)
     }
 
     override fun onCreateView(

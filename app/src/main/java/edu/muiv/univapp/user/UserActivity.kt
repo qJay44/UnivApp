@@ -46,7 +46,7 @@ class UserActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_notifications, R.id.navigation_schedule_list
+                R.id.navigation_notifications, R.id.navigation_schedule_list, R.id.navigation_profile_list
             )
         )
 

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionInflater
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentProfileListBinding
 import edu.muiv.univapp.user.Subject
@@ -39,6 +40,9 @@ class ProfileListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val inflater = TransitionInflater.from(requireContext())
+        enterTransition = inflater.inflateTransition(R.transition.slide_right)
+        exitTransition = inflater.inflateTransition(R.transition.fade)
 
         if (savedInstanceState == null) {
             profileListViewModel.loadSubjects()
@@ -91,6 +95,8 @@ class ProfileListFragment : Fragment() {
 
             tvAttendancePercent.text = attendancePercentText
             tvAttendanceAmount.text = attendanceAmountText
+
+            postponeEnterTransition()
         }
     }
 
@@ -135,12 +141,14 @@ class ProfileListFragment : Fragment() {
         private val tvSubjectDetails: TextView = itemView.findViewById(R.id.tvSubjectDetails)
 
         fun bind(subject: Subject) {
-            profileListViewModel.teachersById.observe(viewLifecycleOwner) {
-                val teacher = it[subject.teacherID]
-                val teacherField = "${teacher?.surname} ${teacher?.name?.get(0)}. ${teacher?.patronymic?.get(0)}."
-                val detailsField = "$teacherField | ${subject.examType}"
-
-                tvSubjectDetails.text = detailsField
+            profileListViewModel.teachersById.observe(viewLifecycleOwner) { teacherMap ->
+                val teacher = teacherMap[subject.teacherID]
+                teacher?.let {
+                    val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
+                    val detailsField = "$teacherField | ${subject.examType}"
+                    tvSubjectDetails.text = detailsField
+                    startPostponedEnterTransition()
+                }
             }
             tvSubjectName.text = subject.subjectName
         }
