@@ -6,7 +6,7 @@
         android:top="-2dp">
         <shape android:shape="rectangle">
             <solid android:color="@android:color/transparent"/>
-            <stroke android:width="1dp" android:color="@color/muiv_primary"/>
+            <stroke android:width="1dp" android:color="@color/color_primary"/>
         </shape>
     </item>
 </layer-list>

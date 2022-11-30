@@ -108,7 +108,7 @@ class ProfileFragment : Fragment() {
         val spannableString = SpannableString(text)
         val startIndex = text.indexOf(":") + 2
         val endIndex = spannableString.length
-        val foregroundSpan = ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.muiv_primary))
+        val foregroundSpan = ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.color_primary))
 
         spannableString.setSpan(foregroundSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 

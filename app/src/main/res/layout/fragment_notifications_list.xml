@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:transitionGroup="true"
     tools:context=".ui.notifications.NotificationListFragment">
 
     <ImageView
@@ -20,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/round_border"
-        android:backgroundTint="@color/muiv_primary"
+        android:backgroundTint="@color/color_primary"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:text="@string/notifications_title"

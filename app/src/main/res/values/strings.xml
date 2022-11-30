@@ -7,10 +7,10 @@
     <string name="room_number_example">ауд. 301</string>
     <string name="prompt_username">Логин</string>
     <string name="prompt_password">Пароль</string>
-    <string name="action_sign_in">Sing in</string>
-    <string name="enter_as_example">Enter as</string>
-    <string name="student_btn_text_example">Student</string>
-    <string name="teacher_btn_text_example">Teacher</string>
+    <string name="action_sign_in">ВОЙТИ</string>
+    <string name="enter_as_example">ВОЙТИ КАК</string>
+    <string name="student_btn_text_example">СТУДЕНТ</string>
+    <string name="teacher_btn_text_example">ПРЕПОДОВАТЕЛЬ</string>
     <string name="muiv_logo_image">muivLogo</string>
     <string name="title_activity_user">UserActivity</string>
     <string name="title_home">Home</string>

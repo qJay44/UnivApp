@@ -1,7 +1,6 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.UnivApp" parent="Theme.Material3.Dark">
-<!--        <item name="android:windowFullscreen">true</item>-->
-        <item name="android:navigationBarColor">#1C1B1F</item>
+        <item name="android:navigationBarColor">@color/color_background</item>
     </style>
 </resources>
