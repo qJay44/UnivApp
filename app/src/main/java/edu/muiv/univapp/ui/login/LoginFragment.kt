@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionInflater
 import edu.muiv.univapp.R
 import edu.muiv.univapp.user.DatabaseTestDataBuilder
-import edu.muiv.univapp.user.UserActivity
+import edu.muiv.univapp.user.NavigationActivity
 
 class LoginFragment : Fragment() {
 
@@ -98,7 +98,7 @@ class LoginFragment : Fragment() {
                 Toast.makeText(requireContext(), "user doesn't exist", Toast.LENGTH_SHORT).show()
             } else {
                 loginViewModel.createUserDataHolderInstance(user)
-                val intent = Intent(activity, UserActivity::class.java)
+                val intent = Intent(activity, NavigationActivity::class.java)
                 startActivity(intent)
             }
         }

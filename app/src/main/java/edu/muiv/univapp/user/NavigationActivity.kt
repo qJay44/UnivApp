@@ -11,7 +11,7 @@ import androidx.navigation.ui.setupWithNavController
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.ActivityUserBinding
 
-class UserActivity : AppCompatActivity() {
+class NavigationActivity : AppCompatActivity() {
 
     private lateinit var tvStudentName: TextView
     private lateinit var tvStudentGroup: TextView

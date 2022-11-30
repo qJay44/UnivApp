@@ -23,9 +23,9 @@
 
     <fragment
         android:id="@+id/navigation_profile_list"
-        android:name="edu.muiv.univapp.ui.profile.ProfileListFragment"
+        android:name="edu.muiv.univapp.ui.profile.ProfileFragment"
         android:label="Profile"
-        tools:layout="@layout/fragment_profile_list" >
+        tools:layout="@layout/fragment_profile" >
     </fragment>
 
     <fragment

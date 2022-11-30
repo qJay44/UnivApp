@@ -18,19 +18,19 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionInflater
 import edu.muiv.univapp.R
-import edu.muiv.univapp.databinding.FragmentProfileListBinding
+import edu.muiv.univapp.databinding.FragmentProfileBinding
 import edu.muiv.univapp.user.Subject
 
-class ProfileListFragment : Fragment() {
+class ProfileFragment : Fragment() {
 
     companion object {
         private const val TAG = "ProfileFragmentList"
     }
 
-    private var _binding: FragmentProfileListBinding? = null
+    private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-    private val profileListViewModel by lazy {
-        ViewModelProvider(this)[ProfileListViewModel::class.java]
+    private val profileViewModel by lazy {
+        ViewModelProvider(this)[ProfileViewModel::class.java]
     }
 
     private lateinit var rvSubject: RecyclerView
@@ -45,10 +45,10 @@ class ProfileListFragment : Fragment() {
         exitTransition = inflater.inflateTransition(R.transition.fade)
 
         if (savedInstanceState == null) {
-            profileListViewModel.loadSubjects()
-            profileListViewModel.loadProfileAttendance()
+            profileViewModel.loadSubjects()
+            profileViewModel.loadProfileAttendance()
         } else {
-            profileListViewModel.resetVisitAmount()
+            profileViewModel.resetVisitAmount()
         }
     }
 
@@ -58,7 +58,7 @@ class ProfileListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         adapter = SubjectAdapter()
-        _binding = FragmentProfileListBinding.inflate(inflater, container, false)
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val view = binding.root
 
         tvAttendancePercent = view.findViewById(R.id.tvAttendancePercent)
@@ -74,21 +74,21 @@ class ProfileListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        profileListViewModel.subjects.observe(viewLifecycleOwner) { subjects ->
+        profileViewModel.subjects.observe(viewLifecycleOwner) { subjects ->
             Log.i(TAG, "Got ${subjects.size} subjects")
-            profileListViewModel.loadSubjectTeachers(subjects)
+            profileViewModel.loadSubjectTeachers(subjects)
             updateUI(subjects)
         }
 
-        profileListViewModel.profileAttendance.observe(viewLifecycleOwner) { userProfile ->
-            profileListViewModel.loadProfileProperties(userProfile)
+        profileViewModel.profileAttendance.observe(viewLifecycleOwner) { userProfile ->
+            profileViewModel.loadProfileProperties(userProfile)
 
-            val attendancePercent = profileListViewModel.attendancePercent
+            val attendancePercent = profileViewModel.attendancePercent
             val attendancePercentBaseString = resources.getString(R.string.user_attendance_percent)
             val attendancePercentText =
                 createSpannableString(attendancePercentBaseString + attendancePercent)
 
-            val attendanceAmount = profileListViewModel.attendanceAmount
+            val attendanceAmount = profileViewModel.attendanceAmount
             val attendanceAmountBaseString = resources.getString(R.string.user_attendance_amount)
             val attendanceAmountText =
                 createSpannableString(attendanceAmountBaseString + attendanceAmount)
@@ -96,8 +96,8 @@ class ProfileListFragment : Fragment() {
             tvAttendancePercent.text = attendancePercentText
             tvAttendanceAmount.text = attendanceAmountText
 
-            postponeEnterTransition()
         }
+        postponeEnterTransition()
     }
 
     private fun updateUI(subjects: List<Subject>) {
@@ -119,8 +119,8 @@ class ProfileListFragment : Fragment() {
         : ListAdapter<Subject, SubjectHolder>(DiffCallback) {
 
         init {
-            profileListViewModel.teachers.observe(viewLifecycleOwner) { teachers ->
-                profileListViewModel.teachersById.value = teachers.associateBy { it.id }
+            profileViewModel.teachers.observe(viewLifecycleOwner) { teachers ->
+                profileViewModel.teachersById.value = teachers.associateBy { it.id }
             }
         }
 
@@ -141,7 +141,7 @@ class ProfileListFragment : Fragment() {
         private val tvSubjectDetails: TextView = itemView.findViewById(R.id.tvSubjectDetails)
 
         fun bind(subject: Subject) {
-            profileListViewModel.teachersById.observe(viewLifecycleOwner) { teacherMap ->
+            profileViewModel.teachersById.observe(viewLifecycleOwner) { teacherMap ->
                 val teacher = teacherMap[subject.teacherID]
                 teacher?.let {
                     val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."

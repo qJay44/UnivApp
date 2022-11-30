@@ -10,7 +10,7 @@ import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.UserDataHolder
 import java.util.UUID
 
-class ProfileListViewModel : ViewModel() {
+class ProfileViewModel : ViewModel() {
     private val repository = UnivRepository.get()
     private val user = UserDataHolder.get().user
 
