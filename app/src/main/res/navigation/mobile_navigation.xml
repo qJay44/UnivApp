@@ -22,7 +22,7 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_profile_list"
+        android:id="@+id/navigation_profile"
         android:name="edu.muiv.univapp.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" >
@@ -37,5 +37,23 @@
             android:name="schedule_id"
             app:argType="string" />
     </fragment>
+
+    <!-- To the notifications fragment -->
+    <action
+        android:id="@+id/action_global_navigation_notifications"
+        app:destination="@id/navigation_notifications"
+        app:enterAnim="@anim/slide_in_left"
+        app:exitAnim="@anim/fade_out"
+        app:popEnterAnim="@anim/fade_in"
+        app:popExitAnim="@anim/slide_out_left"/>
+
+    <!-- To the profile fragment -->
+    <action
+        android:id="@+id/action_global_navigation_profile"
+        app:destination="@id/navigation_profile"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/fade_out"
+        app:popExitAnim="@anim/fade_in"
+        app:popEnterAnim="@anim/slide_out_right"/>
 
 </navigation>

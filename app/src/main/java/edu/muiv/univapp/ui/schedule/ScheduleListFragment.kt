@@ -91,7 +91,6 @@ class ScheduleListFragment : Fragment() {
                 }
             }
         }
-        updateUI(emptyList())
     }
 
     override fun onDestroyView() {

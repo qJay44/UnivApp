@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.TransitionInflater
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentNotificationsListBinding
 
@@ -34,13 +33,6 @@ class NotificationListFragment : Fragment() {
 
     private lateinit var rvNotifications: RecyclerView
     private var adapter = NotificationAdapter()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val inflater = TransitionInflater.from(requireContext())
-        enterTransition = inflater.inflateTransition(R.transition.slide_left)
-        exitTransition = inflater.inflateTransition(R.transition.fade)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
