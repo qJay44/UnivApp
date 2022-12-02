@@ -5,6 +5,7 @@
     android:id="@+id/schedule_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:transitionGroup="true"
     tools:context=".ui.schedule.ScheduleFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout

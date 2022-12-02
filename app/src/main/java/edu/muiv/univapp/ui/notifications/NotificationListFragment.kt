@@ -47,6 +47,8 @@ class NotificationListFragment : Fragment() {
         rvNotifications.layoutManager = LinearLayoutManager(context)
         rvNotifications.adapter = adapter
 
+        postponeEnterTransition()
+
         return view
     }
 
@@ -57,6 +59,7 @@ class NotificationListFragment : Fragment() {
             notifications?.let {
                 Log.i(TAG, "Got ${notifications.size} notifications")
                 updateUI(notifications)
+                startPostponedEnterTransition()
             }
         }
     }

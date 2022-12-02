@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentProfileBinding
 import edu.muiv.univapp.user.Subject
+import edu.muiv.univapp.user.Teacher
+import java.util.UUID
 
 class ProfileFragment : Fragment() {
 
@@ -114,9 +116,12 @@ class ProfileFragment : Fragment() {
     private inner class SubjectAdapter
         : ListAdapter<Subject, SubjectHolder>(DiffCallback) {
 
+        private var teachersWithId: Map<UUID, Teacher>? = null
+
         init {
             profileViewModel.teachers.observe(viewLifecycleOwner) { teachers ->
-                profileViewModel.teachersById.value = teachers.associateBy { it.id }
+                teachersWithId = teachers.associateBy { it.id }
+                startPostponedEnterTransition()
             }
         }
 
@@ -128,7 +133,8 @@ class ProfileFragment : Fragment() {
 
         override fun onBindViewHolder(holder: SubjectHolder, position: Int) {
             val subject = currentList[position]
-            holder.bind(subject)
+            val teacher = teachersWithId?.let { it[subject.teacherID] }
+            holder.bind(subject, teacher)
         }
     }
 
@@ -136,15 +142,11 @@ class ProfileFragment : Fragment() {
         private val tvSubjectName: TextView = itemView.findViewById(R.id.tvSubjectName)
         private val tvSubjectDetails: TextView = itemView.findViewById(R.id.tvSubjectDetails)
 
-        fun bind(subject: Subject) {
-            profileViewModel.teachersById.observe(viewLifecycleOwner) { teacherMap ->
-                val teacher = teacherMap[subject.teacherID]
-                teacher?.let {
-                    val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
-                    val detailsField = "$teacherField | ${subject.examType}"
-                    tvSubjectDetails.text = detailsField
-                    startPostponedEnterTransition()
-                }
+        fun bind(subject: Subject, teacher: Teacher?) {
+            teacher?.let {
+                val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
+                val detailsField = "$teacherField | ${subject.examType}"
+                tvSubjectDetails.text = detailsField
             }
             tvSubjectName.text = subject.subjectName
         }

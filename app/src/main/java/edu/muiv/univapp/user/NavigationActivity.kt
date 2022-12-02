@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.size
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import edu.muiv.univapp.R
@@ -96,7 +95,17 @@ class NavigationActivity : AppCompatActivity() {
                         R.id.action_global_navigation_notifications
                     }
                     R.id.navigation_schedule_list -> {
-                        R.id.navigation_schedule_list
+                        when (selectedItem) {
+                            // From the notifications fragment
+                            R.id.navigation_notifications -> {
+                                R.id.action_global_navigation_schedule_list_left
+                            }
+                            // From the profile fragment
+                            R.id.navigation_profile -> {
+                                R.id.action_global_navigation_schedule_list_right
+                            }
+                            else -> R.id.navigation_schedule_list
+                        }
                     }
                     R.id.navigation_profile -> {
                         R.id.action_global_navigation_profile
@@ -106,10 +115,5 @@ class NavigationActivity : AppCompatActivity() {
             )
         }
         selectedItem = item.itemId
-
-        for (i in 0 until navView.size) {
-            val menuItem = navView.menu.getItem(i)
-            if (menuItem.itemId == item.itemId) menuItem.isChecked = true
-        }
     }
 }

@@ -19,7 +19,6 @@ class ProfileViewModel : ViewModel() {
     private val _subjects = MutableLiveData<String>()
     private val _teachers = MutableLiveData<Array<UUID>>()
     private val _profileAttendance = MutableLiveData<UUID>()
-    val teachersById = MutableLiveData<Map<UUID, Teacher>>()
 
     ////////////////////////
 
