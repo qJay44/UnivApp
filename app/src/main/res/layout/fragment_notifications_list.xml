@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_notifications_black_24dp"
+        app:tint="@color/white"
         android:contentDescription="@string/info_icon" />
 
     <TextView

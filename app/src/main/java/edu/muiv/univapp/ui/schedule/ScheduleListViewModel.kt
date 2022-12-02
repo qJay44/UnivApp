@@ -24,7 +24,6 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val weekTeachers = MutableLiveData<Array<UUID>>()
-    val teachersByIdLiveData = MutableLiveData<Map<UUID, Teacher>>()
 
     ////////////////////////
 

@@ -16,7 +16,7 @@ class NavigationActivity : AppCompatActivity() {
 
     private lateinit var tvStudentName: TextView
     private lateinit var tvStudentGroup: TextView
-    // private lateinit var tvStudentCourseAndSemester: TextView
+    private lateinit var tvStudentCourseAndSemester: TextView
 
     private lateinit var binding: ActivityUserBinding
     private lateinit var navView: BottomNavigationView
@@ -33,13 +33,15 @@ class NavigationActivity : AppCompatActivity() {
 
         tvStudentName = binding.tvStudentName
         tvStudentGroup = binding.tvStudentGroup
-        // tvStudentCourseAndSemester = binding.tvStudentCourseAndSemester
+        tvStudentCourseAndSemester = binding.tvStudentCourseAndSemester
 
         val user = UserDataHolder.get().user
         val nameField = "${user.name}\n${user.surname}"
+        val studyInfo = "${user.course} курс | ${user.semester} семестр"
 
         tvStudentName.text = nameField
         tvStudentGroup.text = user.groupName
+        tvStudentCourseAndSemester.text = studyInfo
 
         navView = binding.navView
         val navHostFragment = supportFragmentManager

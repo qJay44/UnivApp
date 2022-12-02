@@ -8,10 +8,12 @@ import java.util.UUID
 data class Student(
     @PrimaryKey
     val id        : UUID,
-    val name      : String,
-    val surname   : String,
+    var name      : String,
+    var surname   : String,
     val login     : String,
-    val patronymic: String,
-    val password  : String,
-    val groupName : String
+    var patronymic: String,
+    var password  : String,
+    var groupName : String,
+    var course    : String,
+    var semester  : String
 )

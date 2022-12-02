@@ -98,6 +98,11 @@ class ProfileFragment : Fragment() {
         postponeEnterTransition()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun updateUI(subjects: List<Subject>) {
         adapter.submitList(subjects)
     }

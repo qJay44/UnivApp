@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
+import edu.muiv.univapp.user.Teacher
+import java.util.UUID
 
 class ScheduleListFragment : Fragment() {
 
@@ -91,6 +93,7 @@ class ScheduleListFragment : Fragment() {
                 }
             }
         }
+        postponeEnterTransition()
     }
 
     override fun onDestroyView() {
@@ -100,6 +103,7 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(schedules: List<Schedule>) {
         rvSchedule.adapter = ScheduleAdapter(schedules)
+        startPostponedEnterTransition()
     }
 
     // The Adapter
@@ -110,6 +114,7 @@ class ScheduleListFragment : Fragment() {
         private val typeList = 1
         private val scheduleAll: List<Schedule>
         private val scheduleAllBooleans: List<Boolean>
+        private var teachersWithId: Map<UUID, Teacher>? = null
 
         init {
             var currentWeekDay = ""
@@ -130,7 +135,6 @@ class ScheduleListFragment : Fragment() {
                     listWithSchedules += schedule
                     listWithBooleans += false
                 }
-
                 currentWeekDay = schedule.date
             }
 
@@ -138,7 +142,7 @@ class ScheduleListFragment : Fragment() {
             scheduleAllBooleans = listWithBooleans.toList()
 
             scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
-                scheduleListViewModel.teachersByIdLiveData.value = teachers.associateBy { it.id }
+                teachersWithId = teachers.associateBy { it.id }
             }
         }
 
@@ -161,7 +165,8 @@ class ScheduleListFragment : Fragment() {
                     holder.bind(schedule, weekDayName)
                 }
                 is ScheduleHolder -> {
-                    holder.bind(schedule)
+                    val teacher = teachersWithId?.let { it[schedule.teacherID] }
+                    holder.bind(schedule, teacher)
                 }
                 else -> {
                     Log.e(TAG, "onBindViewHolder: unknown holder")
@@ -226,12 +231,11 @@ class ScheduleListFragment : Fragment() {
             itemView.setOnClickListener(this)
         }
 
-        fun bind(schedule: Schedule) {
+        fun bind(schedule: Schedule, teacher: Teacher?) {
             this.schedule = schedule
 
-            scheduleListViewModel.teachersByIdLiveData.observe(viewLifecycleOwner) {
-                val teacher = it[this.schedule.teacherID]
-                val teacherField = "${teacher?.surname} ${teacher?.name?.get(0)}. ${teacher?.patronymic?.get(0)}."
+            teacher?.let{
+                val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
                 val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
                 tvScheduleInfo.text = details
             }

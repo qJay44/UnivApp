@@ -247,6 +247,8 @@ object DatabaseTestDataBuilder {
             when (if (isHalf) userGroups[0] else userGroups[1]) {
                 "Student" -> {
                     currentGroupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(groupNames2)
+                    val currCourse = randInt(1, 4)
+                    val currSemester = currCourse * randInt(1, 2)
                     val student =
                         Student(
                             id = UUID.randomUUID(),
@@ -255,7 +257,9 @@ object DatabaseTestDataBuilder {
                             patronymic = randArrayElement(patronymics),
                             login = "stud${studentList.size + 1}",
                             password = "1",
-                            groupName = currentGroupName
+                            groupName = currentGroupName,
+                            course = currCourse.toString(),
+                            semester = currSemester.toString()
                         )
                     studentList += student
                 }
