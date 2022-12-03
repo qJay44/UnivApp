@@ -1,9 +1,12 @@
-package edu.muiv.univapp.user
+package edu.muiv.univapp.utils
 
 import android.util.Log
 import edu.muiv.univapp.ui.notifications.Notification
 import edu.muiv.univapp.ui.profile.ProfileAttendance
 import edu.muiv.univapp.ui.schedule.Schedule
+import edu.muiv.univapp.user.Student
+import edu.muiv.univapp.user.Subject
+import edu.muiv.univapp.user.Teacher
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -246,7 +249,9 @@ object DatabaseTestDataBuilder {
 
             when (if (isHalf) userGroups[0] else userGroups[1]) {
                 "Student" -> {
-                    currentGroupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(groupNames2)
+                    currentGroupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(
+                        groupNames2
+                    )
                     val currCourse = randInt(1, 4)
                     val currSemester = currCourse * randInt(1, 2)
                     val student =

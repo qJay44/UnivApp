@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import edu.muiv.univapp.R
-import edu.muiv.univapp.databinding.ActivityUserBinding
+import edu.muiv.univapp.databinding.ActivityNavigationBinding
 
 class NavigationActivity : AppCompatActivity() {
 
@@ -18,7 +18,7 @@ class NavigationActivity : AppCompatActivity() {
     private lateinit var tvStudentGroup: TextView
     private lateinit var tvStudentCourseAndSemester: TextView
 
-    private lateinit var binding: ActivityUserBinding
+    private lateinit var binding: ActivityNavigationBinding
     private lateinit var navView: BottomNavigationView
     private lateinit var navController: NavController
     private var pressedOnce = false
@@ -27,7 +27,7 @@ class NavigationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityUserBinding.inflate(layoutInflater)
+        binding = ActivityNavigationBinding.inflate(layoutInflater)
         supportActionBar?.hide()
         setContentView(binding.root)
 

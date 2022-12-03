@@ -1,10 +1,9 @@
 package edu.muiv.univapp.ui.schedule
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -14,8 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
-import edu.muiv.univapp.user.Teacher
-import java.util.UUID
+import edu.muiv.univapp.utils.OnSwipeTouchListener
 
 class ScheduleListFragment : Fragment() {
 
@@ -44,6 +42,7 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,23 +52,33 @@ class ScheduleListFragment : Fragment() {
         val root: View = binding.root
 
         tvWeekDays = binding.tvWeekDays
-        tvWeekDays.text = scheduleListViewModel.dayFromTo
 
         ibPrevWeek = binding.ibPrevWeek
         ibPrevWeek.setOnClickListener {
             scheduleListViewModel.prevWeek()
-            tvWeekDays.text = scheduleListViewModel.dayFromTo
         }
 
         ibNextWeek = binding.ibNextWeek
         ibNextWeek.setOnClickListener {
             scheduleListViewModel.nextWeek()
-            tvWeekDays.text = scheduleListViewModel.dayFromTo
         }
 
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
         rvSchedule.adapter = ScheduleAdapter(emptyList())
+
+        // FIXME: Swipes
+        rvSchedule.setOnTouchListener(object : OnSwipeTouchListener(context) {
+            override fun onSwipeLeft(): Boolean {
+                scheduleListViewModel.nextWeek()
+                return true
+            }
+
+            override fun onSwipeRight(): Boolean {
+                scheduleListViewModel.prevWeek()
+                return true
+            }
+        })
 
         return root
     }
@@ -93,6 +102,9 @@ class ScheduleListFragment : Fragment() {
                 }
             }
         }
+        scheduleListViewModel.dayFromTo.observe(viewLifecycleOwner) { dayFromToString ->
+            tvWeekDays.text = dayFromToString
+        }
         postponeEnterTransition()
     }
 
@@ -103,6 +115,21 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(schedules: List<Schedule>) {
         rvSchedule.adapter = ScheduleAdapter(schedules)
+        rvSchedule.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                rvSchedule.viewTreeObserver.removeOnPreDrawListener(this)
+
+                for (i in 0 until rvSchedule.childCount) {
+                    val view = rvSchedule.getChildAt(i)
+                    view.alpha = 0f
+                    view.animate().alpha(1f)
+                        .setDuration(300)
+                        .start()
+                }
+
+                return true
+            }
+        })
         startPostponedEnterTransition()
     }
 
@@ -114,7 +141,6 @@ class ScheduleListFragment : Fragment() {
         private val typeList = 1
         private val scheduleAll: List<Schedule>
         private val scheduleAllBooleans: List<Boolean>
-        private var teachersWithId: Map<UUID, Teacher>? = null
 
         init {
             var currentWeekDay = ""
@@ -142,7 +168,7 @@ class ScheduleListFragment : Fragment() {
             scheduleAllBooleans = listWithBooleans.toList()
 
             scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
-                teachersWithId = teachers.associateBy { it.id }
+                scheduleListViewModel.teachersWithId.value = teachers.associateBy { it.id }
             }
         }
 
@@ -165,8 +191,7 @@ class ScheduleListFragment : Fragment() {
                     holder.bind(schedule, weekDayName)
                 }
                 is ScheduleHolder -> {
-                    val teacher = teachersWithId?.let { it[schedule.teacherID] }
-                    holder.bind(schedule, teacher)
+                    holder.bind(schedule)
                 }
                 else -> {
                     Log.e(TAG, "onBindViewHolder: unknown holder")
@@ -231,13 +256,16 @@ class ScheduleListFragment : Fragment() {
             itemView.setOnClickListener(this)
         }
 
-        fun bind(schedule: Schedule, teacher: Teacher?) {
+        fun bind(schedule: Schedule) {
             this.schedule = schedule
 
-            teacher?.let{
-                val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
-                val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
-                tvScheduleInfo.text = details
+            scheduleListViewModel.teachersWithId.observe(viewLifecycleOwner) { teachersMap ->
+                val teacher = teachersMap[schedule.teacherID]
+                teacher?.let {
+                    val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
+                    val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
+                    tvScheduleInfo.text = details
+                }
             }
 
             tvTimeStart.text = schedule.timeStart

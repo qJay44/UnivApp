@@ -24,6 +24,8 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val weekTeachers = MutableLiveData<Array<UUID>>()
+    private val _dayFromTo = MutableLiveData<String>()
+    val teachersWithId = MutableLiveData<Map<UUID, Teacher>>()
 
     ////////////////////////
 
@@ -32,8 +34,8 @@ class ScheduleListViewModel : ViewModel() {
     val isTeacher: Boolean
         get() = user.groupName == null
 
-    val dayFromTo: String
-        get() = "${days[0]} - ${days.last()}"
+    val dayFromTo: LiveData<String>
+        get() = _dayFromTo
 
     val week: Set<String>
         get() = days.toSet()
@@ -95,6 +97,7 @@ class ScheduleListViewModel : ViewModel() {
         }
         // Subtract extra added day
         calendar.add(Calendar.DAY_OF_MONTH, -1)
+        _dayFromTo.value = "${days[0]} - ${days.last()}"
         loadSchedule()
     }
 
