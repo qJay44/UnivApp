@@ -1,5 +1,6 @@
 package edu.muiv.univapp.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.GestureDetector
@@ -7,7 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import kotlin.math.abs
 
-open class OnSwipeTouchListener(val context: Context?) : View.OnTouchListener {
+open class OnTouchListenerRecyclerView(val context: Context?) : View.OnTouchListener {
     companion object {
         private const val TAG = "OnSwipeTouchListener"
         private const val SWIPE_THRESHOLD = 100
@@ -16,6 +17,7 @@ open class OnSwipeTouchListener(val context: Context?) : View.OnTouchListener {
 
     private val gestureDetector = GestureDetector(context, GestureListener())
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         Log.i(TAG, event.action.toString())
         return gestureDetector.onTouchEvent(event)

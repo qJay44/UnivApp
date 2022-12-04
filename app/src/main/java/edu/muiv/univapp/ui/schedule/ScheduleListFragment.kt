@@ -13,7 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
-import edu.muiv.univapp.utils.OnSwipeTouchListener
+import edu.muiv.univapp.utils.OnTouchListenerItem
+import edu.muiv.univapp.utils.OnTouchListenerRecyclerView
 
 class ScheduleListFragment : Fragment() {
 
@@ -28,6 +29,7 @@ class ScheduleListFragment : Fragment() {
     private lateinit var rvSchedule: RecyclerView
     private lateinit var ibPrevWeek: ImageButton
     private lateinit var ibNextWeek: ImageButton
+    private lateinit var adapter: ScheduleAdapter
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -42,7 +44,6 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,6 +52,7 @@ class ScheduleListFragment : Fragment() {
         _binding = FragmentScheduleListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        adapter = ScheduleAdapter(emptyList())
         tvWeekDays = binding.tvWeekDays
 
         ibPrevWeek = binding.ibPrevWeek
@@ -65,20 +67,27 @@ class ScheduleListFragment : Fragment() {
 
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
-        rvSchedule.adapter = ScheduleAdapter(emptyList())
+        rvSchedule.adapter = adapter
 
-        // FIXME: Swipes
-        rvSchedule.setOnTouchListener(object : OnSwipeTouchListener(context) {
-            override fun onSwipeLeft(): Boolean {
+        rvSchedule.addOnItemTouchListener(OnTouchListenerItem(
+            requireContext(), rvSchedule, object : OnTouchListenerItem.OnTouchActionListener {
+
+            override fun onLeftSwipe(view: View, position: Int) {
                 scheduleListViewModel.nextWeek()
-                return true
             }
 
-            override fun onSwipeRight(): Boolean {
+            override fun onRightSwipe(view: View, position: Int) {
                 scheduleListViewModel.prevWeek()
-                return true
             }
-        })
+
+            override fun onClick(view: View, position: Int) {
+                val schedule = adapter.getScheduleByPosition(position)
+                val action = ScheduleListFragmentDirections
+                    .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
+                view.findNavController().navigate(action)
+                Log.i(TAG, "Selected schedule (date: ${schedule.date})")
+            }
+        }))
 
         return root
     }
@@ -105,6 +114,8 @@ class ScheduleListFragment : Fragment() {
         scheduleListViewModel.dayFromTo.observe(viewLifecycleOwner) { dayFromToString ->
             tvWeekDays.text = dayFromToString
         }
+
+        // Wait for animations availability
         postponeEnterTransition()
     }
 
@@ -113,8 +124,17 @@ class ScheduleListFragment : Fragment() {
         _binding = null
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun updateUI(schedules: List<Schedule>) {
-        rvSchedule.adapter = ScheduleAdapter(schedules)
+        adapter = ScheduleAdapter(schedules)
+        rvSchedule.adapter = adapter
+
+        // Apply extra listener to the recycler view if the list is empty
+        rvSchedule.setOnTouchListener(
+            if (schedules.isEmpty()) getOnTouchListener() else null
+        )
+
+        // Appearance of the items
         rvSchedule.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 rvSchedule.viewTreeObserver.removeOnPreDrawListener(this)
@@ -130,7 +150,23 @@ class ScheduleListFragment : Fragment() {
                 return true
             }
         })
+
+        // Allow animations to play
         startPostponedEnterTransition()
+    }
+
+    // Touch listener for whole recycler view
+    private fun getOnTouchListener(): OnTouchListenerRecyclerView {
+        return object : OnTouchListenerRecyclerView(context) {
+            override fun onSwipeLeft(): Boolean {
+                scheduleListViewModel.nextWeek()
+                return true
+            }
+            override fun onSwipeRight(): Boolean {
+                scheduleListViewModel.prevWeek()
+                return true
+            }
+        }
     }
 
     // The Adapter
@@ -208,21 +244,18 @@ class ScheduleListFragment : Fragment() {
                 typeList
             }
         }
+
+        fun getScheduleByPosition(pos: Int) = scheduleAll.elementAt(pos)
     }
 
     // Header view holder //
 
-    private inner class ScheduleHolderHeader(view: View)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
+    private inner class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
 
         private lateinit var schedule: Schedule
 
         private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
         private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
-
-        init {
-            itemView.setOnClickListener(this)
-        }
 
         fun bind(schedule: Schedule, weekDayName: String) {
             this.schedule = schedule
@@ -230,20 +263,12 @@ class ScheduleListFragment : Fragment() {
             tvDay.text = this.schedule.date
             tvWeekDayName.text = weekDayName
         }
-
-        override fun onClick(p0: View?) {
-            val action = ScheduleListFragmentDirections
-                .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
-            p0?.findNavController()?.navigate(action)
-            Log.i(TAG, "Selected schedule (date: ${schedule.date})")
-        }
     }
     ////////////////////////
 
     // Default view holder //
 
-    private inner class ScheduleHolder(view: View)
-        : RecyclerView.ViewHolder(view), View.OnClickListener {
+    private inner class ScheduleHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         private lateinit var schedule: Schedule
 
@@ -251,10 +276,6 @@ class ScheduleListFragment : Fragment() {
         private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
         private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
         private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
-
-        init {
-            itemView.setOnClickListener(this)
-        }
 
         fun bind(schedule: Schedule) {
             this.schedule = schedule
@@ -271,13 +292,6 @@ class ScheduleListFragment : Fragment() {
             tvTimeStart.text = schedule.timeStart
             tvTimeEnd.text = schedule.timeEnd
             tvSubjectName.text = schedule.subjectName
-        }
-
-        override fun onClick(p0: View?) {
-            val action = ScheduleListFragmentDirections
-                .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
-            p0?.findNavController()?.navigate(action)
-            Log.i(TAG, "Selected schedule (date: ${schedule.date})")
         }
     }
 
