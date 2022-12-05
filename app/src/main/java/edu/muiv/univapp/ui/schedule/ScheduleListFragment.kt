@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -13,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
-import edu.muiv.univapp.utils.OnTouchListenerItem
 import edu.muiv.univapp.utils.OnTouchListenerRecyclerView
 
 class ScheduleListFragment : Fragment() {
@@ -44,6 +44,7 @@ class ScheduleListFragment : Fragment() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -69,25 +70,26 @@ class ScheduleListFragment : Fragment() {
         rvSchedule.layoutManager = LinearLayoutManager(context)
         rvSchedule.adapter = adapter
 
-        rvSchedule.addOnItemTouchListener(OnTouchListenerItem(
-            requireContext(), rvSchedule, object : OnTouchListenerItem.OnTouchActionListener {
-
-            override fun onLeftSwipe(view: View, position: Int) {
+        rvSchedule.setOnTouchListener(object : OnTouchListenerRecyclerView(context, rvSchedule) {
+            override fun onSwipeLeft(): Boolean {
                 scheduleListViewModel.nextWeek()
+                return true
             }
-
-            override fun onRightSwipe(view: View, position: Int) {
+            override fun onSwipeRight(): Boolean {
                 scheduleListViewModel.prevWeek()
+                return true
             }
 
-            override fun onClick(view: View, position: Int) {
+            override fun onClick(view: View, position: Int): Boolean {
                 val schedule = adapter.getScheduleByPosition(position)
                 val action = ScheduleListFragmentDirections
                     .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
                 view.findNavController().navigate(action)
                 Log.i(TAG, "Selected schedule (date: ${schedule.date})")
+
+                return true
             }
-        }))
+        })
 
         return root
     }
@@ -124,23 +126,16 @@ class ScheduleListFragment : Fragment() {
         _binding = null
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun updateUI(schedules: List<Schedule>) {
         adapter = ScheduleAdapter(schedules)
         rvSchedule.adapter = adapter
-
-        // Apply extra listener to the recycler view if the list is empty
-        rvSchedule.setOnTouchListener(
-            if (schedules.isEmpty()) getOnTouchListener() else null
-        )
 
         // Appearance of the items
         rvSchedule.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 rvSchedule.viewTreeObserver.removeOnPreDrawListener(this)
 
-                for (i in 0 until rvSchedule.childCount) {
-                    val view = rvSchedule.getChildAt(i)
+                for (view in rvSchedule.children) {
                     view.alpha = 0f
                     view.animate().alpha(1f)
                         .setDuration(300)
@@ -153,20 +148,6 @@ class ScheduleListFragment : Fragment() {
 
         // Allow animations to play
         startPostponedEnterTransition()
-    }
-
-    // Touch listener for whole recycler view
-    private fun getOnTouchListener(): OnTouchListenerRecyclerView {
-        return object : OnTouchListenerRecyclerView(context) {
-            override fun onSwipeLeft(): Boolean {
-                scheduleListViewModel.nextWeek()
-                return true
-            }
-            override fun onSwipeRight(): Boolean {
-                scheduleListViewModel.prevWeek()
-                return true
-            }
-        }
     }
 
     // The Adapter

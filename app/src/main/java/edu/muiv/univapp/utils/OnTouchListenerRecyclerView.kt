@@ -6,9 +6,12 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.abs
 
-open class OnTouchListenerRecyclerView(val context: Context?) : View.OnTouchListener {
+open class OnTouchListenerRecyclerView(context: Context?, private val recyclerView: RecyclerView)
+    : View.OnTouchListener {
+
     companion object {
         private const val TAG = "OnSwipeTouchListener"
         private const val SWIPE_THRESHOLD = 100
@@ -25,10 +28,22 @@ open class OnTouchListenerRecyclerView(val context: Context?) : View.OnTouchList
 
     open fun onSwipeRight(): Boolean { return false }
     open fun onSwipeLeft() : Boolean { return false }
+    open fun onClick(view: View, position: Int): Boolean { return false }
 
     private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onDown(e: MotionEvent): Boolean {
             return true
+        }
+
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            // Find the item view that was swiped based on the coordinates
+            val child = recyclerView.findChildViewUnder(e.x, e.y)
+            child?.let {
+                val childPosition = recyclerView.getChildAdapterPosition(child)
+                onClick(child, childPosition)
+            }
+
+            return false
         }
 
         override fun onFling(
