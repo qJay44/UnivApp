@@ -66,6 +66,14 @@ class LoginFragment : Fragment() {
 
             for (subject in DatabaseTestDataBuilder.subjectList)
                 loginViewModel.addSubject(subject)
+
+            Log.i(TAG, "Created new test data:\n" +
+                    "Students: ${DatabaseTestDataBuilder.studentList.size}\n" +
+                    "Teachers: ${DatabaseTestDataBuilder.teacherList.size}\n" +
+                    "Schedules: ${DatabaseTestDataBuilder.scheduleList.size}\n" +
+                    "Notifications: ${DatabaseTestDataBuilder.notificationList.size}\n" +
+                    "Profiles: ${DatabaseTestDataBuilder.notificationList.size}\n" +
+                    "Subjects: ${DatabaseTestDataBuilder.subjectList.size}\n")
         }
     }
 

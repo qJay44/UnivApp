@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentNotificationsListBinding
 
-
 class NotificationListFragment : Fragment() {
 
     companion object {
@@ -24,8 +23,7 @@ class NotificationListFragment : Fragment() {
 
     private var _binding: FragmentNotificationsListBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
     private val notificationListViewModel by lazy {
         ViewModelProvider(this)[NotificationListViewModel::class.java]
@@ -33,6 +31,13 @@ class NotificationListFragment : Fragment() {
 
     private lateinit var rvNotifications: RecyclerView
     private var adapter = NotificationAdapter()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null)
+            notificationListViewModel.loadNotifications()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -233,15 +233,11 @@ class ScheduleListFragment : Fragment() {
 
     private inner class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
 
-        private lateinit var schedule: Schedule
-
         private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
         private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
 
         fun bind(schedule: Schedule, weekDayName: String) {
-            this.schedule = schedule
-
-            tvDay.text = this.schedule.date
+            tvDay.text = schedule.date
             tvWeekDayName.text = weekDayName
         }
     }
@@ -251,21 +247,17 @@ class ScheduleListFragment : Fragment() {
 
     private inner class ScheduleHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        private lateinit var schedule: Schedule
-
         private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
         private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
         private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
         private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
 
         fun bind(schedule: Schedule) {
-            this.schedule = schedule
-
             scheduleListViewModel.teachersWithId.observe(viewLifecycleOwner) { teachersMap ->
                 val teacher = teachersMap[schedule.teacherID]
                 teacher?.let {
                     val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
-                    val details = "$teacherField | ${this.schedule.type} | Ауд. ${this.schedule.roomNum}"
+                    val details = "$teacherField | ${schedule.type} | Ауд. ${schedule.roomNum}"
                     tvScheduleInfo.text = details
                 }
             }

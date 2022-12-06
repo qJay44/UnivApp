@@ -216,8 +216,7 @@ object DatabaseTestDataBuilder {
         val amount = randInt(1, 6)
         val maxStartIndex = timeStart.size - amount
         val startIndex = randInt(0, maxStartIndex)
-        val groupNameIndex = randInt(0, 1)
-        val currentSubjectList = if (groupNameIndex == 0) subjectNames1 else subjectNames2
+        val currentSubjectList = if (currentGroupName.startsWith("ИД")) subjectNames1 else subjectNames2
 
         for (i in 0 until amount) {
             val schedule = Schedule(
@@ -249,9 +248,10 @@ object DatabaseTestDataBuilder {
 
             when (if (isHalf) userGroups[0] else userGroups[1]) {
                 "Student" -> {
-                    currentGroupName = if (i % 2 == 0) randArrayElement(groupNames1) else randArrayElement(
-                        groupNames2
-                    )
+                    currentGroupName =
+                        if (i % 2 == 0) randArrayElement(groupNames1)
+                        else randArrayElement(groupNames2)
+
                     val currCourse = randInt(1, 4)
                     val currSemester = currCourse * randInt(1, 2)
                     val student =

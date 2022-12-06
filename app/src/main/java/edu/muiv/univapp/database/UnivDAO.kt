@@ -51,8 +51,8 @@ interface UnivDAO {
     @Upsert(entity = ScheduleUserNotes::class)
     fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes)
 
-    @Query("SELECT * FROM Notification")
-    fun getNotifications(): LiveData<List<Notification>>
+    @Query("SELECT * FROM Notification WHERE date IN (:days)")
+    fun getNotifications(days: List<String>): LiveData<List<Notification>>
 
     @Query("SELECT * FROM Subject WHERE groupName=:groupName")
     fun getSubjectsByGroupName(groupName: String): LiveData<List<Subject>>
