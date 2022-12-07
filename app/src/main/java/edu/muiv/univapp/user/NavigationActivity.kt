@@ -63,9 +63,9 @@ class NavigationActivity : AppCompatActivity() {
                     return
                 }
                 if (pressedOnce) {
-                    UserDataHolder.uninitialize()
                     finish()
                 }
+
                 pressedOnce = true
 
                 Toast.makeText(

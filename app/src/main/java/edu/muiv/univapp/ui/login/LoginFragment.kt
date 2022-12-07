@@ -1,5 +1,6 @@
 package edu.muiv.univapp.ui.login
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,10 @@ class LoginFragment : Fragment() {
     companion object {
         private const val TAG = "LoginFragment"
         private const val ADD_TEST_DATA = false
+        private const val PREFS_NAME = "LOG_IN_PREF"
+        private const val PREF_USERNAME = "USERNAME_PREF"
+        private const val PREF_PASSWORD = "PASSWORD_PREF"
+        private const val PREF_USER_TYPE = "USER_TYPE_PREF"
 
         fun newInstance(isTeacher: Boolean): LoginFragment {
             val args = Bundle().apply {
@@ -99,7 +104,8 @@ class LoginFragment : Fragment() {
 
         loginViewModel.userLiveData.observe(viewLifecycleOwner) { user ->
             if (user == null) {
-                Toast.makeText(requireContext(), "user doesn't exist", Toast.LENGTH_SHORT).show()
+                val msg = "Логин или пароль введены неправильно"
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
             } else {
                 loginViewModel.createUserDataHolderInstance(user)
                 val intent = Intent(activity, NavigationActivity::class.java)
@@ -118,7 +124,7 @@ class LoginFragment : Fragment() {
             val inputErrorText = loginViewModel.inputValidation()
             Log.i(TAG, "Searching for user...")
 
-            if (inputErrorText == "") {
+            if (inputErrorText == null) {
                 val isTeacher = arguments?.getBoolean("isTeacher")!!
                 loginViewModel.loadUser(isTeacher)
             } else {
@@ -127,13 +133,41 @@ class LoginFragment : Fragment() {
 
             switchVisibility()
         }
+    }
 
-        // temp
-        val u = "stud1"
-        val p = "1"
-        etUsername.setText(u)
-        etPassword.setText(p)
-        //
+    override fun onResume() {
+        super.onResume()
+        loadPreferences()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        savePreferences()
+    }
+
+    private fun loadPreferences() {
+        val settings = activity?.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return
+        with (settings) {
+            val username = getString(PREF_USERNAME, null)
+            val password = getString(PREF_PASSWORD, null)
+            val userType = getBoolean(PREF_USER_TYPE, false)
+
+            if (userType == arguments?.getBoolean("isTeacher")) {
+                etUsername.setText(username)
+                etPassword.setText(password)
+            }
+        }
+    }
+
+    private fun savePreferences() {
+        val settings = activity?.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return
+        val isTeacher = arguments?.getBoolean("isTeacher")!!
+        with (settings.edit()) {
+            putString(PREF_USERNAME, etUsername.text.toString())
+            putString(PREF_PASSWORD, etPassword.text.toString())
+            putBoolean(PREF_USER_TYPE, isTeacher)
+            apply()
+        }
     }
 
     private fun switchVisibility() {

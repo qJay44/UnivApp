@@ -23,17 +23,17 @@ class LoginViewModel : ViewModel() {
     val usernameTW get() = loginTW.usernameTW
     val passwordTW get() = loginTW.passwordTW
 
-    var userLiveData: LiveData<LoginResult> =
+    val userLiveData: LiveData<LoginResult> =
         Transformations.switchMap(userLoginLiveData) { login ->
             univRepository.getUser(login)
     }
 
-    fun inputValidation(): String {
+    fun inputValidation(): String? {
         val inputErrorText =
             when ("") {
-                login.username -> "Login field can't be empty"
-                login.password -> "Password field can't be empty"
-                else -> ""
+                login.username -> "Логин не может быть пустым"
+                login.password -> "Пароль не может быть пустым"
+                else -> null
             }
 
         return inputErrorText

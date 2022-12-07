@@ -24,6 +24,7 @@ class UserDataHolder private constructor(val user: LoginResult){
 
         fun uninitialize() {
             INSTANCE = null
+            Log.i(TAG, "UserDataHolder has been uninitialized")
         }
     }
 }
