@@ -8,8 +8,9 @@ import edu.muiv.univapp.R
 class LoginActivity : AppCompatActivity(), LoginFragmentChoice.Callbacks {
 
     private companion object {
-        private const val TAG = "LoginActivity"
+        private const val TAG = ".LoginActivity"
     }
+    private var lastCallbackParam: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,10 +18,9 @@ class LoginActivity : AppCompatActivity(), LoginFragmentChoice.Callbacks {
         setContentView(R.layout.activity_login)
 
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container_login)
-
         if (currentFragment == null) {
             Log.i(TAG, "Creating login fragment...")
-            val fragment = LoginFragmentChoice.newInstance()
+            val fragment = LoginFragmentChoice.newInstance(lastCallbackParam)
             supportFragmentManager
                 .beginTransaction()
                 .add(R.id.fragment_container_login, fragment)
@@ -29,6 +29,7 @@ class LoginActivity : AppCompatActivity(), LoginFragmentChoice.Callbacks {
     }
 
     override fun onLoginChoice(isTeacher: Boolean) {
+        lastCallbackParam = isTeacher
         val fragment = LoginFragment.newInstance(isTeacher)
         supportFragmentManager
             .beginTransaction()

@@ -1,18 +1,28 @@
-package edu.muiv.univapp.user
+package edu.muiv.univapp.ui
 
+import android.content.Context
 import android.os.*
+import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.ActivityNavigationBinding
+import edu.muiv.univapp.user.UserDataHolder
 
 class NavigationActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "NavigationActivity"
+        private const val PREFS_NAME = "USER_INFO"
+    }
 
     private lateinit var tvStudentName: TextView
     private lateinit var tvStudentGroup: TextView
@@ -21,8 +31,14 @@ class NavigationActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNavigationBinding
     private lateinit var navView: BottomNavigationView
     private lateinit var navController: NavController
+
     private var pressedOnce = false
     private var selectedItem = -1
+    private var isLoggingOut = false
+
+    private val navigationViewModel: NavigationViewModel by lazy {
+        ViewModelProvider(this)[NavigationViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,13 +51,9 @@ class NavigationActivity : AppCompatActivity() {
         tvStudentGroup = binding.tvStudentGroup
         tvStudentCourseAndSemester = binding.tvStudentCourseAndSemester
 
-        val user = UserDataHolder.get().user
-        val nameField = "${user.name}\n${user.surname}"
-        val studyInfo = "${user.course} курс | ${user.semester} семестр"
-
-        tvStudentName.text = nameField
-        tvStudentGroup.text = user.groupName
-        tvStudentCourseAndSemester.text = studyInfo
+        tvStudentName.text = navigationViewModel.nameField
+        tvStudentGroup.text = navigationViewModel.groupName
+        tvStudentCourseAndSemester.text = navigationViewModel.studyInfo
 
         navView = binding.navView
         val navHostFragment = supportFragmentManager
@@ -63,7 +75,10 @@ class NavigationActivity : AppCompatActivity() {
                     return
                 }
                 if (pressedOnce) {
+                    isLoggingOut = true
+                    UserDataHolder.uninitialize()
                     finish()
+                    return
                 }
 
                 pressedOnce = true
@@ -82,9 +97,28 @@ class NavigationActivity : AppCompatActivity() {
         ///////////////////////////
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        UserDataHolder.uninitialize()
+    override fun onPause() {
+        super.onPause()
+        if (isLoggingOut)
+            clearUserPrefs()
+        else
+            saveUserPrefs()
+    }
+
+    private fun saveUserPrefs() {
+        Log.i(TAG, "Saving user info...")
+        val settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return
+        val userInfoInJson = Gson().toJson(navigationViewModel.userInfo)
+        with (settings.edit()) {
+            putString("userInfo", userInfoInJson)
+            apply()
+        }
+    }
+
+    private fun clearUserPrefs() {
+        Log.i(TAG, "Clearing user info...")
+        val settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return
+        settings.edit().clear().apply()
     }
 
     private fun selectFragment(item: MenuItem) {

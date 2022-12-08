@@ -15,14 +15,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import edu.muiv.univapp.R
 import edu.muiv.univapp.utils.DatabaseTestDataBuilder
-import edu.muiv.univapp.user.NavigationActivity
+import edu.muiv.univapp.ui.NavigationActivity
 
 class LoginFragment : Fragment() {
 
     companion object {
         private const val TAG = "LoginFragment"
         private const val ADD_TEST_DATA = false
-        private const val PREFS_NAME = "LOG_IN_PREF"
+        private const val PREFS_STUDENT = "STUDENT_TYPE"
+        private const val PREFS_TEACHER = "TEACHER_TYPE"
         private const val PREF_USERNAME = "USERNAME_PREF"
         private const val PREF_PASSWORD = "PASSWORD_PREF"
         private const val PREF_USER_TYPE = "USER_TYPE_PREF"
@@ -45,6 +46,14 @@ class LoginFragment : Fragment() {
 
     private val loginViewModel: LoginViewModel by lazy {
         ViewModelProvider(this)[LoginViewModel::class.java]
+    }
+
+    private val isTeacher by lazy { requireArguments().getBoolean("isTeacher") }
+    private val settings by lazy {
+        if (isTeacher)
+            activity?.getSharedPreferences(PREFS_TEACHER, Context.MODE_PRIVATE)
+        else
+            activity?.getSharedPreferences(PREFS_STUDENT, Context.MODE_PRIVATE)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -146,23 +155,19 @@ class LoginFragment : Fragment() {
     }
 
     private fun loadPreferences() {
-        val settings = activity?.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return
-        with (settings) {
+        if (settings == null) return
+        with (settings!!) {
             val username = getString(PREF_USERNAME, null)
             val password = getString(PREF_PASSWORD, null)
-            val userType = getBoolean(PREF_USER_TYPE, false)
 
-            if (userType == arguments?.getBoolean("isTeacher")) {
-                etUsername.setText(username)
-                etPassword.setText(password)
-            }
+            etUsername.setText(username)
+            etPassword.setText(password)
         }
     }
 
     private fun savePreferences() {
-        val settings = activity?.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return
-        val isTeacher = arguments?.getBoolean("isTeacher")!!
-        with (settings.edit()) {
+        if (settings == null) return
+        with (settings!!.edit()) {
             putString(PREF_USERNAME, etUsername.text.toString())
             putString(PREF_PASSWORD, etPassword.text.toString())
             putBoolean(PREF_USER_TYPE, isTeacher)
