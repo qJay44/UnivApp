@@ -48,7 +48,6 @@ class ScheduleFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val args: ScheduleFragmentArgs by navArgs()
-
         scheduleViewModel.scheduleID = UUID.fromString(args.scheduleId)
     }
 
@@ -169,15 +168,14 @@ class ScheduleFragment : Fragment() {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
 
-        val dialogBtn = dialog.findViewById<Button>(R.id.btnDialogYes)
-        dialogBtn.setOnClickListener {
+        val btnLambda: ((Boolean) -> Unit) = {
             val attendance = if (scheduleViewModel.scheduleAttendance != null) {
                 with(scheduleViewModel.scheduleAttendance!!) {
                     ScheduleAttendance(
                         id,
                         scheduleID,
                         studentID,
-                        willAttend
+                        it
                     )
                 }
             } else {
@@ -185,13 +183,19 @@ class ScheduleFragment : Fragment() {
                     UUID.randomUUID(),
                     scheduleViewModel.scheduleID!!,
                     UserDataHolder.get().user.id,
-                    true
+                    it
                 )
             }
 
             scheduleViewModel.upsertAttendance(attendance)
             dialog.dismiss()
         }
+
+        val btnYes = dialog.findViewById<Button>(R.id.btnDialogYes)
+        val btnNo = dialog.findViewById<Button>(R.id.btnDialogNo)
+
+        btnYes.setOnClickListener { btnLambda(true) }
+        btnNo.setOnClickListener { btnLambda(false) }
 
         dialog.show()
     }

@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:layout_marginBottom="80dp"
-        android:backgroundTint="@color/color_primary"
+        android:backgroundTint="@color/primary"
         android:text="@string/action_sign_in"
         android:textSize="18sp"
         android:textColor="@color/white"
