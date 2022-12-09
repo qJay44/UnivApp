@@ -1,4 +1,4 @@
-package edu.muiv.univapp.ui.profile
+package edu.muiv.univapp.ui.navigation.profile
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

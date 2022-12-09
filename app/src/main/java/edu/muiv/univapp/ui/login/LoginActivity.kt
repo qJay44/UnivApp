@@ -10,6 +10,7 @@ class LoginActivity : AppCompatActivity(), LoginFragmentChoice.Callbacks {
     private companion object {
         private const val TAG = ".LoginActivity"
     }
+
     private var lastCallbackParam: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

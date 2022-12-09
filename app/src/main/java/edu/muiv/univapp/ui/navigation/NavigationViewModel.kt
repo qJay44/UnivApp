@@ -1,4 +1,4 @@
-package edu.muiv.univapp.ui
+package edu.muiv.univapp.ui.navigation
 
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.user.UserDataHolder

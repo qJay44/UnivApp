@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/color_background"
     android:transitionGroup="true"
-    tools:context=".ui.notifications.NotificationListFragment">
+    tools:context=".ui.navigation.notifications.NotificationListFragment">
 
     <ImageView
         android:id="@+id/info_icon"

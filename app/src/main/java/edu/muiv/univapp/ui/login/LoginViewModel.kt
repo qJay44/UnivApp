@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.ui.notifications.Notification
-import edu.muiv.univapp.ui.profile.ProfileAttendance
-import edu.muiv.univapp.ui.schedule.Schedule
+import edu.muiv.univapp.ui.navigation.notifications.Notification
+import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
+import edu.muiv.univapp.ui.navigation.schedule.Schedule
 import edu.muiv.univapp.user.Student
 import edu.muiv.univapp.user.Subject
 import edu.muiv.univapp.user.Teacher

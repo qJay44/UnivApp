@@ -1,4 +1,4 @@
-package edu.muiv.univapp.ui.schedule
+package edu.muiv.univapp.ui.navigation.schedule
 
 enum class ScheduleWeekDays(val dayName: String) {
     MONDAY("Понедельник"),

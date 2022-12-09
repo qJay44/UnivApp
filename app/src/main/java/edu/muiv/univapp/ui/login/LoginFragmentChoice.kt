@@ -13,7 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import edu.muiv.univapp.R
-import edu.muiv.univapp.ui.NavigationActivity
+import edu.muiv.univapp.ui.navigation.NavigationActivity
 import edu.muiv.univapp.user.UserDataHolder
 
 class LoginFragmentChoice : Fragment() {

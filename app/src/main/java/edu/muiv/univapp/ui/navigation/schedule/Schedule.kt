@@ -1,4 +1,4 @@
-package edu.muiv.univapp.ui.schedule
+package edu.muiv.univapp.ui.navigation.schedule
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

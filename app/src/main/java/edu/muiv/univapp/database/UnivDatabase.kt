@@ -3,11 +3,11 @@ package edu.muiv.univapp.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import edu.muiv.univapp.ui.notifications.Notification
-import edu.muiv.univapp.ui.profile.ProfileAttendance
-import edu.muiv.univapp.ui.schedule.Schedule
-import edu.muiv.univapp.ui.schedule.ScheduleAttendance
-import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
+import edu.muiv.univapp.ui.navigation.notifications.Notification
+import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
+import edu.muiv.univapp.ui.navigation.schedule.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.ScheduleAttendance
+import edu.muiv.univapp.ui.navigation.schedule.ScheduleUserNotes
 import edu.muiv.univapp.user.Student
 import edu.muiv.univapp.user.Subject
 import edu.muiv.univapp.user.Teacher

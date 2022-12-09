@@ -1,4 +1,4 @@
-package edu.muiv.univapp.ui.notifications
+package edu.muiv.univapp.ui.navigation.notifications
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

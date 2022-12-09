@@ -6,11 +6,11 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import edu.muiv.univapp.ui.login.LoginResult
-import edu.muiv.univapp.ui.notifications.Notification
-import edu.muiv.univapp.ui.profile.ProfileAttendance
-import edu.muiv.univapp.ui.schedule.Schedule
-import edu.muiv.univapp.ui.schedule.ScheduleAttendance
-import edu.muiv.univapp.ui.schedule.ScheduleUserNotes
+import edu.muiv.univapp.ui.navigation.notifications.Notification
+import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
+import edu.muiv.univapp.ui.navigation.schedule.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.ScheduleAttendance
+import edu.muiv.univapp.ui.navigation.schedule.ScheduleUserNotes
 import edu.muiv.univapp.user.*
 import java.util.UUID
 
