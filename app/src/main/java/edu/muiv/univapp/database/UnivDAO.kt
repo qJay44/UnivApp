@@ -42,6 +42,13 @@ interface UnivDAO {
     @Query("SELECT * FROM ScheduleAttendance WHERE scheduleID=:scheduleID AND studentID=:studentID")
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?>
 
+    @Query(
+        "SELECT student.* FROM ScheduleAttendance " +
+        "INNER JOIN student ON ScheduleAttendance.studentID=student.id " +
+        "WHERE scheduleID=:scheduleID AND willAttend=1"
+    )
+    fun getWillAttendStudents(scheduleID: UUID): LiveData<List<Student>>
+
     @Query("SELECT * FROM ScheduleUserNotes WHERE scheduleID=:scheduleID AND studentID=:studentID")
     fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?>
 

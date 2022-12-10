@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
+import edu.muiv.univapp.user.Student
 import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.UserDataHolder
 import java.util.UUID
@@ -15,8 +16,11 @@ class ScheduleViewModel : ViewModel() {
     private val scheduleDateLiveData = MutableLiveData<UUID>()
     private val teacherIdLiveData = MutableLiveData<Array<UUID>>()
     private val scheduleToStudentLiveData = MutableLiveData<Map<UUID, UUID>>()
+    private val scheduleIdLiveData = MutableLiveData<UUID>()
     var scheduleAttendance: ScheduleAttendance? = null
     var scheduleUserNotes: ScheduleUserNotes? = null
+
+    val isTeacher: Boolean by lazy { getUserType() }
 
     var scheduleID: UUID? = null
         set(value) {
@@ -24,6 +28,8 @@ class ScheduleViewModel : ViewModel() {
             loadSchedule(value!!)
             loadAttendance(value, UserDataHolder.get().user.id)
         }
+
+    // Public LiveData //
 
     val scheduleLiveData: LiveData<Schedule> =
         Transformations.switchMap(scheduleDateLiveData) { id ->
@@ -49,13 +55,25 @@ class ScheduleViewModel : ViewModel() {
             )
         }
 
+    val studentsWillAttend: LiveData<List<Student>> =
+        Transformations.switchMap(scheduleIdLiveData) { id ->
+            univRepository.getWillAttendStudents(id)
+        }
+
+    /////////////////////
+
+    private fun getUserType(): Boolean = UserDataHolder.get().user.groupName == null
+
     private fun loadSchedule(scheduleID: UUID) {
         scheduleDateLiveData.value = scheduleID
     }
 
-    private fun loadAttendance(scheduleID: UUID, studentID: UUID) {
-        val idMap = mapOf(scheduleID to studentID)
-        scheduleToStudentLiveData.value = idMap
+    private fun loadAttendance(scheduleID: UUID, userID: UUID) {
+        val idMap = mapOf(scheduleID to userID)
+        if (isTeacher)
+            scheduleIdLiveData.value = scheduleID
+        else
+            scheduleToStudentLiveData.value = idMap
     }
 
     fun loadTeacher(id: UUID) {

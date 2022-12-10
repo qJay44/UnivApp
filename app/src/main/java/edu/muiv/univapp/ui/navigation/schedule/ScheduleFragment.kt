@@ -73,10 +73,6 @@ class ScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tvAttendance.setOnClickListener {
-            showDialog()
-        }
-
         // Update schedule info
         scheduleViewModel.scheduleLiveData.observe(viewLifecycleOwner) { schedule ->
             schedule?.let {
@@ -94,10 +90,23 @@ class ScheduleFragment : Fragment() {
         }
 
         // Update attendance status
-        scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
-            scheduleViewModel.scheduleAttendance = it
-            val willAttend = it?.willAttend ?: false
-            tvAttendance.text = if (willAttend) "+" else ("Н")
+        if (scheduleViewModel.isTeacher) {
+            scheduleViewModel.studentsWillAttend.observe(viewLifecycleOwner) { studentsWillAttend ->
+                tvAttendance.text = studentsWillAttend.size.toString()
+            }
+            // Specific listener
+            tvAttendance.setOnClickListener {
+                val dialogFragment = StudentsWillAttendDialogFragment.newInstance(scheduleViewModel.scheduleID!!)
+                dialogFragment.show(parentFragmentManager, null)
+            }
+        } else {
+            scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
+                scheduleViewModel.scheduleAttendance = it
+                val willAttend = it?.willAttend ?: false
+                tvAttendance.text = if (willAttend) "+" else ("Н")
+            }
+            // Specific listener
+            tvAttendance.setOnClickListener { showDialog() }
         }
 
         // Update notes
@@ -120,6 +129,7 @@ class ScheduleFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        if (scheduleViewModel.isTeacher) return
         val notes = if (scheduleViewModel.scheduleUserNotes != null) {
             with(scheduleViewModel.scheduleUserNotes!!) {
                 val changedNotes = if(notes != notesText) notesText else notes
