@@ -1,5 +1,7 @@
 package edu.muiv.univapp.ui.navigation.schedule
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -36,12 +38,11 @@ class StudentsWillAttendDialogFragment : DialogFragment() {
 
     private var _binding: DialogStudentsBinding? = null
     private val binding get() = _binding!!
+    private val adapter = StudentsWillAttendAdapter()
     private val rvStudentsWillAttend by lazy { binding.rvStudentsWillAttend }
     private val studentsWillAttendDialogFragmentVM by lazy {
         ViewModelProvider(this)[StudentsWillAttendDialogFragmentVM::class.java]
     }
-
-    private var adapter = StudentsWillAttendAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +71,15 @@ class StudentsWillAttendDialogFragment : DialogFragment() {
         studentsWillAttendDialogFragmentVM.studentsWillAttend.observe(viewLifecycleOwner) { students ->
             updateUI(students)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val decorView = dialog?.window?.decorView
+        val appear = ObjectAnimator.ofPropertyValuesHolder(decorView,
+            PropertyValuesHolder.ofFloat("alpha", 0f, 1f))
+        appear.duration = 300
+        appear.start()
     }
 
     override fun onDestroyView() {

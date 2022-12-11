@@ -96,8 +96,11 @@ class ScheduleFragment : Fragment() {
             }
             // Specific listener
             tvAttendance.setOnClickListener {
-                val dialogFragment = StudentsWillAttendDialogFragment.newInstance(scheduleViewModel.scheduleID!!)
-                dialogFragment.show(parentFragmentManager, null)
+                if (scheduleViewModel.studentsWillAttend.value != null) {
+                    val dialogFragment =
+                        StudentsWillAttendDialogFragment.newInstance(scheduleViewModel.scheduleID!!)
+                    dialogFragment.show(parentFragmentManager, null)
+                }
             }
         } else {
             scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {

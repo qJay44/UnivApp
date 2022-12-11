@@ -85,14 +85,13 @@ class NavigationActivity : AppCompatActivity() {
 
                 Toast.makeText(
                     this@NavigationActivity,
-                    "Click BACK again to exit",
+                    "Нажмите НАЗАД снова чтобы выйти",
                     Toast.LENGTH_SHORT
                 ).show()
 
                 Handler(Looper.myLooper()!!).postDelayed({ pressedOnce = false }, 2000)
             }
-        }
-        )
+        })
 
         ///////////////////////////
     }
