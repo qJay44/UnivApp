@@ -5,14 +5,15 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
+import edu.muiv.univapp.model.Student
+import edu.muiv.univapp.model.Teacher
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
-import edu.muiv.univapp.ui.navigation.schedule.model.Subject
-import edu.muiv.univapp.user.*
+import edu.muiv.univapp.model.Subject
 import java.util.UUID
 
 @Dao

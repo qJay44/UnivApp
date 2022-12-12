@@ -1,4 +1,4 @@
-package edu.muiv.univapp.user
+package edu.muiv.univapp.utils
 
 import android.util.Log
 import edu.muiv.univapp.ui.login.LoginResult

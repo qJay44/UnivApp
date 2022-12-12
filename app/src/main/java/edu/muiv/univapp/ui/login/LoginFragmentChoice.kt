@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.ui.navigation.NavigationActivity
-import edu.muiv.univapp.user.UserDataHolder
+import edu.muiv.univapp.utils.UserDataHolder
 
 class LoginFragmentChoice : Fragment() {
 

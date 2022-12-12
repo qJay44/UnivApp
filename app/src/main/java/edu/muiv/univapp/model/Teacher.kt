@@ -1,4 +1,4 @@
-package edu.muiv.univapp.user
+package edu.muiv.univapp.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

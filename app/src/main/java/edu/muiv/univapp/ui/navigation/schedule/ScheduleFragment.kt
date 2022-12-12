@@ -22,7 +22,7 @@ import edu.muiv.univapp.databinding.FragmentScheduleBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
-import edu.muiv.univapp.user.UserDataHolder
+import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
 

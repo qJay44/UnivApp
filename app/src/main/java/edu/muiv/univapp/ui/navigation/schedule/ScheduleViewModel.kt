@@ -8,9 +8,9 @@ import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
-import edu.muiv.univapp.user.Student
-import edu.muiv.univapp.user.Teacher
-import edu.muiv.univapp.user.UserDataHolder
+import edu.muiv.univapp.model.Student
+import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.utils.UserDataHolder
 import java.util.UUID
 
 class ScheduleViewModel : ViewModel() {

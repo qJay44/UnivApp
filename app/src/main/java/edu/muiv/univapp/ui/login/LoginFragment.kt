@@ -14,7 +14,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import edu.muiv.univapp.R
-import edu.muiv.univapp.utils.DatabaseTestDataBuilder
+import edu.muiv.univapp.ui.login.utils.DatabaseTestDataBuilder
 import edu.muiv.univapp.ui.navigation.NavigationActivity
 
 class LoginFragment : Fragment() {

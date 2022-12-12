@@ -1,4 +1,4 @@
-package edu.muiv.univapp.utils
+package edu.muiv.univapp.ui.navigation.schedule.utils
 
 import android.annotation.SuppressLint
 import android.content.Context

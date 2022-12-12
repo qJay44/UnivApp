@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
-import edu.muiv.univapp.user.Teacher
-import edu.muiv.univapp.user.UserDataHolder
+import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
 

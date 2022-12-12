@@ -8,10 +8,10 @@ import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
-import edu.muiv.univapp.user.Student
-import edu.muiv.univapp.ui.navigation.schedule.model.Subject
-import edu.muiv.univapp.user.Teacher
-import edu.muiv.univapp.user.UserDataHolder
+import edu.muiv.univapp.model.Student
+import edu.muiv.univapp.model.Subject
+import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.utils.UserDataHolder
 
 class LoginViewModel : ViewModel() {
 

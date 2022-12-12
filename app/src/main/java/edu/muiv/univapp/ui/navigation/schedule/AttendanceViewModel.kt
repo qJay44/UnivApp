@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.user.Student
+import edu.muiv.univapp.model.Student
 import java.util.*
 
 class AttendanceViewModel : ViewModel() {

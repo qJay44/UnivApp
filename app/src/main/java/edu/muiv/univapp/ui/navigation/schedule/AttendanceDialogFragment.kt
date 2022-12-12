@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.DialogStudentsBinding
-import edu.muiv.univapp.user.Student
+import edu.muiv.univapp.model.Student
 import java.util.UUID
 
 class AttendanceDialogFragment : DialogFragment() {

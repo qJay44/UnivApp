@@ -15,7 +15,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.ActivityNavigationBinding
-import edu.muiv.univapp.user.UserDataHolder
+import edu.muiv.univapp.utils.UserDataHolder
 
 class NavigationActivity : AppCompatActivity() {
 

@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentProfileBinding
-import edu.muiv.univapp.ui.navigation.schedule.model.Subject
-import edu.muiv.univapp.user.Teacher
+import edu.muiv.univapp.model.Subject
+import edu.muiv.univapp.model.Teacher
 import java.util.UUID
 
 class ProfileFragment : Fragment() {

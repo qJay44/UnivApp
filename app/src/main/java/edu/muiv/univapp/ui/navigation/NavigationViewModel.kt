@@ -1,7 +1,7 @@
 package edu.muiv.univapp.ui.navigation
 
 import androidx.lifecycle.ViewModel
-import edu.muiv.univapp.user.UserDataHolder
+import edu.muiv.univapp.utils.UserDataHolder
 
 class NavigationViewModel : ViewModel() {
     private val user = UserDataHolder.get().user
