@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.user.Student
 import edu.muiv.univapp.user.Teacher
 import edu.muiv.univapp.user.UserDataHolder

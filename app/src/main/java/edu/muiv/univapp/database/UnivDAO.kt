@@ -8,9 +8,10 @@ import androidx.room.Upsert
 import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
-import edu.muiv.univapp.ui.navigation.schedule.Schedule
-import edu.muiv.univapp.ui.navigation.schedule.ScheduleAttendance
-import edu.muiv.univapp.ui.navigation.schedule.ScheduleUserNotes
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
+import edu.muiv.univapp.ui.navigation.schedule.model.Subject
 import edu.muiv.univapp.user.*
 import java.util.UUID
 

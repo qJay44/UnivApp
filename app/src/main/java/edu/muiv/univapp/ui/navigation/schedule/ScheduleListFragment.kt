@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.utils.OnTouchListenerRecyclerView
 
 class ScheduleListFragment : Fragment() {

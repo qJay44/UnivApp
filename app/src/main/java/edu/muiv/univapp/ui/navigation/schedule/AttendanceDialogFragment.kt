@@ -21,16 +21,16 @@ import edu.muiv.univapp.databinding.DialogStudentsBinding
 import edu.muiv.univapp.user.Student
 import java.util.UUID
 
-class StudentsWillAttendDialogFragment : DialogFragment() {
+class AttendanceDialogFragment : DialogFragment() {
 
     companion object {
         private const val SCHEDULE_ID = "schedule_id"
 
-        fun newInstance(scheduleID: UUID): StudentsWillAttendDialogFragment {
+        fun newInstance(scheduleID: UUID): AttendanceDialogFragment {
             val args = Bundle().apply {
                 putSerializable(SCHEDULE_ID, scheduleID)
             }
-            return StudentsWillAttendDialogFragment().apply {
+            return AttendanceDialogFragment().apply {
                 arguments = args
             }
         }
@@ -40,8 +40,8 @@ class StudentsWillAttendDialogFragment : DialogFragment() {
     private val binding get() = _binding!!
     private val adapter = StudentsWillAttendAdapter()
     private val rvStudentsWillAttend by lazy { binding.rvStudentsWillAttend }
-    private val studentsWillAttendDialogFragmentVM by lazy {
-        ViewModelProvider(this)[StudentsWillAttendDialogFragmentVM::class.java]
+    private val attendanceViewModel by lazy {
+        ViewModelProvider(this)[AttendanceViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -61,14 +61,14 @@ class StudentsWillAttendDialogFragment : DialogFragment() {
         } else {
             requireArguments().getSerializable(SCHEDULE_ID) as UUID
         }
-        studentsWillAttendDialogFragmentVM.loadStudents(scheduleID)
+        attendanceViewModel.loadStudents(scheduleID)
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        studentsWillAttendDialogFragmentVM.studentsWillAttend.observe(viewLifecycleOwner) { students ->
+        attendanceViewModel.studentsWillAttend.observe(viewLifecycleOwner) { students ->
             updateUI(students)
         }
     }

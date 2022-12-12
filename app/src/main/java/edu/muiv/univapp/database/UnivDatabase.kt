@@ -5,11 +5,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
-import edu.muiv.univapp.ui.navigation.schedule.Schedule
-import edu.muiv.univapp.ui.navigation.schedule.ScheduleAttendance
-import edu.muiv.univapp.ui.navigation.schedule.ScheduleUserNotes
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.user.Student
-import edu.muiv.univapp.user.Subject
+import edu.muiv.univapp.ui.navigation.schedule.model.Subject
 import edu.muiv.univapp.user.Teacher
 
 @Database(

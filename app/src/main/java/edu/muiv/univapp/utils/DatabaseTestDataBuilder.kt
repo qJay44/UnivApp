@@ -3,9 +3,9 @@ package edu.muiv.univapp.utils
 import android.util.Log
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
-import edu.muiv.univapp.ui.navigation.schedule.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.user.Student
-import edu.muiv.univapp.user.Subject
+import edu.muiv.univapp.ui.navigation.schedule.model.Subject
 import edu.muiv.univapp.user.Teacher
 import java.text.SimpleDateFormat
 import java.util.*

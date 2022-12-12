@@ -19,6 +19,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleBinding
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.user.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -94,11 +97,11 @@ class ScheduleFragment : Fragment() {
             scheduleViewModel.studentsWillAttend.observe(viewLifecycleOwner) { studentsWillAttend ->
                 tvAttendance.text = studentsWillAttend.size.toString()
             }
-            // Specific listener
+            // Show students that will attend on click
             tvAttendance.setOnClickListener {
-                if (scheduleViewModel.studentsWillAttend.value != null) {
+                if (!scheduleViewModel.studentsWillAttend.value.isNullOrEmpty()) {
                     val dialogFragment =
-                        StudentsWillAttendDialogFragment.newInstance(scheduleViewModel.scheduleID!!)
+                        AttendanceDialogFragment.newInstance(scheduleViewModel.scheduleID!!)
                     dialogFragment.show(parentFragmentManager, null)
                 }
             }
@@ -108,7 +111,7 @@ class ScheduleFragment : Fragment() {
                 val willAttend = it?.willAttend ?: false
                 tvAttendance.text = if (willAttend) "+" else ("Н")
             }
-            // Specific listener
+            // Show dialog with choose options
             tvAttendance.setOnClickListener { showDialog() }
         }
 

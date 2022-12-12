@@ -8,7 +8,7 @@ import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.user.Student
 import java.util.*
 
-class StudentsWillAttendDialogFragmentVM : ViewModel() {
+class AttendanceViewModel : ViewModel() {
     private val univRepository = UnivRepository.get()
     private val scheduleIdLiveData = MutableLiveData<UUID>()
 
