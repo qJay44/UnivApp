@@ -93,11 +93,12 @@ class ScheduleFragment : Fragment() {
         }
 
         // Update attendance status
+        // TODO: Add date restriction
         if (scheduleViewModel.isTeacher) {
             scheduleViewModel.studentsWillAttend.observe(viewLifecycleOwner) { studentsWillAttend ->
                 tvAttendance.text = studentsWillAttend.size.toString()
             }
-            // Show students that will attend on click
+            // Show student(s) that will attend
             tvAttendance.setOnClickListener {
                 if (!scheduleViewModel.studentsWillAttend.value.isNullOrEmpty()) {
                     val dialogFragment =

@@ -22,23 +22,26 @@
 
         <ImageView
             android:id="@+id/muivLogo"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:contentDescription="@string/muiv_logo_image"
+            android:src="@drawable/img_background_login_choice"
+            android:scaleType="fitStart"
+            app:layout_constrainedWidth="true"
+            app:layout_constrainedHeight="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_launcher_background" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
+            android:fontFamily="@font/gothampro_bold"
             android:text="@string/enter_as_example"
             android:textColor="@color/primary"
             android:textSize="30sp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/btnAsStudent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -49,10 +52,12 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:backgroundTint="@color/primary"
-            android:minWidth="250dp"
+            android:minWidth="287dp"
+            android:minHeight="57dp"
             android:text="@string/student_btn_text_example"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="20sp"
+            android:fontFamily="@font/gothampro_bold"
             app:layout_constraintBottom_toTopOf="@id/btnAsTeacher"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -61,12 +66,14 @@
             android:id="@+id/btnAsTeacher"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="80dp"
+            android:layout_marginBottom="50dp"
             android:backgroundTint="@color/primary"
-            android:minWidth="250dp"
+            android:minWidth="287dp"
+            android:minHeight="57dp"
             android:text="@string/teacher_btn_text_example"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="20sp"
+            android:fontFamily="@font/gothampro_bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
