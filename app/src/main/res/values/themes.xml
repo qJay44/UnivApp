@@ -55,4 +55,9 @@
         <item name="android:elevation">5dp</item>
         <item name="android:stateListAnimator">@null</item>
     </style>
+
+    <!-- Remove icon color selection -->
+    <style name="ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/primary</item>
+    </style>
 </resources>

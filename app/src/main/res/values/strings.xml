@@ -51,4 +51,5 @@
     <string name="user_current_subjects">Дисциплины в текущем семестре</string>
     <string name="user_subject_details_example">Блощук А.А. | Экзамен</string>
     <string name="title_profile">Profile</string>
+    <string name="patch_top">вверхная плашка</string>
 </resources>
