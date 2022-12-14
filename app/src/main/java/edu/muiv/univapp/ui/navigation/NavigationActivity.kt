@@ -44,7 +44,6 @@ class NavigationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityNavigationBinding.inflate(layoutInflater)
-        supportActionBar?.hide()
         setContentView(binding.root)
 
         tvStudentName = binding.tvStudentName

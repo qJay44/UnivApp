@@ -19,8 +19,7 @@
             android:background="@drawable/round_button"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_baseline_school_24"
-            app:tint="@color/white"
+            app:srcCompat="@drawable/ic_schedule"
             android:contentDescription="@string/info_icon" />
 
         <TextView

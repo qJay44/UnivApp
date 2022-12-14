@@ -9,10 +9,11 @@
         android:id="@+id/muivLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:src="@drawable/img_background_login"
+        android:scaleType="fitStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_launcher_background"
         android:contentDescription="@string/muiv_logo_image" />
 
     <EditText
@@ -22,13 +23,9 @@
         android:layout_marginBottom="10dp"
         android:paddingHorizontal="30dp"
         android:paddingVertical="10dp"
-        android:gravity="start"
-        android:background="@drawable/round_border"
-        android:backgroundTint="#0CFFFFFF"
-        android:backgroundTintMode="add"
         android:hint="@string/prompt_username"
         android:inputType="text"
-        android:selectAllOnFocus="true"
+        style="@style/InputEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/etPassword"
@@ -41,14 +38,9 @@
         android:layout_marginBottom="10dp"
         android:paddingHorizontal="30dp"
         android:paddingVertical="10dp"
-        android:gravity="start"
-        android:background="@drawable/round_border"
-        android:backgroundTint="#0CFFFFFF"
-        android:backgroundTintMode="add"
         android:hint="@string/prompt_password"
-        android:imeOptions="actionDone"
         android:inputType="textPassword"
-        android:selectAllOnFocus="true"
+        style="@style/InputEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnLogin"
@@ -59,15 +51,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:layout_marginBottom="80dp"
-        android:backgroundTint="@color/primary"
+        android:layout_marginBottom="30dp"
+        android:minWidth="139dp"
+        android:minHeight="55dp"
         android:text="@string/action_sign_in"
-        android:textSize="18sp"
-        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
         android:id="@+id/pbLoading"
@@ -79,7 +69,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/etPassword"
         app:layout_constraintStart_toStartOf="@+id/etPassword"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

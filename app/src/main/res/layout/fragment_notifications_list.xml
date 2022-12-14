@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
     android:transitionGroup="true"
+    android:background="@android:color/white"
     tools:context=".ui.navigation.notifications.NotificationListFragment">
 
     <ImageView
@@ -15,8 +15,7 @@
         android:background="@drawable/round_button"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_notifications_black_24dp"
-        app:tint="@color/white"
+        app:srcCompat="@drawable/ic_notifications"
         android:contentDescription="@string/info_icon" />
 
     <TextView
@@ -28,6 +27,7 @@
         android:paddingEnd="20dp"
         android:text="@string/notifications_title"
         android:textSize="20sp"
+        android:textColor="@android:color/white"
         app:layout_constraintTop_toTopOf="@id/info_icon"
         app:layout_constraintStart_toEndOf="@id/info_icon"
         app:layout_constraintEnd_toEndOf="parent"
