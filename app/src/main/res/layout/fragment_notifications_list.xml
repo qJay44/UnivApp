@@ -5,22 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:transitionGroup="true"
-    android:background="@android:color/white"
     tools:context=".ui.navigation.notifications.NotificationListFragment">
 
     <ImageView
         android:id="@+id/info_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:background="@drawable/round_button"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/info_icon" />
+
+    <ImageView
+        android:layout_width="23dp"
+        android:layout_height="22dp"
+        app:layout_constraintTop_toTopOf="@id/info_icon"
+        app:layout_constraintStart_toStartOf="@id/info_icon"
+        app:layout_constraintEnd_toEndOf="@id/info_icon"
+        app:layout_constraintBottom_toBottomOf="@id/info_icon"
         app:srcCompat="@drawable/ic_notifications"
         android:contentDescription="@string/info_icon" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="258dp"
+        android:minHeight="36dp"
         android:background="@drawable/round_border"
         android:backgroundTint="@color/primary"
         android:paddingStart="20dp"
@@ -28,18 +38,33 @@
         android:text="@string/notifications_title"
         android:textSize="20sp"
         android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:fontFamily="@font/gothampro_bold"
         app:layout_constraintTop_toTopOf="@id/info_icon"
         app:layout_constraintStart_toEndOf="@id/info_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/info_icon" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvNotifications"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
-        android:overScrollMode="never"
+        app:cardCornerRadius="20dp"
+        app:strokeWidth="3dp"
+        app:strokeColor="@color/primary"
         app:layout_constraintTop_toBottomOf="@id/info_icon"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvNotifications"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="55dp"
+            android:overScrollMode="never"
+            app:layout_constraintTop_toBottomOf="@id/info_icon"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

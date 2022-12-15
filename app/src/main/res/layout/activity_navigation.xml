@@ -79,7 +79,7 @@
         app:defaultNavHost="true"
         app:layout_constrainedHeight="true"
         app:layout_constraintTop_toBottomOf="@id/patch_top"
-        app:layout_constraintBottom_toTopOf="@id/nav_view"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:navGraph="@navigation/mobile_navigation" />
