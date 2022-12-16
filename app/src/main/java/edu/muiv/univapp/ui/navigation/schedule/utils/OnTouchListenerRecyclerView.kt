@@ -14,8 +14,8 @@ open class OnTouchListenerRecyclerView(context: Context?, private val recyclerVi
 
     companion object {
         private const val TAG = "OnSwipeTouchListener"
-        private const val SWIPE_THRESHOLD = 100
-        private const val SWIPE_THRESHOLD_VELOCITY = 100
+        private const val SWIPE_THRESHOLD = 200
+        private const val SWIPE_THRESHOLD_VELOCITY = 200
     }
 
     private val gestureDetector = GestureDetector(context, GestureListener())

@@ -3,35 +3,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp"
-    android:background="@drawable/round_border">
-
-    <TextView
-        android:id="@+id/tvDay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tvDate_example"
-        android:textSize="10pt"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/guidelineVertical"
-        app:layout_constraintStart_toStartOf="@id/guidelineVertical" />
-
-    <TextView
-        android:id="@+id/tvWeekDayName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/week_day_example"
-        android:textSize="10pt"
-        app:layout_constraintStart_toEndOf="@id/guidelineVertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:paddingVertical="5dp"
+    android:background="@color/primary">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineVertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:fontFamily="@font/montserrat_medium"
         app:layout_constraintGuide_percent="0.15"/>
+
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:text="@string/tvDate_example"
+        android:textSize="10pt"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:fontFamily="@font/gothampro_bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvWeekDayName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/week_day_example"
+        android:textSize="10pt"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:fontFamily="@font/gothampro_bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guidelineVertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

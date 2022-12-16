@@ -20,7 +20,7 @@
     <string name="week_days_example">24.10 – 30.10</string>
     <string name="previous_week_btn">previous week button</string>
     <string name="next_week_btn">next week button</string>
-    <string name="week_day_example">Monday</string>
+    <string name="week_day_example">ВТОРНИК</string>
     <string name="tv_time_start_example">08:20</string>
     <string name="tv_time_end_example">18:35</string>
     <string name="subject_details_example">Блощук А.А. | Лекция | Ауд. 505</string>
@@ -52,4 +52,5 @@
     <string name="user_subject_details_example">Блощук А.А. | Экзамен</string>
     <string name="title_profile">Profile</string>
     <string name="patch_top">вверхная плашка</string>
+    <string name="text_login_title">РАСПИСАНИЕ ЗАНЯТИЙ</string>
 </resources>

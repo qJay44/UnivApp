@@ -13,9 +13,9 @@
         android:layout_marginEnd="15dp"
         android:background="@drawable/round_button"
         android:contentDescription="@string/previous_week_btn"
-        android:minWidth="28dp"
-        android:minHeight="28dp"
-        android:src="@drawable/ic_baseline_arrow_back_24"
+        android:minWidth="@dimen/arrow_size"
+        android:minHeight="@dimen/arrow_size"
+        android:src="@drawable/ic_arrow_left"
         app:layout_constraintBottom_toBottomOf="@id/tvWeekDays"
         app:layout_constraintRight_toLeftOf="@id/tvWeekDays"
         app:layout_constraintTop_toTopOf="@id/tvWeekDays" />
@@ -27,9 +27,11 @@
         android:layout_marginStart="15dp"
         android:background="@drawable/round_button"
         android:contentDescription="@string/next_week_btn"
-        android:minWidth="28dp"
-        android:minHeight="28dp"
-        android:src="@drawable/ic_baseline_arrow_forward_24"
+        android:minWidth="@dimen/arrow_size"
+        android:minHeight="@dimen/arrow_size"
+        android:rotationX="180"
+        android:rotationY="180"
+        android:src="@drawable/ic_arrow_left"
         app:layout_constraintBottom_toBottomOf="@id/tvWeekDays"
         app:layout_constraintLeft_toRightOf="@id/tvWeekDays"
         app:layout_constraintTop_toTopOf="@id/tvWeekDays" />
@@ -38,21 +40,33 @@
         android:id="@+id/tvWeekDays"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="175dp"
+        android:minHeight="36dp"
         android:text="@string/week_days_example"
-        android:textSize="22sp"
+        android:textAlignment="center"
+        android:gravity="center"
+        style="@style/FragmentMainTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/schedule_recycler_view"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="15dp"
-        android:overScrollMode="never"
-        android:layoutAnimation="@anim/layout_animation"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_marginTop="@dimen/recycler_view_margin_top"
         app:layout_constraintTop_toBottomOf="@id/tvWeekDays"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/schedule_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="55dp"
+            android:overScrollMode="never"
+            android:layoutAnimation="@anim/layout_animation"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
