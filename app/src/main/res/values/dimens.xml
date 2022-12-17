@@ -3,4 +3,9 @@
     <dimen name="recycler_view_margin_top">15dp</dimen>
     <dimen name="notification_title_text_size">18sp</dimen>
     <dimen name="arrow_size">31dp</dimen>
+    <dimen name="fragment_icon_size">23dp</dimen>
+    <dimen name="fragment_icon_size_background">35dp</dimen>
+    <dimen name="schedule_fragment_icon_margin_top">10dp</dimen>
+    <dimen name="schedule_fragment_icon_margin_start">20dp</dimen>
+    <dimen name="schedule_fragment_icon_size">40dp</dimen>
 </resources>

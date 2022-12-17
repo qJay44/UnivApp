@@ -4,6 +4,8 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -11,9 +13,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -36,13 +41,14 @@ class ScheduleFragment : Fragment() {
     private val binding get() = _binding!!
     private var notesText: String? = null
 
-    private lateinit var tvSubjectName: TextView
-    private lateinit var tvSubjectType: TextView
-    private lateinit var tvDate       : TextView
-    private lateinit var tvTeacherName: TextView
-    private lateinit var tvRoom       : TextView
-    private lateinit var tvAttendance : TextView
-    private lateinit var etNotes      : EditText
+    private lateinit var tvSubjectName : TextView
+    private lateinit var tvSubjectType : TextView
+    private lateinit var tvDate        : TextView
+    private lateinit var tvTeacherName : TextView
+    private lateinit var tvRoom        : TextView
+    private lateinit var btnAttendance : TextView
+    private lateinit var etNotes       : EditText
+    private lateinit var svScroll      : ScrollView
 
     private val scheduleViewModel: ScheduleViewModel by lazy {
         ViewModelProvider(this)[ScheduleViewModel::class.java]
@@ -67,8 +73,9 @@ class ScheduleFragment : Fragment() {
         tvDate = binding.tvDate
         tvTeacherName = binding.tvTeacherName
         tvRoom = binding.tvRoom
-        tvAttendance = binding.tvAttendance
+        btnAttendance = binding.btnAttendance
         etNotes = binding.etNotes
+        svScroll = binding.svScroll
 
         return root
     }
@@ -96,10 +103,10 @@ class ScheduleFragment : Fragment() {
         // TODO: Add date restriction
         if (scheduleViewModel.isTeacher) {
             scheduleViewModel.studentsWillAttend.observe(viewLifecycleOwner) { studentsWillAttend ->
-                tvAttendance.text = studentsWillAttend.size.toString()
+                btnAttendance.text = studentsWillAttend.size.toString()
             }
             // Show student(s) that will attend
-            tvAttendance.setOnClickListener {
+            btnAttendance.setOnClickListener {
                 if (!scheduleViewModel.studentsWillAttend.value.isNullOrEmpty()) {
                     val dialogFragment =
                         AttendanceDialogFragment.newInstance(scheduleViewModel.scheduleID!!)
@@ -110,10 +117,22 @@ class ScheduleFragment : Fragment() {
             scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
                 scheduleViewModel.scheduleAttendance = it
                 val willAttend = it?.willAttend ?: false
-                tvAttendance.text = if (willAttend) "+" else ("Н")
+                btnAttendance.text = if (willAttend) {
+                    btnAttendance.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                    btnAttendance.background = ContextCompat.getDrawable(requireContext(), R.drawable.attendance_button_yes)
+                    ""
+                } else {
+                    btnAttendance.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
+                    btnAttendance.background = ContextCompat.getDrawable(requireContext(), R.drawable.attendance_button_no)
+                    "Н"
+                }
             }
             // Show dialog with choose options
-            tvAttendance.setOnClickListener { showDialog() }
+            btnAttendance.setOnClickListener {
+                val btnAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.attendance_button_animation)
+                it.startAnimation(btnAnimation)
+                showDialog()
+            }
         }
 
         // Update notes
@@ -131,7 +150,13 @@ class ScheduleFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {}
         }
 
+        // FIXME: scrolling focus
         etNotes.addTextChangedListener(notesTextWatcher)
+        etNotes.setOnClickListener {
+            Handler(Looper.myLooper()!!).postDelayed({
+                svScroll.scrollTo(0, svScroll.bottom)
+            }, 200)
+        }
     }
 
     override fun onStop() {

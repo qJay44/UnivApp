@@ -4,11 +4,13 @@ import android.content.Context
 import android.os.*
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -93,6 +95,14 @@ class NavigationActivity : AppCompatActivity() {
         })
 
         ///////////////////////////
+
+        // Hide/show bottom navigation bar when IME appears/disappears
+        window.decorView.setOnApplyWindowInsetsListener { view, insets ->
+            val insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets, view)
+            val imeVisible = insetsCompat.isVisible(WindowInsetsCompat.Type.ime())
+            navView.visibility = if (imeVisible) View.GONE else View.VISIBLE
+            view.onApplyWindowInsets(insets)
+        }
     }
 
     override fun onPause() {

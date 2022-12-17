@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:minWidth="250dp"
-    android:background="@drawable/round_border"
+    android:background="@drawable/round_border_30"
     android:padding="10dp">
 
     <androidx.recyclerview.widget.RecyclerView
