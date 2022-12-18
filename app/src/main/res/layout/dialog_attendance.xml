@@ -2,16 +2,24 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/round_border_30"
+    android:background="@drawable/round_border_20_3"
+    android:padding="15dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/question"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:maxWidth="270dp"
+        android:fontFamily="@font/montserrat_bold"
         android:text="@string/dialog_tv_question"
         android:textAlignment="center"
-        android:textSize="25sp"
+        android:textSize="19sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -19,27 +27,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintGuide_percent="0.6" />
 
     <Button
-        android:id="@+id/btnDialogYes"
-        android:layout_width="match_parent"
+        android:id="@+id/btnDialogCancel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
-        android:text="@string/dialog_btn_yes"
-        android:textSize="20sp"
+        android:backgroundTint="#312326"
+        android:fontFamily="@font/gothampro_bold"
+        android:text="@string/dialog_btn_cancel"
+        android:textSize="16sp"
+        app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@id/guidelineVertical"
         app:layout_constraintTop_toBottomOf="@id/question" />
 
     <Button
-        android:id="@+id/btnDialogNo"
-        android:layout_width="match_parent"
+        android:id="@+id/btnDialogYes"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="20dp"
-        android:text="@string/dialog_btn_no"
-        android:textSize="20sp"
+        android:fontFamily="@font/gothampro_bold"
+        android:paddingHorizontal="40dp"
+        android:text="@string/dialog_btn_yes"
+        android:textSize="16sp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="@+id/question"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical"
         app:layout_constraintTop_toBottomOf="@id/question" />
 

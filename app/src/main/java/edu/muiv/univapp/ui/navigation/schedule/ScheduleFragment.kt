@@ -4,8 +4,6 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -150,13 +148,7 @@ class ScheduleFragment : Fragment() {
             override fun afterTextChanged(p0: Editable?) {}
         }
 
-        // FIXME: scrolling focus
         etNotes.addTextChangedListener(notesTextWatcher)
-        etNotes.setOnClickListener {
-            Handler(Looper.myLooper()!!).postDelayed({
-                svScroll.scrollTo(0, svScroll.bottom)
-            }, 200)
-        }
     }
 
     override fun onStop() {
@@ -195,7 +187,7 @@ class ScheduleFragment : Fragment() {
         val formatOut = SimpleDateFormat("dd MMMM, EEEE", Locale.getDefault())
         val formattedDate = formatOut.format(date)
 
-        val dateField = "$formattedDate ${schedule.timeStart} - ${schedule.timeEnd}"
+        val dateField = "$formattedDate\n${schedule.timeStart} - ${schedule.timeEnd}"
         val roomField = "Аудитория ${schedule.roomNum}"
 
         tvSubjectName.text = schedule.subjectName
@@ -234,7 +226,7 @@ class ScheduleFragment : Fragment() {
         }
 
         val btnYes = dialog.findViewById<Button>(R.id.btnDialogYes)
-        val btnNo = dialog.findViewById<Button>(R.id.btnDialogNo)
+        val btnNo = dialog.findViewById<Button>(R.id.btnDialogCancel)
 
         btnYes.setOnClickListener { btnLambda(true) }
         btnNo.setOnClickListener { btnLambda(false) }
