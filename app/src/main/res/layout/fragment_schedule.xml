@@ -40,7 +40,7 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/recycler_view_margin_top"
+        android:layout_marginTop="@dimen/fragment_content_margin_top"
         app:layout_constraintTop_toBottomOf="@id/icon_background">
 
         <ScrollView

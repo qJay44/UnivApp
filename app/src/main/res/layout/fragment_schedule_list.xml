@@ -53,7 +53,7 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/recycler_view_margin_top"
+        android:layout_marginTop="@dimen/fragment_content_margin_top"
         app:layout_constraintTop_toBottomOf="@id/tvWeekDays"
         app:layout_constraintBottom_toBottomOf="parent">
 

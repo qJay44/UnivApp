@@ -26,7 +26,7 @@ class ProfileViewModel : ViewModel() {
     private var visitAmount = 0
 
     val attendanceAmount: String
-        get() = " $visitAmount / $scheduleAllSize"
+        get() = " $visitAmount/$scheduleAllSize пар"
 
     val attendancePercent: String
         get() {

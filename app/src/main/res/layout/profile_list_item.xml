@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/item_horizontal_padding"
     android:background="@drawable/separate_line" >
 
     <TextView
         android:id="@+id/tvSubjectName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="3dp"
         android:text="@string/subject_name_example"
-        android:textSize="15sp"
-        android:textStyle="bold"
+        android:textSize="16sp"
+        android:fontFamily="@font/montserrat_medium"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -20,7 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/user_subject_details_example"
-        android:textSize="13sp"
+        android:textSize="15sp"
+        android:fontFamily="@font/montserrat"
         app:layout_constraintTop_toBottomOf="@id/tvSubjectName"
         app:layout_constraintStart_toStartOf="parent" />
 
