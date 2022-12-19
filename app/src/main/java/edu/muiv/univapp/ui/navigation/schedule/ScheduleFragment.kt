@@ -182,15 +182,16 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun updateUI(schedule: Schedule) {
-        val formatIn = SimpleDateFormat("dd.MM", Locale.getDefault())
+        val formatIn = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
         val date = formatIn.parse(schedule.date)!!
-        val formatOut = SimpleDateFormat("dd MMMM, EEEE", Locale.getDefault())
+        val formatOut = SimpleDateFormat("dd MMMM, EEEE", Locale.forLanguageTag("ru"))
         val formattedDate = formatOut.format(date)
 
         val dateField = "$formattedDate\n${schedule.timeStart} - ${schedule.timeEnd}"
         val roomField = "Аудитория ${schedule.roomNum}"
 
         tvSubjectName.text = schedule.subjectName
+        tvSubjectType.text = schedule.type.uppercase(Locale.ROOT)
         tvDate.text = dateField
         tvRoom.text = roomField
     }

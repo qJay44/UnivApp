@@ -197,11 +197,11 @@ object DatabaseTestDataBuilder {
         "Комплексный экономический анализ хозяйственной деятельности"
     )
 
-    private var examTypes: Array<String> = arrayOf(
+    private val examTypes: Array<String> = arrayOf(
         "Зачет", "Экзамен"
     )
 
-    private var currentGroupName = ""
+    private val usedGroups = mutableListOf<String>()
 
     val studentList: MutableList<Student> = mutableListOf()
     val teacherList: MutableList<Teacher> = mutableListOf()
@@ -211,44 +211,110 @@ object DatabaseTestDataBuilder {
     val subjectList: MutableList<Subject> = mutableListOf()
 
     private fun randInt(a: Int, b: Int) = (a..b).shuffled().last()
-
-    private fun createScheduleDay(scheduleDate: String) {
-        val amount = randInt(1, 6)
-        val maxStartIndex = timeStart.size - amount
-        val startIndex = randInt(0, maxStartIndex)
-        val currentSubjectList = if (currentGroupName.startsWith("ИД")) subjectNames1 else subjectNames2
-
-        for (i in 0 until amount) {
-            val schedule = Schedule(
-                id = UUID.randomUUID(),
-                date = scheduleDate,
-                timeStart = timeStart[startIndex + i],
-                timeEnd = timeEnd[startIndex + i],
-                subjectName = currentSubjectList[(currentSubjectList.indices).shuffled().last()],
-                roomNum = randInt(100, 525),
-                type = randArrayElement(scheduleTypes),
-                studentGroup = currentGroupName,
-                teacherID = teacherList[(teacherList.indices).shuffled().last()].id
-            )
-
-            scheduleList += schedule
-        }
-    }
-
     private fun randArrayElement(arr: Array<String>) = arr[(arr.indices).shuffled().last()]
 
-    fun createAll(amount: Int) {
-        val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
-        val calendar = Calendar.getInstance(Locale.FRANCE)
+    // Weeks to create: previous, current and next
+    private fun createScheduleForThreeWeeks(currentGroupName: String) {
+        val format = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
+        val calendar = Calendar.getInstance(Locale.forLanguageTag("ru"))
         calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
 
+        // Set current week to previous
+        calendar.add(Calendar.WEEK_OF_MONTH, -1)
+        for (k in 0 until 3) {
+            val studyDays = randInt(1, 7)
+            for (i in 0 until studyDays) {
+                val amount = randInt(1, 6)
+                val maxStartIndex = timeStart.size - amount
+                val startIndex = randInt(0, maxStartIndex)
+                val currentSubjectList =
+                    if (currentGroupName.startsWith("ИД")) subjectNames1 else subjectNames2
+
+                for (j in 0 until amount) {
+                    val schedule = Schedule(
+                        id = UUID.randomUUID(),
+                        date = format.format(calendar.time),
+                        timeStart = timeStart[startIndex + j],
+                        timeEnd = timeEnd[startIndex + j],
+                        subjectName = currentSubjectList[(currentSubjectList.indices).shuffled().last()],
+                        roomNum = randInt(100, 525),
+                        type = randArrayElement(scheduleTypes),
+                        studentGroup = currentGroupName,
+                        teacherID = teacherList[(teacherList.indices).shuffled().last()].id
+                    )
+
+                    scheduleList += schedule
+                }
+                // Next day
+                calendar.add(Calendar.DAY_OF_MONTH, 1)
+            }
+            // Subtract extra day
+            calendar.add(Calendar.DAY_OF_MONTH, -1)
+            // Set day of week to Monday
+            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            // Next week
+            calendar.add(Calendar.WEEK_OF_MONTH, 1)
+        }
+        usedGroups += currentGroupName
+    }
+
+    private fun createNotificationsForTwoMonths() {
+        val format = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
+        val calendar = Calendar.getInstance(Locale.forLanguageTag("ru"))
+        val currentDay = calendar.time
+
+        // Set month to previous
+        calendar.add(Calendar.MONTH, -1)
+        var i = 0
+        while (calendar.time != currentDay) {
+            val notification = Notification(
+                UUID.randomUUID(),
+                format.format(calendar.time),
+                "Уведомление №$i",
+                ""
+            )
+            val words = SENTENCE.split(" ")
+            val length = (1..words.size).shuffled().last()
+
+            for (k in 0 until length) {
+                notification.text += words.shuffled().last() + " "
+            }
+            notificationList += notification
+
+            // Next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+            i++
+        }
+        notificationList.reverse()
+    }
+
+    private fun createProfileAttendance() {
+        val boolList = listOf(false, true)
+        for (student in studentList) {
+            for (schedule in scheduleList.withIndex()) {
+                if (student.groupName == schedule.value.studentGroup) {
+                    val profileAttendance = ProfileAttendance(
+                        id = UUID.randomUUID(),
+                        scheduleID = schedule.value.id,
+                        userID = student.id,
+                        visited = boolList.shuffled().last()
+                    )
+                    profileAttendanceList += profileAttendance
+                }
+                // Cut search amount
+                if (schedule.index >= 70) break
+            }
+        }
+    }
+
+    fun createAll(amount: Int) {
         for (i in 0 until amount) {
             val isHalf = i > amount / 2 - 1
 
             when (if (isHalf) userGroups[0] else userGroups[1]) {
                 "Student" -> {
-                    currentGroupName =
+                    val currentGroupName =
                         if (i % 2 == 0) randArrayElement(groupNames1)
                         else randArrayElement(groupNames2)
 
@@ -285,43 +351,13 @@ object DatabaseTestDataBuilder {
                     Log.e(TAG, "Wrong user group")
                 }
             }
-
-            // Notifications //
-
-            val date = format.format(calendar.time)
-            val notification = Notification(UUID.randomUUID(), date, "Уведомление №$i", "")
-            val words = SENTENCE.split(" ")
-            val length = (1..words.size).shuffled().last()
-
-            for (k in 0 until length) {
-                notification.text += " " + words.shuffled().last()
-            }
-            notificationList += notification
-
-            ///////////////////
-
-            createScheduleDay(format.format(calendar.time))
-
-            // Profile //
-
-            val boolList = listOf(false, true)
-            val currentSchedule = scheduleList.last()
-            for (student in studentList) {
-                if (student.groupName == currentSchedule.studentGroup) {
-                    val profileAttendance = ProfileAttendance(
-                        id = UUID.randomUUID(),
-                        scheduleID = currentSchedule.id,
-                        userID = student.id,
-                        visited = boolList.shuffled().last()
-                    )
-                    profileAttendanceList += profileAttendance
-                }
-            }
-
-            /////////////
-
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
+        for (pair in groupNames1 zip groupNames2) {
+            createScheduleForThreeWeeks(pair.first)
+            createScheduleForThreeWeeks(pair.second)
+        }
+        createNotificationsForTwoMonths()
+        createProfileAttendance()
 
         // Subjects //
 

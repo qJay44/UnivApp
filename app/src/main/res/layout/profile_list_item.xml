@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="@dimen/item_horizontal_padding"
+    android:paddingVertical="5dp"
     android:background="@drawable/separate_line" >
 
     <TextView
@@ -12,8 +14,11 @@
         android:layout_height="wrap_content"
         android:text="@string/subject_name_example"
         android:textSize="16sp"
-        android:fontFamily="@font/montserrat_medium"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:fontFamily="@font/montserrat_semibold"
+        android:lineSpacingExtra="-3dp"
+        android:includeFontPadding="false"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="15dp" />
 
     <TextView
         android:id="@+id/tvSubjectDetails"
@@ -22,6 +27,7 @@
         android:text="@string/user_subject_details_example"
         android:textSize="15sp"
         android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
         app:layout_constraintTop_toBottomOf="@id/tvSubjectName"
         app:layout_constraintStart_toStartOf="parent" />
 

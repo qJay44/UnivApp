@@ -9,4 +9,5 @@
     <dimen name="schedule_fragment_icon_margin_start">20dp</dimen>
     <dimen name="schedule_fragment_icon_size">40dp</dimen>
     <dimen name="schedule_fragment_info_padding_horizontal">5dp</dimen>
+    <dimen name="fragment_item_padding_bottom">2dp</dimen>
 </resources>

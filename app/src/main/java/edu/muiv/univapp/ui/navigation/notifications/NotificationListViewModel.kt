@@ -32,10 +32,9 @@ class NotificationListViewModel : ViewModel() {
 
     fun loadNotifications() {
         val calendar = Calendar.getInstance().apply {
-            time = Date()
             set(Calendar.DAY_OF_MONTH, 1)
+            add(Calendar.MONTH, -1)
         }
-        calendar.add(Calendar.MONTH, -1)
 
         // Month change (next month) every function call
         val previousMonthDays = getMonthDays(calendar)

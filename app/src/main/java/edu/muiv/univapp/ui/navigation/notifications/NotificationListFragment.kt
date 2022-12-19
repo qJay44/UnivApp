@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.TextView
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
@@ -52,8 +54,6 @@ class NotificationListFragment : Fragment() {
         rvNotifications.layoutManager = LinearLayoutManager(context)
         rvNotifications.adapter = adapter
 
-        postponeEnterTransition()
-
         return view
     }
 
@@ -64,7 +64,6 @@ class NotificationListFragment : Fragment() {
             notifications?.let {
                 Log.i(TAG, "Got ${notifications.size} notifications")
                 updateUI(notifications)
-                startPostponedEnterTransition()
             }
         }
     }
@@ -76,6 +75,23 @@ class NotificationListFragment : Fragment() {
 
     private fun updateUI(notifications: List<Notification>) {
         adapter.submitList(notifications)
+
+        // Appearance of the items
+        rvNotifications.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                rvNotifications.viewTreeObserver.removeOnPreDrawListener(this)
+
+                for (view in rvNotifications.children) {
+                    Log.i(TAG, view.id.toString())
+                    view.alpha = 0f
+                    view.animate().alpha(1f)
+                        .setDuration(300)
+                        .start()
+                }
+
+                return true
+            }
+        })
     }
 
     private inner class NotificationAdapter

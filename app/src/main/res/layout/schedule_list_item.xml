@@ -4,15 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="@dimen/item_horizontal_padding"
+    android:paddingBottom="@dimen/fragment_item_padding_bottom"
     android:background="@drawable/separate_line">
 
     <TextView
         android:id="@+id/tvTimeStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/montserrat_medium"
+        android:paddingTop="5dp"
         android:text="@string/tv_time_start_example"
         android:textSize="14sp"
+        android:fontFamily="@font/montserrat_medium"
+        android:includeFontPadding="false"
         app:layout_constraintBottom_toTopOf="@+id/guidelineHorizontal"
         app:layout_constraintEnd_toStartOf="@+id/guidelineVertical"
         app:layout_constraintStart_toStartOf="parent" />
@@ -21,9 +24,11 @@
         android:id="@+id/tvTimeEnd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
         android:fontFamily="@font/montserrat_medium"
         android:text="@string/tv_time_end_example"
         android:textSize="14sp"
+        android:includeFontPadding="false"
         app:layout_constraintTop_toBottomOf="@+id/guidelineHorizontal"
         app:layout_constraintEnd_toStartOf="@+id/guidelineVertical"
         app:layout_constraintStart_toStartOf="parent" />
@@ -50,22 +55,25 @@
         android:paddingHorizontal="2dp"
         android:text="@string/subject_name_example"
         android:textAlignment="center"
-        android:textSize="16sp"
-        android:fontFamily="@font/montserrat_medium"
+        android:textSize="15sp"
+        android:fontFamily="@font/montserrat_semibold"
+        android:includeFontPadding="false"
         app:layout_constrainedWidth="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/guidelineVertical"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tvScheduleInfo"/>
 
     <TextView
         android:id="@+id/tvScheduleInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat"
+        android:includeFontPadding="false"
         android:text="@string/subject_details_example"
         android:textSize="13sp"
-        android:fontFamily="@font/montserrat"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/guidelineVertical"
-        app:layout_constraintTop_toBottomOf="@+id/tvSubjectName" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
