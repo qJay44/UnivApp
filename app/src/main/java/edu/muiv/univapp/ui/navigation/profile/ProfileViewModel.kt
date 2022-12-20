@@ -5,8 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.model.Subject
-import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.model.SubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import java.util.UUID
 
@@ -17,7 +16,6 @@ class ProfileViewModel : ViewModel() {
     // LiveData variables //
 
     private val _subjects = MutableLiveData<String>()
-    private val _teachers = MutableLiveData<Array<UUID>>()
     private val _profileAttendance = MutableLiveData<UUID>()
 
     ////////////////////////
@@ -44,14 +42,9 @@ class ProfileViewModel : ViewModel() {
             repository.getProfileAttendance(userID)
         }
 
-    val subjects: LiveData<List<Subject>> =
+    val subjectAndTeacherList: LiveData<List<SubjectAndTeacher>> =
         Transformations.switchMap(_subjects) { groupName ->
-            repository.getSubjectsByGroupName(groupName)
-        }
-
-    val teachers: LiveData<Array<Teacher>> =
-        Transformations.switchMap(_teachers) { IDs ->
-            repository.getTeachersByIDs(IDs)
+            repository.getSubjectsAndTeachers(groupName)
         }
 
     /////////////////////////////////////
@@ -64,13 +57,6 @@ class ProfileViewModel : ViewModel() {
 
     fun loadProfileAttendance() {
         _profileAttendance.value = user.id
-    }
-
-    fun loadSubjectTeachers(subjects: List<Subject>) {
-        val teacherIDs: Array<UUID> = Array(subjects.size) {
-            subjects[it].teacherID
-        }
-        _teachers.value = teacherIDs
     }
 
     fun loadProfileProperties(profileAttendanceList: List<ProfileAttendance>) {

@@ -110,7 +110,6 @@ class ScheduleListViewModel : ViewModel() {
         calendar = Calendar.getInstance(Locale.FRANCE)
         calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-
         loadDays()
     }
 

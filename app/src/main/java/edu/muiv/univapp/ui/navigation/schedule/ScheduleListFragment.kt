@@ -71,6 +71,8 @@ class ScheduleListFragment : Fragment() {
         rvSchedule.layoutManager = LinearLayoutManager(context)
         rvSchedule.adapter = adapter
 
+        // Swipes //
+
         rvSchedule.setOnTouchListener(object : OnTouchListenerRecyclerView(context, rvSchedule) {
             override fun onSwipeLeft(): Boolean {
                 scheduleListViewModel.nextWeek()
@@ -91,6 +93,8 @@ class ScheduleListFragment : Fragment() {
                 return true
             }
         })
+
+        ////////////
 
         return root
     }

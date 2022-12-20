@@ -13,6 +13,7 @@ import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.model.Subject
+import edu.muiv.univapp.model.SubjectAndTeacher
 import java.util.UUID
 import java.util.concurrent.Executors
 
@@ -58,7 +59,7 @@ class UnivRepository private constructor(context: Context){
     fun getWillAttendStudents(scheduleID: UUID): LiveData<List<Student>> = univDAO.getWillAttendStudents(scheduleID)
     fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?> = univDAO.getScheduleUserNotes(scheduleID, studentID)
     fun getNotifications(days: List<String>): LiveData<List<Notification>> = univDAO.getNotifications(days)
-    fun getSubjectsByGroupName(groupName: String): LiveData<List<Subject>> = univDAO.getSubjectsByGroupName(groupName)
+    fun getSubjectsAndTeachers(groupName: String): LiveData<List<SubjectAndTeacher>> = univDAO.getSubjectsAndTeachersByGroupName(groupName)
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>> = univDAO.getProfileAttendance(userID)
 
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {

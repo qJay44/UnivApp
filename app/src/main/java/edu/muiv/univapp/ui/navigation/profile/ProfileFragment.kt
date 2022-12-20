@@ -12,15 +12,11 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentProfileBinding
-import edu.muiv.univapp.model.Subject
-import edu.muiv.univapp.model.Teacher
-import java.util.UUID
+import edu.muiv.univapp.model.SubjectAndTeacher
 
 class ProfileFragment : Fragment() {
 
@@ -37,7 +33,7 @@ class ProfileFragment : Fragment() {
     private lateinit var rvSubject: RecyclerView
     private lateinit var tvAttendancePercent: TextView
     private lateinit var tvAttendanceAmount: TextView
-    private lateinit var adapter: SubjectAdapter
+    private var adapter: DisciplineAdapter = DisciplineAdapter(emptyList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +51,6 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        adapter = SubjectAdapter()
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -72,10 +67,9 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        profileViewModel.subjects.observe(viewLifecycleOwner) { subjects ->
-            Log.i(TAG, "Got ${subjects.size} subjects")
-            profileViewModel.loadSubjectTeachers(subjects)
-            updateUI(subjects)
+        profileViewModel.subjectAndTeacherList.observe(viewLifecycleOwner) { subjectAndTeacherList ->
+            Log.i(TAG, "Got ${subjectAndTeacherList.size} subjects")
+            updateUI(subjectAndTeacherList)
         }
 
         profileViewModel.profileAttendance.observe(viewLifecycleOwner) { userProfile ->
@@ -93,7 +87,6 @@ class ProfileFragment : Fragment() {
 
             tvAttendancePercent.text = attendancePercentText
             tvAttendanceAmount.text = attendanceAmountText
-
         }
         postponeEnterTransition()
     }
@@ -103,8 +96,9 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 
-    private fun updateUI(subjects: List<Subject>) {
-        adapter.submitList(subjects)
+    private fun updateUI(subjectAndTeacherList: List<SubjectAndTeacher>) {
+        adapter = DisciplineAdapter(subjectAndTeacherList)
+        rvSubject.adapter = adapter
     }
 
     private fun createSpannableString(text: String): SpannableString {
@@ -118,52 +112,41 @@ class ProfileFragment : Fragment() {
         return spannableString
     }
 
-    private inner class SubjectAdapter
-        : ListAdapter<Subject, SubjectHolder>(DiffCallback) {
-
-        private var teachersWithId: Map<UUID, Teacher>? = null
+    private inner class DisciplineAdapter(private val subjectAndTeacherList: List<SubjectAndTeacher>)
+        : RecyclerView.Adapter<DisciplineHolder>() {
 
         init {
-            profileViewModel.teachers.observe(viewLifecycleOwner) { teachers ->
-                teachersWithId = teachers.associateBy { it.id }
-                startPostponedEnterTransition()
-            }
+            startPostponedEnterTransition()
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubjectHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DisciplineHolder {
             val view = layoutInflater.inflate(R.layout.profile_list_item, parent, false)
 
-            return SubjectHolder(view)
+            return DisciplineHolder(view)
         }
 
-        override fun onBindViewHolder(holder: SubjectHolder, position: Int) {
-            val subject = currentList[position]
-            val teacher = teachersWithId?.let { it[subject.teacherID] }
-            holder.bind(subject, teacher)
+        override fun onBindViewHolder(holder: DisciplineHolder, position: Int) {
+            val subjectAndTeacher = subjectAndTeacherList[position]
+            holder.bind(subjectAndTeacher)
         }
+
+        override fun getItemCount(): Int = subjectAndTeacherList.size
     }
 
-    private inner class SubjectHolder(view: View) : RecyclerView.ViewHolder(view) {
+    private inner class DisciplineHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val tvSubjectName: TextView = itemView.findViewById(R.id.tvSubjectName)
         private val tvSubjectDetails: TextView = itemView.findViewById(R.id.tvSubjectDetails)
 
-        fun bind(subject: Subject, teacher: Teacher?) {
-            teacher?.let {
-                val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
-                val detailsField = "$teacherField | ${subject.examType}"
-                tvSubjectDetails.text = detailsField
-            }
-            tvSubjectName.text = subject.subjectName
-        }
-    }
+        fun bind(subjectAndTeacher: SubjectAndTeacher) {
+            val teacherField =
+                "${subjectAndTeacher.teacherSurname} " +
+                "${subjectAndTeacher.teacherName[0]}. " +
+                "${subjectAndTeacher.teacherPatronymic[0]}."
 
-    private object DiffCallback : DiffUtil.ItemCallback<Subject>() {
-        override fun areItemsTheSame(oldItem: Subject, newItem: Subject): Boolean {
-            return oldItem.id == newItem.id
-        }
+            val detailsField = "$teacherField | ${subjectAndTeacher.subjectExamType}"
 
-        override fun areContentsTheSame(oldItem: Subject, newItem: Subject): Boolean {
-            return oldItem == newItem
+            tvSubjectDetails.text = detailsField
+            tvSubjectName.text = subjectAndTeacher.subjectName
         }
     }
 }

@@ -14,6 +14,7 @@ import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.model.Subject
+import edu.muiv.univapp.model.SubjectAndTeacher
 import java.util.UUID
 
 @Dao
@@ -63,8 +64,11 @@ interface UnivDAO {
     @Query("SELECT * FROM Notification WHERE date IN (:days)")
     fun getNotifications(days: List<String>): LiveData<List<Notification>>
 
-    @Query("SELECT * FROM Subject WHERE groupName=:groupName")
-    fun getSubjectsByGroupName(groupName: String): LiveData<List<Subject>>
+    @Query(
+        "SELECT subjectName, examType, name, surname, patronymic FROM Subject " +
+        "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
+        "WHERE groupName=:groupName")
+    fun getSubjectsAndTeachersByGroupName(groupName: String): LiveData<List<SubjectAndTeacher>>
 
     @Query("SELECT * FROM ProfileAttendance WHERE userID=:userID")
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>>
