@@ -61,33 +61,39 @@ class LoginFragment : Fragment() {
 
         if (ADD_TEST_DATA) {
 
-            DatabaseTestDataBuilder.createAll(25)
+            with (DatabaseTestDataBuilder) {
+                createAll(50)
 
-            for (student in DatabaseTestDataBuilder.studentList)
-                loginViewModel.addStudent(student)
+                for (student in studentList)
+                    loginViewModel.addStudent(student)
 
-            for (teacher in DatabaseTestDataBuilder.teacherList)
-                loginViewModel.addTeacher(teacher)
+                for (teacher in teacherList)
+                    loginViewModel.addTeacher(teacher)
 
-            for (schedule in DatabaseTestDataBuilder.scheduleList)
-                loginViewModel.addSchedule(schedule)
+                for (subject1 in subject1List)
+                    loginViewModel.addSubject(subject1)
 
-            for (notification in DatabaseTestDataBuilder.notificationList)
-                loginViewModel.addNotification(notification)
+                for (subject2 in subject2List)
+                    loginViewModel.addSubject(subject2)
 
-            for (profileAttendance in DatabaseTestDataBuilder.profileAttendanceList)
-                loginViewModel.addProfileAttendance(profileAttendance)
+                for (schedule in scheduleList)
+                    loginViewModel.addSchedule(schedule)
 
-            for (subject in DatabaseTestDataBuilder.subjectList)
-                loginViewModel.addSubject(subject)
+                for (notification in notificationList)
+                    loginViewModel.addNotification(notification)
 
-            Log.w(TAG, "Created new test data:\n" +
-                    "Students: ${DatabaseTestDataBuilder.studentList.size}\n" +
-                    "Teachers: ${DatabaseTestDataBuilder.teacherList.size}\n" +
-                    "Schedules: ${DatabaseTestDataBuilder.scheduleList.size}\n" +
-                    "Notifications: ${DatabaseTestDataBuilder.notificationList.size}\n" +
-                    "Profiles: ${DatabaseTestDataBuilder.notificationList.size}\n" +
-                    "Subjects: ${DatabaseTestDataBuilder.subjectList.size}\n")
+                for (profileAttendance in profileAttendanceList)
+                    loginViewModel.addProfileAttendance(profileAttendance)
+
+                Log.w(TAG, "Created new test data:\n" +
+                    "Students: ${studentList.size}\n" +
+                    "Teachers: ${teacherList.size}\n" +
+                    "Subjects: ${subject1List.size + subject2List.size}\n" +
+                    "Schedules: ${scheduleList.size}\n" +
+                    "Notifications: ${notificationList.size}\n" +
+                    "ProfileAttendances: ${profileAttendanceList.size}\n"
+                )
+            }
         }
     }
 

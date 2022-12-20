@@ -11,9 +11,8 @@ data class Schedule(
     val date        : String,
     val timeStart   : String,
     val timeEnd     : String,
-    val subjectName : String,
     val roomNum     : Int,
     val type        : String,
-    val studentGroup: String,
+    val subjectID   : UUID,
     val teacherID   : UUID
 )

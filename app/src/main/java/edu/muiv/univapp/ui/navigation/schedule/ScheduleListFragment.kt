@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
-import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
 
 class ScheduleListFragment : Fragment() {
@@ -105,15 +105,12 @@ class ScheduleListFragment : Fragment() {
         if (scheduleListViewModel.isTeacher) {
             scheduleListViewModel.teacherSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
-                    Log.i(TAG, "Got ${schedules.size} schedules for teacher")
                     updateUI(schedules)
                 }
             }
         } else {
-            scheduleListViewModel.studentSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
+            scheduleListViewModel.studentSchedule.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
-                    Log.i(TAG, "Got ${schedules.size} schedules for student")
-                    scheduleListViewModel.loadScheduleTeachers(schedules)
                     updateUI(schedules)
                 }
             }
@@ -131,8 +128,9 @@ class ScheduleListFragment : Fragment() {
         _binding = null
     }
 
-    private fun updateUI(schedules: List<Schedule>) {
-        adapter = ScheduleAdapter(schedules)
+    private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
+        Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
+        adapter = ScheduleAdapter(scheduleForUserList)
         rvSchedule.adapter = adapter
 
         // Appearance of the items
@@ -156,20 +154,20 @@ class ScheduleListFragment : Fragment() {
     }
 
     // The Adapter
-    private inner class ScheduleAdapter(currentList: List<Schedule>)
+    private inner class ScheduleAdapter(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val typeHeader = 0
         private val typeList = 1
-        private val scheduleAll: List<Schedule>
+        private val scheduleAll: List<ScheduleWithSubjectAndTeacher>
         private val scheduleAllBooleans: List<Boolean>
 
         init {
             var currentWeekDay = ""
-            val listWithSchedules: MutableList<Schedule> = mutableListOf()
+            val listWithSchedules: MutableList<ScheduleWithSubjectAndTeacher> = mutableListOf()
             val listWithBooleans: MutableList<Boolean> = mutableListOf()
 
-            for (schedule in currentList) {
+            for (schedule in scheduleForUserList) {
                 if (schedule.date != currentWeekDay) {
                     // Create schedule holder as header
                     listWithSchedules += schedule
@@ -188,10 +186,6 @@ class ScheduleListFragment : Fragment() {
 
             scheduleAll = listWithSchedules.toList()
             scheduleAllBooleans = listWithBooleans.toList()
-
-            scheduleListViewModel.weekTeachersLiveData.observe(viewLifecycleOwner) { teachers ->
-                scheduleListViewModel.teachersWithId.value = teachers.associateBy { it.id }
-            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -205,15 +199,15 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val schedule = scheduleAll.elementAt(position)
+            val scheduleForUser = scheduleAll.elementAt(position)
             when (holder) {
                 is ScheduleHolderHeader -> {
-                    val dayIndex = scheduleListViewModel.week.indexOf(schedule.date)
+                    val dayIndex = scheduleListViewModel.week.indexOf(scheduleForUser.date)
                     val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
-                    holder.bind(schedule, weekDayName)
+                    holder.bind(scheduleForUser.date, weekDayName)
                 }
                 is ScheduleHolder -> {
-                    holder.bind(schedule)
+                    holder.bind(scheduleForUser)
                 }
                 else -> {
                     Log.e(TAG, "onBindViewHolder: unknown holder")
@@ -241,8 +235,8 @@ class ScheduleListFragment : Fragment() {
         private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
         private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
 
-        fun bind(schedule: Schedule, weekDayName: String) {
-            tvDay.text = schedule.date
+        fun bind(date: String, weekDayName: String) {
+            tvDay.text = date
             tvWeekDayName.text = weekDayName
         }
     }
@@ -257,19 +251,21 @@ class ScheduleListFragment : Fragment() {
         private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
         private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
 
-        fun bind(schedule: Schedule) {
-            scheduleListViewModel.teachersWithId.observe(viewLifecycleOwner) { teachersMap ->
-                val teacher = teachersMap[schedule.teacherID]
-                teacher?.let {
-                    val teacherField = "${it.surname} ${it.name[0]}. ${it.patronymic[0]}."
-                    val details = "$teacherField | ${schedule.type} | Ауд. ${schedule.roomNum}"
-                    tvScheduleInfo.text = details
-                }
-            }
+        fun bind(scheduleForUser: ScheduleWithSubjectAndTeacher) {
+            val teacherField = "" +
+                    "${scheduleForUser.teacherSurname} " +
+                    "${scheduleForUser.teacherName[0]}. " +
+                    "${scheduleForUser.teacherPatronymic[0]}."
 
-            tvTimeStart.text = schedule.timeStart
-            tvTimeEnd.text = schedule.timeEnd
-            tvSubjectName.text = schedule.subjectName
+            val details = "" +
+                    "$teacherField | " +
+                    "${scheduleForUser.type} | " +
+                    "Ауд. ${scheduleForUser.roomNum}"
+
+            tvScheduleInfo.text = details
+            tvTimeStart.text = scheduleForUser.timeStart
+            tvTimeEnd.text = scheduleForUser.timeEnd
+            tvSubjectName.text = scheduleForUser.subjectName
         }
     }
 

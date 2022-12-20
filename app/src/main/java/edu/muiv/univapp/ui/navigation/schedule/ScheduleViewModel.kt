@@ -9,6 +9,7 @@ import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.model.Student
+import edu.muiv.univapp.model.Subject
 import edu.muiv.univapp.model.Teacher
 import edu.muiv.univapp.utils.UserDataHolder
 import java.util.UUID
@@ -20,6 +21,7 @@ class ScheduleViewModel : ViewModel() {
     private val teacherIdLiveData = MutableLiveData<Array<UUID>>()
     private val scheduleToStudentLiveData = MutableLiveData<Map<UUID, UUID>>()
     private val scheduleIdLiveData = MutableLiveData<UUID>()
+    private val subjectLiveData = MutableLiveData<UUID>()
     var scheduleAttendance: ScheduleAttendance? = null
     var scheduleUserNotes: ScheduleUserNotes? = null
 
@@ -63,6 +65,11 @@ class ScheduleViewModel : ViewModel() {
             univRepository.getWillAttendStudents(id)
         }
 
+    val subject: LiveData<Subject> =
+        Transformations.switchMap(subjectLiveData) { id ->
+            univRepository.getSubjectById(id)
+        }
+
     /////////////////////
 
     private fun getUserType(): Boolean = UserDataHolder.get().user.groupName == null
@@ -82,6 +89,10 @@ class ScheduleViewModel : ViewModel() {
     fun loadTeacher(id: UUID) {
         val idArr = Array(1) { id }
         teacherIdLiveData.value = idArr
+    }
+
+    fun loadSubject(id: UUID) {
+        subjectLiveData.value = id
     }
 
     fun upsertAttendance(scheduleAttendance: ScheduleAttendance) {

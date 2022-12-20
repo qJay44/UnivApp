@@ -6,8 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.login.LoginResult
-import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
-import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,9 +23,7 @@ class ScheduleListViewModel : ViewModel() {
 
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
-    private val weekTeachers = MutableLiveData<Array<UUID>>()
     private val _dayFromTo = MutableLiveData<String>()
-    val teachersWithId = MutableLiveData<Map<UUID, Teacher>>()
 
     ////////////////////////
 
@@ -45,19 +42,14 @@ class ScheduleListViewModel : ViewModel() {
 
     // LiveData repository observables //
 
-    val studentSchedulesLiveData: LiveData<List<Schedule>> =
-        Transformations.switchMap(scheduleForStudent) { scheduleGroup ->
-            univRepository.getScheduleForStudent(scheduleGroup, days)
-        }
-
-    val teacherSchedulesLiveData: LiveData<List<Schedule>> =
+    val teacherSchedulesLiveData: LiveData<List<ScheduleWithSubjectAndTeacher>> =
         Transformations.switchMap(scheduleForTeacher) { teacherID ->
-            univRepository.getScheduleForTeacher(teacherID, days)
+            univRepository.getScheduleForWeek(teacherID, days.toList())
         }
 
-    val weekTeachersLiveData: LiveData<Array<Teacher>> =
-        Transformations.switchMap(weekTeachers) { IDs ->
-            univRepository.getTeachersByIDs(IDs)
+    val studentSchedule: LiveData<List<ScheduleWithSubjectAndTeacher>> =
+        Transformations.switchMap(scheduleForStudent) { scheduleGroup ->
+            univRepository.getScheduleForWeek(scheduleGroup, days.toList())
         }
 
     /////////////////////////////////////
@@ -70,13 +62,6 @@ class ScheduleListViewModel : ViewModel() {
 
     private fun loadScheduleForTeacher(teacherID: UUID) {
         scheduleForTeacher.value = teacherID
-    }
-
-    fun loadScheduleTeachers(schedules: List<Schedule>) {
-        val teacherIDs: Array<UUID> = Array(schedules.size) {
-            schedules[it].teacherID
-        }
-        weekTeachers.value = teacherIDs
     }
 
     ////////////////////////////

@@ -208,7 +208,8 @@ object DatabaseTestDataBuilder {
     val scheduleList: MutableList<Schedule> = mutableListOf()
     val notificationList: MutableList<Notification> = mutableListOf()
     val profileAttendanceList: MutableList<ProfileAttendance> = mutableListOf()
-    val subjectList: MutableList<Subject> = mutableListOf()
+    val subject1List: MutableList<Subject> = mutableListOf()
+    val subject2List: MutableList<Subject> = mutableListOf()
 
     private fun randInt(a: Int, b: Int) = (a..b).shuffled().last()
     private fun randArrayElement(arr: Array<String>) = arr[(arr.indices).shuffled().last()]
@@ -222,6 +223,7 @@ object DatabaseTestDataBuilder {
 
         // Set current week to previous
         calendar.add(Calendar.WEEK_OF_MONTH, -1)
+        var roomCounter = 0
         for (k in 0 until 3) {
             val studyDays = randInt(1, 7)
             for (i in 0 until studyDays) {
@@ -229,7 +231,7 @@ object DatabaseTestDataBuilder {
                 val maxStartIndex = timeStart.size - amount
                 val startIndex = randInt(0, maxStartIndex)
                 val currentSubjectList =
-                    if (currentGroupName.startsWith("ИД")) subjectNames1 else subjectNames2
+                    if (currentGroupName.startsWith("ИД")) subject1List else subject2List
 
                 for (j in 0 until amount) {
                     val schedule = Schedule(
@@ -237,10 +239,9 @@ object DatabaseTestDataBuilder {
                         date = format.format(calendar.time),
                         timeStart = timeStart[startIndex + j],
                         timeEnd = timeEnd[startIndex + j],
-                        subjectName = currentSubjectList[(currentSubjectList.indices).shuffled().last()],
-                        roomNum = randInt(100, 525),
+                        roomNum = ++roomCounter,
                         type = randArrayElement(scheduleTypes),
-                        studentGroup = currentGroupName,
+                        subjectID = currentSubjectList[(currentSubjectList.indices).shuffled().last()].id,
                         teacherID = teacherList[(teacherList.indices).shuffled().last()].id
                     )
 
@@ -293,17 +294,60 @@ object DatabaseTestDataBuilder {
         val boolList = listOf(false, true)
         for (student in studentList) {
             for (schedule in scheduleList.withIndex()) {
-                if (student.groupName == schedule.value.studentGroup) {
-                    val profileAttendance = ProfileAttendance(
-                        id = UUID.randomUUID(),
-                        scheduleID = schedule.value.id,
-                        userID = student.id,
-                        visited = boolList.shuffled().last()
-                    )
-                    profileAttendanceList += profileAttendance
+                for (pair in subject1List zip subject2List) {
+                    if (student.groupName == pair.first.groupName
+                        || student.groupName == pair.second.groupName) {
+
+                        val profileAttendance = ProfileAttendance(
+                            id = UUID.randomUUID(),
+                            scheduleID = schedule.value.id,
+                            userID = student.id,
+                            visited = boolList.shuffled().last()
+                        )
+                        profileAttendanceList += profileAttendance
+                    }
                 }
                 // Cut search amount
-                if (schedule.index >= 70) break
+                if (schedule.index >= 30) break
+            }
+        }
+    }
+
+    private fun createSubjects() {
+        val unusedTeachers = mutableListOf<Teacher>()
+        unusedTeachers.addAll(teacherList)
+        groupNames1.zip(groupNames2).forEach { (a, b) ->
+            if (unusedTeachers.isEmpty()) return
+            subjectNames1.zip(subjectNames2).forEach { (x, y) ->
+                if (unusedTeachers.isEmpty()) return
+                var teacher = unusedTeachers.shuffled().last()
+                var examTypeIndex = randInt(0, 1)
+
+                // For IT faculty
+                val subject1 = Subject(
+                    id = UUID.randomUUID(),
+                    subjectName = x,
+                    groupName = a,
+                    teacherID = teacher.id,
+                    examType = examTypes[examTypeIndex]
+                )
+                subject1List += subject1
+                unusedTeachers.removeLast()
+
+                if (unusedTeachers.isEmpty()) return
+                teacher = unusedTeachers.shuffled().last()
+
+                examTypeIndex = randInt(0, 1)
+                // For Economics faculty
+                val subject2 = Subject(
+                    id = UUID.randomUUID(),
+                    subjectName = y,
+                    groupName = b,
+                    teacherID = teacher.id,
+                    examType = examTypes[examTypeIndex]
+                )
+                subject2List += subject2
+                unusedTeachers.removeLast()
             }
         }
     }
@@ -352,39 +396,16 @@ object DatabaseTestDataBuilder {
                 }
             }
         }
-        for (pair in groupNames1 zip groupNames2) {
-            createScheduleForThreeWeeks(pair.first)
-            createScheduleForThreeWeeks(pair.second)
+        createSubjects()
+
+        for (group in groupNames1) {
+            createScheduleForThreeWeeks(group)
         }
+        for (group in groupNames2) {
+            createScheduleForThreeWeeks(group)
+        }
+
         createNotificationsForTwoMonths()
         createProfileAttendance()
-
-        // Subjects //
-
-        groupNames1.zip(groupNames2).forEach { (a, b) ->
-            subjectNames1.zip(subjectNames2).forEach { (x, y) ->
-                var examTypeIndex = randInt(0, 1)
-                var subject = Subject(
-                    id = UUID.randomUUID(),
-                    subjectName = x,
-                    groupName = a,
-                    teacherID = teacherList.shuffled().last().id,
-                    examType = examTypes[examTypeIndex]
-                )
-                subjectList += subject
-
-                examTypeIndex = randInt(0, 1)
-                subject = Subject(
-                    id = UUID.randomUUID(),
-                    subjectName = y,
-                    groupName = b,
-                    teacherID = teacherList.shuffled().last().id,
-                    examType = examTypes[examTypeIndex]
-                )
-                subjectList += subject
-            }
-        }
-
-        //////////////
     }
 }

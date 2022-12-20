@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentProfileBinding
-import edu.muiv.univapp.model.SubjectAndTeacher
 
 class ProfileFragment : Fragment() {
 

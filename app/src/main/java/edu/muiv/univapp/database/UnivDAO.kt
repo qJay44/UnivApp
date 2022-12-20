@@ -14,7 +14,8 @@ import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.model.Subject
-import edu.muiv.univapp.model.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import java.util.UUID
 
 @Dao
@@ -32,15 +33,24 @@ interface UnivDAO {
     @Query("SELECT * FROM schedule WHERE id=:id")
     fun getScheduleById(id: UUID): LiveData<Schedule>
 
-    @Query("SELECT * FROM schedule WHERE studentGroup=:group AND date IN (:days)")
-    fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>>
+    @Query(
+        "SELECT schedule.id, date, timeStart, timeEnd, roomNum, type, subjectName, groupName, name, surname, patronymic FROM Schedule " +
+        "INNER JOIN Subject ON schedule.subjectID=subject.id " +
+        "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
+        "WHERE subject.groupName=:groupName AND date IN (:days) ORDER BY date"
+    )
+    fun getScheduleForWeek(groupName: String, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
     @Query(
-        "SELECT schedule.* FROM teacher " +
-        "INNER JOIN schedule ON teacher.id=schedule.teacherID " +
-        "WHERE teacher.id=:teacherID AND date IN (:days)"
+        "SELECT schedule.id, teacher.id, date, timeStart, timeEnd, roomNum, type, subjectName, groupName, name, surname, patronymic FROM Schedule " +
+        "INNER JOIN Teacher ON schedule.teacherID=:teacherID " +
+        "INNER JOIN Subject ON teacher.id=subject.teacherID " +
+        "WHERE schedule.teacherID=:teacherID AND subject.teacherID=:teacherID AND date IN (:days) ORDER BY date"
     )
-    fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>>
+    fun getScheduleForWeek(teacherID: UUID, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
+
+    @Query("SELECT * FROM Subject WHERE id=:id")
+    fun getSubjectById(id: UUID): LiveData<Subject>
 
     @Query("SELECT * FROM ScheduleAttendance WHERE scheduleID=:scheduleID AND studentID=:studentID")
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?>
@@ -67,7 +77,8 @@ interface UnivDAO {
     @Query(
         "SELECT subjectName, examType, name, surname, patronymic FROM Subject " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
-        "WHERE groupName=:groupName")
+        "WHERE groupName=:groupName"
+    )
     fun getSubjectsAndTeachersByGroupName(groupName: String): LiveData<List<SubjectAndTeacher>>
 
     @Query("SELECT * FROM ProfileAttendance WHERE userID=:userID")

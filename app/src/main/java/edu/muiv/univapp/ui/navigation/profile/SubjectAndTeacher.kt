@@ -1,4 +1,4 @@
-package edu.muiv.univapp.model
+package edu.muiv.univapp.ui.navigation.profile
 
 import androidx.room.ColumnInfo
 

@@ -13,7 +13,8 @@ import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.model.Subject
-import edu.muiv.univapp.model.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import java.util.UUID
 import java.util.concurrent.Executors
 
@@ -53,8 +54,9 @@ class UnivRepository private constructor(context: Context){
 
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>> = univDAO.getTeachersByIDs(IDs)
     fun getScheduleById(id: UUID): LiveData<Schedule> = univDAO.getScheduleById(id)
-    fun getScheduleForStudent(group: String, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForStudent(group, days)
-    fun getScheduleForTeacher(teacherID: UUID, days: Array<String>): LiveData<List<Schedule>> = univDAO.getScheduleForTeacher(teacherID, days)
+    fun getScheduleForWeek(groupName: String, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>> = univDAO.getScheduleForWeek(groupName, days)
+    fun getScheduleForWeek(id: UUID, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>> = univDAO.getScheduleForWeek(id, days)
+    fun getSubjectById(id: UUID): LiveData<Subject> = univDAO.getSubjectById(id)
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?> = univDAO.getScheduleAttendance(scheduleID, studentID)
     fun getWillAttendStudents(scheduleID: UUID): LiveData<List<Student>> = univDAO.getWillAttendStudents(scheduleID)
     fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?> = univDAO.getScheduleUserNotes(scheduleID, studentID)

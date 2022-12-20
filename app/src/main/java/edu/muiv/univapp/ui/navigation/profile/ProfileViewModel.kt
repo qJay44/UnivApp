@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.model.SubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import java.util.UUID
 

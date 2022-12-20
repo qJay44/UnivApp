@@ -85,8 +85,9 @@ class ScheduleFragment : Fragment() {
         scheduleViewModel.scheduleLiveData.observe(viewLifecycleOwner) { schedule ->
             schedule?.let {
                 Log.i(TAG, schedule.toString())
-                updateUI(schedule)
                 scheduleViewModel.loadTeacher(schedule.teacherID)
+                scheduleViewModel.loadSubject(schedule.subjectID)
+                updateUI(schedule)
             }
         }
 
@@ -100,6 +101,7 @@ class ScheduleFragment : Fragment() {
         // Update attendance status
         // TODO: Add date restriction
         if (scheduleViewModel.isTeacher) {
+            // For teacher
             scheduleViewModel.studentsWillAttend.observe(viewLifecycleOwner) { studentsWillAttend ->
                 btnAttendance.text = studentsWillAttend.size.toString()
             }
@@ -112,6 +114,7 @@ class ScheduleFragment : Fragment() {
                 }
             }
         } else {
+            // For student
             scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
                 scheduleViewModel.scheduleAttendance = it
                 val willAttend = it?.willAttend ?: false
@@ -137,6 +140,11 @@ class ScheduleFragment : Fragment() {
         scheduleViewModel.scheduleUserNotesLiveData.observe(viewLifecycleOwner) {
             scheduleViewModel.scheduleUserNotes = it
             etNotes.setText(it?.notes)
+        }
+
+        // Update subject name
+        scheduleViewModel.subject.observe(viewLifecycleOwner) { subject ->
+            tvSubjectName.text = subject.subjectName
         }
 
         val notesTextWatcher = object : TextWatcher {
@@ -190,7 +198,6 @@ class ScheduleFragment : Fragment() {
         val dateField = "$formattedDate\n${schedule.timeStart} - ${schedule.timeEnd}"
         val roomField = "Аудитория ${schedule.roomNum}"
 
-        tvSubjectName.text = schedule.subjectName
         tvSubjectType.text = schedule.type.uppercase(Locale.ROOT)
         tvDate.text = dateField
         tvRoom.text = roomField
