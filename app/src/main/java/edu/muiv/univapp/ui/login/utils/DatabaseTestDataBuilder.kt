@@ -201,7 +201,7 @@ object DatabaseTestDataBuilder {
         "Зачет", "Экзамен"
     )
 
-    private val usedGroups = mutableListOf<String>()
+    private val groupsMap = mutableMapOf<String, List<Subject>>()
 
     val studentList: MutableList<Student> = mutableListOf()
     val teacherList: MutableList<Teacher> = mutableListOf()
@@ -230,10 +230,15 @@ object DatabaseTestDataBuilder {
                 val amount = randInt(1, 6)
                 val maxStartIndex = timeStart.size - amount
                 val startIndex = randInt(0, maxStartIndex)
-                val currentSubjectList =
-                    if (currentGroupName.startsWith("ИД")) subject1List else subject2List
+                val currentSubjectList = groupsMap[currentGroupName]
 
                 for (j in 0 until amount) {
+                    if (currentSubjectList.isNullOrEmpty()) {
+                        Log.w(TAG, "No subject found for this group")
+                        return
+                    }
+
+                    val subject = currentSubjectList[(currentSubjectList.indices).shuffled().last()]
                     val schedule = Schedule(
                         id = UUID.randomUUID(),
                         date = format.format(calendar.time),
@@ -241,8 +246,8 @@ object DatabaseTestDataBuilder {
                         timeEnd = timeEnd[startIndex + j],
                         roomNum = ++roomCounter,
                         type = randArrayElement(scheduleTypes),
-                        subjectID = currentSubjectList[(currentSubjectList.indices).shuffled().last()].id,
-                        teacherID = teacherList[(teacherList.indices).shuffled().last()].id
+                        subjectID = subject.id,
+                        teacherID = subject.teacherID
                     )
 
                     scheduleList += schedule
@@ -257,7 +262,6 @@ object DatabaseTestDataBuilder {
             // Next week
             calendar.add(Calendar.WEEK_OF_MONTH, 1)
         }
-        usedGroups += currentGroupName
     }
 
     private fun createNotificationsForTwoMonths() {
@@ -314,35 +318,43 @@ object DatabaseTestDataBuilder {
     }
 
     private fun createSubjects() {
+        val groupIT1List = mutableListOf<Subject>()
+        val groupIT2List = mutableListOf<Subject>()
+        val groupIT3List = mutableListOf<Subject>()
+
+        val groupEconomics1List = mutableListOf<Subject>()
+        val groupEconomics2List = mutableListOf<Subject>()
+        val groupEconomics3List = mutableListOf<Subject>()
+
         val unusedTeachers = mutableListOf<Teacher>()
         unusedTeachers.addAll(teacherList)
-        groupNames1.zip(groupNames2).forEach { (a, b) ->
-            if (unusedTeachers.isEmpty()) return
-            subjectNames1.zip(subjectNames2).forEach { (x, y) ->
-                if (unusedTeachers.isEmpty()) return
+
+        groupNames1.zip(groupNames2).forEach rootLoop@ { (ITGroupName, EconomicGroupName) ->
+            subjectNames1.zip(subjectNames2).forEach { (ITSubjectName, EconomicSubjectName) ->
+                if (unusedTeachers.isEmpty()) return@rootLoop
                 var teacher = unusedTeachers.shuffled().last()
                 var examTypeIndex = randInt(0, 1)
 
                 // For IT faculty
                 val subject1 = Subject(
                     id = UUID.randomUUID(),
-                    subjectName = x,
-                    groupName = a,
+                    subjectName = ITSubjectName,
+                    groupName = ITGroupName,
                     teacherID = teacher.id,
                     examType = examTypes[examTypeIndex]
                 )
                 subject1List += subject1
                 unusedTeachers.removeLast()
 
-                if (unusedTeachers.isEmpty()) return
+                if (unusedTeachers.isEmpty()) return@rootLoop
                 teacher = unusedTeachers.shuffled().last()
 
                 examTypeIndex = randInt(0, 1)
                 // For Economics faculty
                 val subject2 = Subject(
                     id = UUID.randomUUID(),
-                    subjectName = y,
-                    groupName = b,
+                    subjectName = EconomicSubjectName,
+                    groupName = EconomicGroupName,
                     teacherID = teacher.id,
                     examType = examTypes[examTypeIndex]
                 )
@@ -350,6 +362,29 @@ object DatabaseTestDataBuilder {
                 unusedTeachers.removeLast()
             }
         }
+
+        for (subject in subject1List) {
+            when (subject.groupName) {
+                "ИД 23.1/Б1-19" -> groupIT1List.add(subject)
+                "ИД 23.2/Б1-19" -> groupIT2List.add(subject)
+                "ИД 23.3/Б1-19" -> groupIT3List.add(subject)
+            }
+        }
+
+        for (subject in subject2List) {
+            when (subject.groupName) {
+                "ЭД 23.1/Б1-19" -> groupEconomics1List.add(subject)
+                "ЭД 23.2/Б1-19" -> groupEconomics2List.add(subject)
+                "ЭД 23.3/Б1-19" -> groupEconomics3List.add(subject)
+            }
+        }
+        groupsMap["ИД 23.1/Б1-19"] = groupIT1List
+        groupsMap["ИД 23.2/Б1-19"] = groupIT2List
+        groupsMap["ИД 23.3/Б1-19"] = groupIT3List
+
+        groupsMap["ЭД 23.1/Б1-19"] = groupEconomics1List
+        groupsMap["ЭД 23.2/Б1-19"] = groupEconomics2List
+        groupsMap["ЭД 23.3/Б1-19"] = groupEconomics3List
     }
 
     fun createAll(amount: Int) {

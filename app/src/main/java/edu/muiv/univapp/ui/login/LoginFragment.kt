@@ -62,7 +62,7 @@ class LoginFragment : Fragment() {
         if (ADD_TEST_DATA) {
 
             with (DatabaseTestDataBuilder) {
-                createAll(50)
+                createAll(70)
 
                 for (student in studentList)
                     loginViewModel.addStudent(student)
