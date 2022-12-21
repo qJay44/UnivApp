@@ -1,10 +1,7 @@
 package edu.muiv.univapp.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Upsert
+import androidx.room.*
 import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.model.Teacher
 import edu.muiv.univapp.ui.login.LoginResult
@@ -70,6 +67,9 @@ interface UnivDAO {
 
     @Upsert(entity = ScheduleUserNotes::class)
     fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes)
+
+    @Update(entity = Schedule::class)
+    fun updateScheduleNotes(schedule: Schedule)
 
     @Query("SELECT * FROM Notification WHERE date IN (:days)")
     fun getNotifications(days: List<String>): LiveData<List<Notification>>

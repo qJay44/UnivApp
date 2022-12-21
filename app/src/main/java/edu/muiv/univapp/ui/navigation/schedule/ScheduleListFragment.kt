@@ -252,12 +252,12 @@ class ScheduleListFragment : Fragment() {
         private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
 
         fun bind(scheduleForUser: ScheduleWithSubjectAndTeacher) {
-            val teacherField = "" +
+            val teacherField =
                     "${scheduleForUser.teacherSurname} " +
                     "${scheduleForUser.teacherName[0]}. " +
                     "${scheduleForUser.teacherPatronymic[0]}."
 
-            val details = "" +
+            val details =
                     "$teacherField | " +
                     "${scheduleForUser.type} | " +
                     "Ауд. ${scheduleForUser.roomNum}"

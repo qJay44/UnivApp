@@ -214,6 +214,23 @@ object DatabaseTestDataBuilder {
     private fun randInt(a: Int, b: Int) = (a..b).shuffled().last()
     private fun randArrayElement(arr: Array<String>) = arr[(arr.indices).shuffled().last()]
 
+    private fun randomText(textLength: Int? = null): String {
+        val textObj = object {
+            private val words = SENTENCE.split(" ")
+            private val length = textLength ?: (1..words.size).shuffled().last()
+            var text = ""
+
+            init {
+                for (k in 0 until length) {
+                    text += words.shuffled().last() + " "
+                    if (textLength != null && randInt(0, 10) == 5) text += "\n"
+                }
+            }
+        }
+
+        return textObj.text
+    }
+
     // Weeks to create: previous, current and next
     private fun createScheduleForThreeWeeks(currentGroupName: String) {
         val format = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
@@ -246,6 +263,7 @@ object DatabaseTestDataBuilder {
                         timeEnd = timeEnd[startIndex + j],
                         roomNum = ++roomCounter,
                         type = randArrayElement(scheduleTypes),
+                        teacherNotes = randomText(50),
                         subjectID = subject.id,
                         teacherID = subject.teacherID
                     )
@@ -279,12 +297,8 @@ object DatabaseTestDataBuilder {
                 "Уведомление №$i",
                 ""
             )
-            val words = SENTENCE.split(" ")
-            val length = (1..words.size).shuffled().last()
 
-            for (k in 0 until length) {
-                notification.text += words.shuffled().last() + " "
-            }
+            notification.text = randomText()
             notificationList += notification
 
             // Next day

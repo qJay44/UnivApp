@@ -10,4 +10,5 @@
     <dimen name="schedule_fragment_icon_size">40dp</dimen>
     <dimen name="schedule_fragment_info_padding_horizontal">5dp</dimen>
     <dimen name="fragment_item_padding_bottom">2dp</dimen>
+    <dimen name="bullet_padding">10dp</dimen>
 </resources>

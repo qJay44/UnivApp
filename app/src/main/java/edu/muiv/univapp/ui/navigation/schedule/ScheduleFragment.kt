@@ -11,12 +11,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowManager.LayoutParams
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.FontRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
@@ -39,14 +45,15 @@ class ScheduleFragment : Fragment() {
     private val binding get() = _binding!!
     private var notesText: String? = null
 
-    private lateinit var tvSubjectName : TextView
-    private lateinit var tvSubjectType : TextView
-    private lateinit var tvDate        : TextView
-    private lateinit var tvTeacherName : TextView
-    private lateinit var tvRoom        : TextView
-    private lateinit var btnAttendance : TextView
-    private lateinit var etNotes       : EditText
-    private lateinit var svScroll      : ScrollView
+    private lateinit var tvSubjectName          : TextView
+    private lateinit var tvSubjectType          : TextView
+    private lateinit var tvDate                 : TextView
+    private lateinit var tvTeacherName          : TextView
+    private lateinit var tvRoom                 : TextView
+    private lateinit var btnAttendance          : TextView
+    private lateinit var etNotes                : EditText
+    private lateinit var svScroll               : ScrollView
+    private lateinit var llTeacherNotesContainer: LinearLayout
 
     private val scheduleViewModel: ScheduleViewModel by lazy {
         ViewModelProvider(this)[ScheduleViewModel::class.java]
@@ -74,6 +81,7 @@ class ScheduleFragment : Fragment() {
         btnAttendance = binding.btnAttendance
         etNotes = binding.etNotes
         svScroll = binding.svScroll
+        llTeacherNotesContainer = binding.llTeacherNotesContainer
 
         return root
     }
@@ -85,8 +93,7 @@ class ScheduleFragment : Fragment() {
         scheduleViewModel.scheduleLiveData.observe(viewLifecycleOwner) { schedule ->
             schedule?.let {
                 Log.i(TAG, schedule.toString())
-                scheduleViewModel.loadTeacher(schedule.teacherID)
-                scheduleViewModel.loadSubject(schedule.subjectID)
+                scheduleViewModel.schedule = schedule
                 updateUI(schedule)
             }
         }
@@ -161,7 +168,6 @@ class ScheduleFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        if (scheduleViewModel.isTeacher) return
         val notes = if (scheduleViewModel.scheduleUserNotes != null) {
             with(scheduleViewModel.scheduleUserNotes!!) {
                 val changedNotes = if(notes != notesText) notesText else notes
@@ -180,6 +186,8 @@ class ScheduleFragment : Fragment() {
                 notesText
             )
         }
+        if (scheduleViewModel.isTeacher && notesText != null)
+            scheduleViewModel.schedule!!.teacherNotes = notesText as String
 
         scheduleViewModel.upsertScheduleUserNotes(notes)
     }
@@ -187,6 +195,19 @@ class ScheduleFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun TextView.leftDrawable(@DrawableRes id: Int, @DimenRes paddingRes: Int) {
+        val drawable = ContextCompat.getDrawable(requireContext(), id)
+        val padding = resources.getDimensionPixelSize(paddingRes)
+
+        this.compoundDrawablePadding = padding
+        this.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
+    }
+
+    private fun TextView.font(@FontRes id: Int) {
+        val typeface = ResourcesCompat.getFont(requireContext(), id)
+        this.typeface = typeface
     }
 
     private fun updateUI(schedule: Schedule) {
@@ -201,6 +222,32 @@ class ScheduleFragment : Fragment() {
         tvSubjectType.text = schedule.type.uppercase(Locale.ROOT)
         tvDate.text = dateField
         tvRoom.text = roomField
+
+        if (scheduleViewModel.isTeacher) etNotes.setText(schedule.teacherNotes)
+
+        val teacherNotes = schedule.teacherNotes.split("\n")
+        for (note in teacherNotes) {
+            if (note == "") continue
+            createBulletTextView(note)
+        }
+    }
+
+    private fun createBulletTextView(text: String) {
+        val tvNote = TextView(requireContext())
+        val params = LinearLayout.LayoutParams(
+            LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT
+        )
+        params.leftMargin = 20
+        params.topMargin = 20
+
+        tvNote.text = text
+        tvNote.setPadding(0, 0, 0, 0)
+        tvNote.layoutParams = params
+        tvNote.leftDrawable(R.drawable.ic_bullet, R.dimen.bullet_padding)
+        tvNote.font(R.font.montserrat)
+
+        llTeacherNotesContainer.addView(tvNote)
     }
 
     private fun showDialog() {
@@ -210,14 +257,14 @@ class ScheduleFragment : Fragment() {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
 
-        val btnLambda: ((Boolean) -> Unit) = {
+        val btnLambda: ((Boolean) -> Unit) = { willAttend ->
             val attendance = if (scheduleViewModel.scheduleAttendance != null) {
                 with(scheduleViewModel.scheduleAttendance!!) {
                     ScheduleAttendance(
                         id,
                         scheduleID,
                         studentID,
-                        it
+                        willAttend
                     )
                 }
             } else {
@@ -225,7 +272,7 @@ class ScheduleFragment : Fragment() {
                     UUID.randomUUID(),
                     scheduleViewModel.scheduleID!!,
                     UserDataHolder.get().user.id,
-                    it
+                    willAttend
                 )
             }
 
@@ -236,8 +283,8 @@ class ScheduleFragment : Fragment() {
         val btnYes = dialog.findViewById<Button>(R.id.btnDialogYes)
         val btnNo = dialog.findViewById<Button>(R.id.btnDialogCancel)
 
-        btnYes.setOnClickListener { btnLambda(true) }
-        btnNo.setOnClickListener { btnLambda(false) }
+        btnYes.setOnClickListener { btnLambda(true)  }
+        btnNo.setOnClickListener  { btnLambda(false) }
 
         dialog.show()
     }

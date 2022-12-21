@@ -29,11 +29,17 @@ class ScheduleViewModel : ViewModel() {
 
     var scheduleID: UUID? = null
         set(value) {
-            field = value
-            loadSchedule(value!!)
+            field = value!!
+            loadSchedule(value)
             loadAttendance(value, UserDataHolder.get().user.id)
         }
 
+    var schedule: Schedule? = null
+        set(value) {
+            field = value!!
+            loadTeacher(value.teacherID)
+            loadSubject(value.subjectID)
+        }
     // Public LiveData //
 
     val scheduleLiveData: LiveData<Schedule> =
@@ -86,12 +92,12 @@ class ScheduleViewModel : ViewModel() {
             scheduleToStudentLiveData.value = idMap
     }
 
-    fun loadTeacher(id: UUID) {
+    private fun loadTeacher(id: UUID) {
         val idArr = Array(1) { id }
         teacherIdLiveData.value = idArr
     }
 
-    fun loadSubject(id: UUID) {
+    private fun loadSubject(id: UUID) {
         subjectLiveData.value = id
     }
 
@@ -100,6 +106,7 @@ class ScheduleViewModel : ViewModel() {
     }
 
     fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes) {
-        univRepository.upsertScheduleUserNotes(scheduleUserNotes)
+        if (isTeacher) univRepository.updateScheduleNotes(schedule!!)
+        else univRepository.upsertScheduleUserNotes(scheduleUserNotes)
     }
 }

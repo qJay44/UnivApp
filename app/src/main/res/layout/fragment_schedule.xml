@@ -269,18 +269,19 @@
                     app:layout_constraintStart_toEndOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
-                <TextView
-                    android:id="@+id/lastItem"
-                    android:layout_width="250dp"
+                <LinearLayout
+                    android:id="@+id/llTeacherNotesContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="20dp"
-                    android:text="@string/topic_example"
-                    android:textAlignment="textStart"
+                    android:paddingHorizontal="20dp"
+                    android:orientation="vertical"
+                    android:gravity="start"
                     app:layout_constraintTop_toBottomOf="@id/etNotes"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

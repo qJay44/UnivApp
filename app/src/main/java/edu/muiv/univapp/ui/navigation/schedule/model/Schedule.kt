@@ -8,11 +8,12 @@ import java.util.UUID
 data class Schedule(
     @PrimaryKey
     val id          : UUID,
-    val date        : String,
-    val timeStart   : String,
-    val timeEnd     : String,
-    val roomNum     : Int,
-    val type        : String,
-    val subjectID   : UUID,
-    val teacherID   : UUID
+    var date        : String,
+    var timeStart   : String,
+    var timeEnd     : String,
+    var roomNum     : Int,
+    var type        : String,
+    var teacherNotes: String,
+    var subjectID   : UUID,
+    var teacherID   : UUID
 )

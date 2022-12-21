@@ -76,6 +76,12 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
+    fun updateScheduleNotes(schedule: Schedule) {
+        executor.execute {
+            univDAO.updateScheduleNotes(schedule)
+        }
+    }
+
     fun addSchedule(schedule: Schedule) {
         executor.execute {
             univDAO.addSchedule(schedule)
