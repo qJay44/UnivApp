@@ -211,7 +211,7 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun updateUI(schedule: Schedule) {
-        val formatIn = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
+        val formatIn = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         val date = formatIn.parse(schedule.date)!!
         val formatOut = SimpleDateFormat("dd MMMM, EEEE", Locale.forLanguageTag("ru"))
         val formattedDate = formatOut.format(date)
@@ -242,7 +242,6 @@ class ScheduleFragment : Fragment() {
         params.topMargin = 20
 
         tvNote.text = text
-        tvNote.setPadding(0, 0, 0, 0)
         tvNote.layoutParams = params
         tvNote.leftDrawable(R.drawable.ic_bullet, R.dimen.bullet_padding)
         tvNote.font(R.font.montserrat)

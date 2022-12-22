@@ -233,7 +233,7 @@ object DatabaseTestDataBuilder {
 
     // Weeks to create: previous, current and next
     private fun createScheduleForThreeWeeks(currentGroupName: String) {
-        val format = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
+        val format = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         val calendar = Calendar.getInstance(Locale.forLanguageTag("ru"))
         calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
@@ -283,7 +283,7 @@ object DatabaseTestDataBuilder {
     }
 
     private fun createNotificationsForTwoMonths() {
-        val format = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
+        val format = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         val calendar = Calendar.getInstance(Locale.forLanguageTag("ru"))
         val currentDay = calendar.time
 
@@ -326,7 +326,7 @@ object DatabaseTestDataBuilder {
                     }
                 }
                 // Cut search amount
-                if (schedule.index >= 30) break
+                if (schedule.index >= 20) break
             }
         }
     }

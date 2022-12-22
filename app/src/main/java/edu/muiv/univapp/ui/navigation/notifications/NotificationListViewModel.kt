@@ -10,6 +10,7 @@ import java.util.*
 
 class NotificationListViewModel : ViewModel() {
     private val repository = UnivRepository.get()
+    private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
     private val _notifications = MutableLiveData<List<String>>()
 
     val notifications: LiveData<List<Notification>> =
@@ -19,15 +20,21 @@ class NotificationListViewModel : ViewModel() {
 
     private fun getMonthDays(calendar: Calendar): List<String> {
         val currentMonth = calendar.get(Calendar.MONTH)
-        val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
         val days = mutableListOf<String>()
 
         while (currentMonth == calendar.get(Calendar.MONTH)) {
-            days += format.format(calendar.time)
+            days += originalDateFormat.format(calendar.time)
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
         return days.toList()
+    }
+
+    fun getSimpleDate(dateString: String): String {
+        val date = originalDateFormat.parse(dateString)!!
+        val formatOut = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
+
+        return formatOut.format(date)
     }
 
     fun loadNotifications() {

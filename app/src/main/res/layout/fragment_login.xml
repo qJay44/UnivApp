@@ -66,13 +66,13 @@
         android:layout_marginBottom="10dp"
         android:paddingHorizontal="30dp"
         android:paddingVertical="10dp"
+        android:inputType="textCapSentences"
         android:hint="@string/prompt_username"
-        android:inputType="text"
+        android:autofillHints=""
         style="@style/InputEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/etPassword"
-        android:autofillHints="username" />
+        app:layout_constraintBottom_toTopOf="@id/etPassword" />
 
     <EditText
         android:id="@+id/etPassword"
@@ -82,12 +82,12 @@
         android:paddingHorizontal="30dp"
         android:paddingVertical="10dp"
         android:hint="@string/prompt_password"
-        android:inputType="textPassword"
+        android:inputType="textPassword|textNoSuggestions"
         style="@style/InputEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnLogin"
-        android:autofillHints="password" />
+        android:autofillHints="" />
 
     <Button
         android:id="@+id/btnLogin"
@@ -108,6 +108,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="60dp"
+        android:indeterminateTint="@color/primary"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/etPassword"

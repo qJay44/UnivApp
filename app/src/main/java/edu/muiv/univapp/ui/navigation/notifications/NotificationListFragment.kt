@@ -66,6 +66,9 @@ class NotificationListFragment : Fragment() {
                 updateUI(notifications)
             }
         }
+
+        // Wait for animations availability
+        postponeEnterTransition()
     }
 
     override fun onDestroyView() {
@@ -92,6 +95,9 @@ class NotificationListFragment : Fragment() {
                 return true
             }
         })
+
+        // Allow animations to play
+        startPostponedEnterTransition()
     }
 
     private inner class NotificationAdapter
@@ -115,7 +121,7 @@ class NotificationListFragment : Fragment() {
         private val tvText: TextView = itemView.findViewById(R.id.tvText)
 
         fun bind(notification: Notification) {
-            tvDate.text = notification.date
+            tvDate.text = notificationListViewModel.getSimpleDate(notification.date)
             tvTitle.text = notification.title
             tvText.text = notification.text
         }

@@ -17,6 +17,7 @@ class ScheduleListViewModel : ViewModel() {
     private lateinit var calendar: Calendar
 
     private val univRepository = UnivRepository.get()
+    private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
     private val days: Array<String> = Array(7) { it.toString() }
 
     // LiveData variables //
@@ -75,16 +76,26 @@ class ScheduleListViewModel : ViewModel() {
     }
 
     private fun loadDays() {
-        val format = SimpleDateFormat("dd.MM", Locale.FRANCE)
-
         for (i in days.indices) {
-            days[i] = format.format(calendar.time)
+            days[i] = originalDateFormat.format(calendar.time)
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
         // Subtract extra added day
         calendar.add(Calendar.DAY_OF_MONTH, -1)
-        _dayFromTo.value = "${days[0]} - ${days.last()}"
+
+
+        val firstDay = getSimpleDate(days[0])
+        val lastDay = getSimpleDate(days.last())
+
+        _dayFromTo.value = "$firstDay - $lastDay"
         loadSchedule()
+    }
+
+    fun getSimpleDate(dateString: String): String {
+        val date = originalDateFormat.parse(dateString)!!
+        val formatOut = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
+
+        return formatOut.format(date)
     }
 
     fun loadUser() {

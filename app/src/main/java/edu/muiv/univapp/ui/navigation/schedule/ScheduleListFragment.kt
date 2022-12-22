@@ -16,6 +16,8 @@ import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ScheduleListFragment : Fragment() {
 
@@ -130,7 +132,14 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
         Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
-        adapter = ScheduleAdapter(scheduleForUserList)
+
+        // Without this sorting 01.01 (2023) will be earlier than 10.12 (2022)
+        val sortedScheduleList = scheduleForUserList.sortedBy {
+            val df = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+            df.parse(it.date)!!.time
+        }
+
+        adapter = ScheduleAdapter(sortedScheduleList)
         rvSchedule.adapter = adapter
 
         // Appearance of the items
@@ -209,9 +218,7 @@ class ScheduleListFragment : Fragment() {
                 is ScheduleHolder -> {
                     holder.bind(scheduleForUser)
                 }
-                else -> {
-                    Log.e(TAG, "onBindViewHolder: unknown holder")
-                }
+                else -> Log.e(TAG, "onBindViewHolder: unknown holder")
             }
         }
 
@@ -236,7 +243,7 @@ class ScheduleListFragment : Fragment() {
         private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
 
         fun bind(date: String, weekDayName: String) {
-            tvDay.text = date
+            tvDay.text = scheduleListViewModel.getSimpleDate(date)
             tvWeekDayName.text = weekDayName
         }
     }

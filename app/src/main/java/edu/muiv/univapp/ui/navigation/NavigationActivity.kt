@@ -35,7 +35,7 @@ class NavigationActivity : AppCompatActivity() {
     private lateinit var navController: NavController
 
     private var pressedOnce = false
-    private var selectedItem = -1
+    private var selectedItem = R.id.navigation_schedule_list
     private var isLoggingOut = false
 
     private val navigationViewModel: NavigationViewModel by lazy {
@@ -130,34 +130,30 @@ class NavigationActivity : AppCompatActivity() {
     }
 
     private fun selectFragment(item: MenuItem) {
-        if (selectedItem == -1) {
-            navController.navigate(item.itemId)
-        } else {
-            navController.navigate(
-                when (item.itemId) {
-                    R.id.navigation_notifications -> {
-                        R.id.action_global_navigation_notifications
-                    }
-                    R.id.navigation_schedule_list -> {
-                        when (selectedItem) {
-                            // From the notifications fragment
-                            R.id.navigation_notifications -> {
-                                R.id.action_global_navigation_schedule_list_left
-                            }
-                            // From the profile fragment
-                            R.id.navigation_profile -> {
-                                R.id.action_global_navigation_schedule_list_right
-                            }
-                            else -> R.id.navigation_schedule_list
-                        }
-                    }
-                    R.id.navigation_profile -> {
-                        R.id.action_global_navigation_profile
-                    }
-                    else -> item.itemId
+        navController.navigate(
+            when (item.itemId) {
+                R.id.navigation_notifications -> {
+                    R.id.action_global_navigation_notifications
                 }
-            )
-        }
-        selectedItem = item.itemId
+                R.id.navigation_schedule_list -> {
+                    when (selectedItem) {
+                        // From the notifications fragment
+                        R.id.navigation_notifications -> {
+                            R.id.action_global_navigation_schedule_list_left
+                        }
+                        // From the profile fragment
+                        R.id.navigation_profile -> {
+                            R.id.action_global_navigation_schedule_list_right
+                        }
+                        else -> R.id.navigation_schedule_list
+                    }
+                }
+                R.id.navigation_profile -> {
+                    R.id.action_global_navigation_profile
+                }
+                else -> item.itemId
+            }
+        )
+    selectedItem = item.itemId
     }
 }
