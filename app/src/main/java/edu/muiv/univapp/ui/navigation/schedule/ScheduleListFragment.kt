@@ -16,6 +16,7 @@ import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
+import edu.muiv.univapp.utils.CodeInspectionHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,10 +42,13 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null) {
-            scheduleListViewModel.loadUser()
-            scheduleListViewModel.loadCalendar()
+        val exeTime = CodeInspectionHelper.measureTimeMillis {
+            if (savedInstanceState == null) {
+                scheduleListViewModel.loadUser()
+                scheduleListViewModel.loadCalendar()
+            }
         }
+        Log.d(TAG, "onCreate: $exeTime")
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -139,7 +143,12 @@ class ScheduleListFragment : Fragment() {
             df.parse(it.date)!!.time
         }
 
-        adapter = ScheduleAdapter(sortedScheduleList)
+        adapter = CodeInspectionHelper.measureTimeMillis({time ->
+            Log.d(TAG, "Schedule Adapter: $time")
+        }) {
+            ScheduleAdapter(sortedScheduleList)
+        }
+
         rvSchedule.adapter = adapter
 
         // Appearance of the items
@@ -170,6 +179,8 @@ class ScheduleListFragment : Fragment() {
         private val typeList = 1
         private val scheduleAll: List<ScheduleWithSubjectAndTeacher>
         private val scheduleAllBooleans: List<Boolean>
+        private val createHolderMeasurer = CodeInspectionHelper.newInstance()
+        private val bindViewHolderMeasurer = CodeInspectionHelper.newInstance()
 
         init {
             var currentWeekDay = ""
@@ -201,25 +212,32 @@ class ScheduleListFragment : Fragment() {
             val view = if (viewType == typeHeader) {
                 ScheduleHolderHeader(layoutInflater.inflate(R.layout.schedule_list_item_header, parent, false))
             } else {
-                ScheduleHolder(layoutInflater.inflate(R.layout.schedule_list_item, parent, false))
+                createHolderMeasurer.measureTimeMillis({avgTime ->
+                    Log.d(TAG, "onCreateViewHolder: $avgTime")
+                }) {
+                    ScheduleHolder(layoutInflater.inflate(R.layout.schedule_list_item, parent, false))
+                }
             }
 
             return view
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val scheduleForUser = scheduleAll.elementAt(position)
-            when (holder) {
-                is ScheduleHolderHeader -> {
-                    val dayIndex = scheduleListViewModel.week.indexOf(scheduleForUser.date)
-                    val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
-                    holder.bind(scheduleForUser.date, weekDayName)
+            val exeTime = bindViewHolderMeasurer.measureTimeMillis {
+                val scheduleForUser = scheduleAll.elementAt(position)
+                when (holder) {
+                    is ScheduleHolderHeader -> {
+                        val dayIndex = scheduleListViewModel.week.indexOf(scheduleForUser.date)
+                        val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
+                        holder.bind(scheduleForUser.date, weekDayName)
+                    }
+                    is ScheduleHolder -> {
+                        holder.bind(scheduleForUser)
+                    }
+                    else -> Log.e(TAG, "onBindViewHolder: Got unexpected holder")
                 }
-                is ScheduleHolder -> {
-                    holder.bind(scheduleForUser)
-                }
-                else -> Log.e(TAG, "onBindViewHolder: unknown holder")
             }
+            Log.d(TAG, "onBindViewHolder: $exeTime")
         }
 
         override fun getItemCount(): Int = scheduleAll.size
