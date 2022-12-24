@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package edu.muiv.univapp.utils
 
 import android.os.Environment
@@ -25,7 +27,7 @@ class CodeInspectionHelper {
             return "Execution time - ${System.currentTimeMillis() - start} ms\n"
         }
 
-        // If need to measure time for single usage (return type of the give function not Unit)
+        // If need to measure time for single usage (return type of the given function is not Unit)
         inline fun <T> measureTimeMillis(loggingFunction: (String) -> Unit, function: () -> T): T {
             val startTime = System.currentTimeMillis()
             val result: T = function.invoke()

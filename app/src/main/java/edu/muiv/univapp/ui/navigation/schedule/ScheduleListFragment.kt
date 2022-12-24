@@ -26,6 +26,11 @@ class ScheduleListFragment : Fragment() {
         private const val TAG = "ScheduleListFragment"
     }
 
+    private enum class ViewTypes(val type: Int) {
+        HEADER(0),
+        DEFAULT(1)
+    }
+
     private var _binding: FragmentScheduleListBinding? = null
     private val binding get() = _binding!!
 
@@ -42,13 +47,10 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val exeTime = CodeInspectionHelper.measureTimeMillis {
-            if (savedInstanceState == null) {
-                scheduleListViewModel.loadUser()
-                scheduleListViewModel.loadCalendar()
-            }
+        if (savedInstanceState == null) {
+            scheduleListViewModel.loadUser()
+            scheduleListViewModel.loadCalendar()
         }
-        Log.d(TAG, "onCreate: $exeTime")
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -175,12 +177,8 @@ class ScheduleListFragment : Fragment() {
     private inner class ScheduleAdapter(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>)
         : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        private val typeHeader = 0
-        private val typeList = 1
         private val scheduleAll: List<ScheduleWithSubjectAndTeacher>
         private val scheduleAllBooleans: List<Boolean>
-        private val createHolderMeasurer = CodeInspectionHelper.newInstance()
-        private val bindViewHolderMeasurer = CodeInspectionHelper.newInstance()
 
         init {
             var currentWeekDay = ""
@@ -209,44 +207,51 @@ class ScheduleListFragment : Fragment() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            val view = if (viewType == typeHeader) {
-                ScheduleHolderHeader(layoutInflater.inflate(R.layout.schedule_list_item_header, parent, false))
-            } else {
-                createHolderMeasurer.measureTimeMillis({avgTime ->
-                    Log.d(TAG, "onCreateViewHolder: $avgTime")
-                }) {
-                    ScheduleHolder(layoutInflater.inflate(R.layout.schedule_list_item, parent, false))
+            return when (viewType) {
+                ViewTypes.HEADER.type -> {
+                    ScheduleHolderHeader(
+                        layoutInflater.inflate(
+                            R.layout.schedule_list_item_header,
+                            parent,
+                            false
+                        )
+                    )
                 }
+                ViewTypes.DEFAULT.type -> {
+                    ScheduleHolder(
+                        layoutInflater.inflate(
+                            R.layout.schedule_list_item,
+                            parent,
+                            false
+                        )
+                    )
+                }
+                else -> throw IllegalStateException("onCreateViewHolder: Unexpected view type")
             }
-
-            return view
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val exeTime = bindViewHolderMeasurer.measureTimeMillis {
-                val scheduleForUser = scheduleAll.elementAt(position)
-                when (holder) {
-                    is ScheduleHolderHeader -> {
-                        val dayIndex = scheduleListViewModel.week.indexOf(scheduleForUser.date)
-                        val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
-                        holder.bind(scheduleForUser.date, weekDayName)
-                    }
-                    is ScheduleHolder -> {
-                        holder.bind(scheduleForUser)
-                    }
-                    else -> Log.e(TAG, "onBindViewHolder: Got unexpected holder")
+            val scheduleForUser = scheduleAll.elementAt(position)
+            when (holder) {
+                is ScheduleHolderHeader -> {
+                    val dayIndex = scheduleListViewModel.week.indexOf(scheduleForUser.date)
+                    val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
+                    val simplifiedDate = scheduleListViewModel.getSimpleDate(scheduleForUser.date)
+                    holder.bind(simplifiedDate, weekDayName)
                 }
+                is ScheduleHolder -> {
+                    holder.bind(scheduleForUser)
+                }
+                else -> Log.e(TAG, "onBindViewHolder: Got unexpected holder")
             }
-            Log.d(TAG, "onBindViewHolder: $exeTime")
         }
 
         override fun getItemCount(): Int = scheduleAll.size
 
         override fun getItemViewType(position: Int): Int {
-            return if (scheduleAllBooleans.elementAt(position)) {
-                typeHeader
-            } else {
-                typeList
+            return when (scheduleAllBooleans.elementAt(position)) {
+                true  -> ViewTypes.HEADER.type
+                false -> ViewTypes.DEFAULT.type
             }
         }
 
@@ -255,13 +260,13 @@ class ScheduleListFragment : Fragment() {
 
     // Header view holder //
 
-    private inner class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
+    private class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
 
         private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
         private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
 
-        fun bind(date: String, weekDayName: String) {
-            tvDay.text = scheduleListViewModel.getSimpleDate(date)
+        fun bind(formattedDate: String, weekDayName: String) {
+            tvDay.text = formattedDate
             tvWeekDayName.text = weekDayName
         }
     }
@@ -269,7 +274,7 @@ class ScheduleListFragment : Fragment() {
 
     // Default view holder //
 
-    private inner class ScheduleHolder(view: View) : RecyclerView.ViewHolder(view) {
+    private class ScheduleHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
         private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
