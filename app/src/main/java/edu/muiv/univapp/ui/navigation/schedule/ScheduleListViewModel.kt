@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
@@ -13,10 +12,10 @@ import java.util.*
 
 class ScheduleListViewModel : ViewModel() {
 
-    private lateinit var user: LoginResult
-    private lateinit var calendar: Calendar
-
+    private val user by lazy { UserDataHolder.get().user }
+    private val calendar by lazy { Calendar.getInstance() }
     private val univRepository = UnivRepository.get()
+
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
     private val days: Array<String> = Array(7) { it.toString() }
 
@@ -35,9 +34,6 @@ class ScheduleListViewModel : ViewModel() {
 
     val dayFromTo: LiveData<String>
         get() = _dayFromTo
-
-    val week: Set<String>
-        get() = days.toSet()
 
     //////////////////////////
 
@@ -91,6 +87,12 @@ class ScheduleListViewModel : ViewModel() {
         loadSchedule()
     }
 
+    fun getWeekDayNameByDate(dateString: String): String {
+        val dayIndex = days.indexOf(dateString)
+
+        return ScheduleWeekDays.getDayNameByIndex(dayIndex)
+    }
+
     fun getSimpleDate(dateString: String): String {
         val date = originalDateFormat.parse(dateString)!!
         val formatOut = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru"))
@@ -98,12 +100,7 @@ class ScheduleListViewModel : ViewModel() {
         return formatOut.format(date)
     }
 
-    fun loadUser() {
-        user = UserDataHolder.get().user
-    }
-
     fun loadCalendar() {
-        calendar = Calendar.getInstance(Locale.FRANCE)
         calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         loadDays()

@@ -1,12 +1,14 @@
 package edu.muiv.univapp.ui.navigation.schedule
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.view.children
+import androidx.annotation.FontRes
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -15,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.schedule.utils.AsyncCell
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
-import edu.muiv.univapp.utils.CodeInspectionHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,7 +28,7 @@ class ScheduleListFragment : Fragment() {
         private const val TAG = "ScheduleListFragment"
     }
 
-    private enum class ViewTypes(val type: Int) {
+    private enum class HolderViewTypes(val type: Int) {
         HEADER(0),
         DEFAULT(1)
     }
@@ -47,10 +49,8 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null) {
-            scheduleListViewModel.loadUser()
+        if (savedInstanceState == null)
             scheduleListViewModel.loadCalendar()
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -123,12 +123,10 @@ class ScheduleListFragment : Fragment() {
                 }
             }
         }
+        // Week borders
         scheduleListViewModel.dayFromTo.observe(viewLifecycleOwner) { dayFromToString ->
             tvWeekDays.text = dayFromToString
         }
-
-        // Wait for animations availability
-        postponeEnterTransition()
     }
 
     override fun onDestroyView() {
@@ -145,32 +143,8 @@ class ScheduleListFragment : Fragment() {
             df.parse(it.date)!!.time
         }
 
-        adapter = CodeInspectionHelper.measureTimeMillis({time ->
-            Log.d(TAG, "Schedule Adapter: $time")
-        }) {
-            ScheduleAdapter(sortedScheduleList)
-        }
-
+        adapter = ScheduleAdapter(sortedScheduleList)
         rvSchedule.adapter = adapter
-
-        // Appearance of the items
-        rvSchedule.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
-                rvSchedule.viewTreeObserver.removeOnPreDrawListener(this)
-
-                for (view in rvSchedule.children) {
-                    view.alpha = 0f
-                    view.animate().alpha(1f)
-                        .setDuration(300)
-                        .start()
-                }
-
-                return true
-            }
-        })
-
-        // Allow animations to play
-        startPostponedEnterTransition()
     }
 
     // The Adapter
@@ -208,22 +182,14 @@ class ScheduleListFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
-                ViewTypes.HEADER.type -> {
+                HolderViewTypes.HEADER.type -> {
                     ScheduleHolderHeader(
-                        layoutInflater.inflate(
-                            R.layout.schedule_list_item_header,
-                            parent,
-                            false
-                        )
+                        HeaderItemCell(parent.context).apply { inflate() }
                     )
                 }
-                ViewTypes.DEFAULT.type -> {
-                    ScheduleHolder(
-                        layoutInflater.inflate(
-                            R.layout.schedule_list_item,
-                            parent,
-                            false
-                        )
+                HolderViewTypes.DEFAULT.type -> {
+                    ScheduleDefaultHolder(
+                        DefaultItemCell(parent.context).apply { inflate() }
                     )
                 }
                 else -> throw IllegalStateException("onCreateViewHolder: Unexpected view type")
@@ -234,13 +200,14 @@ class ScheduleListFragment : Fragment() {
             val scheduleForUser = scheduleAll.elementAt(position)
             when (holder) {
                 is ScheduleHolderHeader -> {
-                    val dayIndex = scheduleListViewModel.week.indexOf(scheduleForUser.date)
-                    val weekDayName = ScheduleWeekDays.getDayNameByIndex(dayIndex)
-                    val simplifiedDate = scheduleListViewModel.getSimpleDate(scheduleForUser.date)
-                    holder.bind(simplifiedDate, weekDayName)
+                    setUpHeaderViewHolder(
+                        holder,
+                        scheduleListViewModel.getSimpleDate(scheduleForUser.date),
+                        scheduleListViewModel.getWeekDayNameByDate(scheduleForUser.date)
+                    )
                 }
-                is ScheduleHolder -> {
-                    holder.bind(scheduleForUser)
+                is ScheduleDefaultHolder -> {
+                    setUpDefaultViewHolder(holder, scheduleForUser)
                 }
                 else -> Log.e(TAG, "onBindViewHolder: Got unexpected holder")
             }
@@ -249,55 +216,87 @@ class ScheduleListFragment : Fragment() {
         override fun getItemCount(): Int = scheduleAll.size
 
         override fun getItemViewType(position: Int): Int {
+            // Which holder to create
             return when (scheduleAllBooleans.elementAt(position)) {
-                true  -> ViewTypes.HEADER.type
-                false -> ViewTypes.DEFAULT.type
+                true  -> HolderViewTypes.HEADER.type
+                false -> HolderViewTypes.DEFAULT.type
             }
         }
+
+        // Use this function when async layout inflater can't set fonts by itself
+        private fun TextView.font(@FontRes id: Int) {
+            val typeface = ResourcesCompat.getFont(requireContext(), id)
+            this.typeface = typeface
+        }
+
+        // Header holder binding
+        private fun setUpHeaderViewHolder(
+            holder: ScheduleHolderHeader,
+            formattedDate: String,
+            weekDayName: String
+        ) {
+            (holder.itemView as HeaderItemCell).bindWhenInflated {
+                with (holder.itemView) {
+                    val tvDay: TextView = findViewById(R.id.tvDay)
+                    val tvWeekDayName: TextView = findViewById(R.id.tvWeekDayName)
+
+                    tvDay.text = formattedDate
+                    tvWeekDayName.text = weekDayName
+                }
+            }
+        }
+
+        // Default holder binding
+        private fun setUpDefaultViewHolder(
+            holder: ScheduleDefaultHolder,
+            scheduleForUser: ScheduleWithSubjectAndTeacher
+        ) {
+            (holder.itemView as DefaultItemCell).bindWhenInflated {
+                with (holder.itemView) {
+                    val tvTimeStart   : TextView = findViewById(R.id.tvTimeStart)
+                    val tvTimeEnd     : TextView = findViewById(R.id.tvTimeEnd)
+                    val tvSubjectName : TextView = findViewById(R.id.tvSubjectName)
+                    val tvScheduleInfo: TextView = findViewById(R.id.tvScheduleInfo)
+
+                    val teacherField =
+                        "${scheduleForUser.teacherSurname} " +
+                        "${scheduleForUser.teacherName[0]}. " +
+                        "${scheduleForUser.teacherPatronymic[0]}."
+
+                    val details =
+                        "$teacherField | " +
+                        "${scheduleForUser.type} | " +
+                        "Ауд. ${scheduleForUser.roomNum}"
+
+
+                    tvTimeStart.font(R.font.montserrat_medium)
+                    tvTimeEnd.font(R.font.montserrat_medium)
+                    tvSubjectName.font(R.font.montserrat_semibold)
+                    tvScheduleInfo.font(R.font.montserrat)
+
+                    tvTimeStart.text = scheduleForUser.timeStart
+                    tvTimeEnd.text = scheduleForUser.timeEnd
+                    tvSubjectName.text = scheduleForUser.subjectName
+                    tvScheduleInfo.text = details
+                }
+            }
+        }
+
+        // Inflate holders asynchronously //
+
+        private inner class HeaderItemCell(context: Context) : AsyncCell(context) {
+            override val layoutId = R.layout.schedule_list_item_header
+        }
+
+        private inner class DefaultItemCell(context: Context) : AsyncCell(context) {
+            override val layoutId = R.layout.schedule_list_item
+        }
+
+        ////////////////////////////////////
 
         fun getScheduleByPosition(pos: Int) = scheduleAll.elementAt(pos)
     }
 
-    // Header view holder //
-
-    private class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view) {
-
-        private val tvDay        : TextView = itemView.findViewById(R.id.tvDay)
-        private val tvWeekDayName: TextView = itemView.findViewById(R.id.tvWeekDayName)
-
-        fun bind(formattedDate: String, weekDayName: String) {
-            tvDay.text = formattedDate
-            tvWeekDayName.text = weekDayName
-        }
-    }
-    ////////////////////////
-
-    // Default view holder //
-
-    private class ScheduleHolder(view: View) : RecyclerView.ViewHolder(view) {
-
-        private val tvTimeStart   : TextView = itemView.findViewById(R.id.tvTimeStart)
-        private val tvTimeEnd     : TextView = itemView.findViewById(R.id.tvTimeEnd)
-        private val tvSubjectName : TextView = itemView.findViewById(R.id.tvSubjectName)
-        private val tvScheduleInfo: TextView = itemView.findViewById(R.id.tvScheduleInfo)
-
-        fun bind(scheduleForUser: ScheduleWithSubjectAndTeacher) {
-            val teacherField =
-                    "${scheduleForUser.teacherSurname} " +
-                    "${scheduleForUser.teacherName[0]}. " +
-                    "${scheduleForUser.teacherPatronymic[0]}."
-
-            val details =
-                    "$teacherField | " +
-                    "${scheduleForUser.type} | " +
-                    "Ауд. ${scheduleForUser.roomNum}"
-
-            tvScheduleInfo.text = details
-            tvTimeStart.text = scheduleForUser.timeStart
-            tvTimeEnd.text = scheduleForUser.timeEnd
-            tvSubjectName.text = scheduleForUser.subjectName
-        }
-    }
-
-    //////////////////////
+    private class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view)
+    private class ScheduleDefaultHolder(view: View) : RecyclerView.ViewHolder(view)
 }
