@@ -5,6 +5,9 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.FontRes
@@ -40,7 +43,8 @@ class ScheduleListFragment : Fragment() {
     private lateinit var rvSchedule: RecyclerView
     private lateinit var ibPrevWeek: ImageButton
     private lateinit var ibNextWeek: ImageButton
-    private lateinit var adapter: ScheduleAdapter
+    private var adapter: ScheduleAdapter? = null
+    private var isAnimationEnded = true
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -62,37 +66,64 @@ class ScheduleListFragment : Fragment() {
         _binding = FragmentScheduleListBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        adapter = ScheduleAdapter(emptyList())
-        tvWeekDays = binding.tvWeekDays
-
-        ibPrevWeek = binding.ibPrevWeek
-        ibPrevWeek.setOnClickListener {
-            scheduleListViewModel.prevWeek()
-        }
-
-        ibNextWeek = binding.ibNextWeek
-        ibNextWeek.setOnClickListener {
-            scheduleListViewModel.nextWeek()
-        }
-
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
-        rvSchedule.adapter = adapter
+
+        val ibPrevWeekAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
+        ibPrevWeekAnimation.setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+                isAnimationEnded = false
+                scheduleListViewModel.loadPreviousWeek()
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                isAnimationEnded = true
+                bindAdapter()
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {}
+        })
+
+        ibPrevWeek = binding.ibPrevWeek
+        ibPrevWeek.setOnClickListener { rvSchedule.startAnimation(ibPrevWeekAnimation) }
+
+        val ibNextWeekAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
+        ibNextWeekAnimation.setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+                isAnimationEnded = false
+                scheduleListViewModel.loadNextWeek()
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                isAnimationEnded = true
+                bindAdapter()
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {}
+        })
+
+        ibNextWeek = binding.ibNextWeek
+        ibNextWeek.setOnClickListener { rvSchedule.startAnimation(ibNextWeekAnimation) }
+
+        tvWeekDays = binding.tvWeekDays
 
         // Swipes //
 
         rvSchedule.setOnTouchListener(object : OnTouchListenerRecyclerView(context, rvSchedule) {
             override fun onSwipeLeft(): Boolean {
-                scheduleListViewModel.nextWeek()
+                ibNextWeek.performClick()
                 return true
             }
+
             override fun onSwipeRight(): Boolean {
-                scheduleListViewModel.prevWeek()
+                ibPrevWeek.performClick()
                 return true
             }
 
             override fun onClick(view: View, position: Int): Boolean {
-                val schedule = adapter.getScheduleByPosition(position)
+                if (adapter == null) return false
+
+                val schedule = adapter!!.getScheduleByPosition(position)
                 val action = ScheduleListFragmentDirections
                     .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
                 view.findNavController().navigate(action)
@@ -110,6 +141,12 @@ class ScheduleListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Week first and last days
+        scheduleListViewModel.dayFromTo.observe(viewLifecycleOwner) { dayFromToString ->
+            tvWeekDays.text = dayFromToString
+        }
+
+        // Update schedule adapter
         if (scheduleListViewModel.isTeacher) {
             scheduleListViewModel.teacherSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
@@ -122,10 +159,6 @@ class ScheduleListFragment : Fragment() {
                     updateUI(schedules)
                 }
             }
-        }
-        // Week borders
-        scheduleListViewModel.dayFromTo.observe(viewLifecycleOwner) { dayFromToString ->
-            tvWeekDays.text = dayFromToString
         }
     }
 
@@ -144,7 +177,14 @@ class ScheduleListFragment : Fragment() {
         }
 
         adapter = ScheduleAdapter(sortedScheduleList)
-        rvSchedule.adapter = adapter
+        if (isAnimationEnded) bindAdapter()
+    }
+
+    private fun bindAdapter() {
+        if (adapter != null) {
+            rvSchedule.adapter = adapter
+            rvSchedule.scheduleLayoutAnimation()
+        }
     }
 
     // The Adapter

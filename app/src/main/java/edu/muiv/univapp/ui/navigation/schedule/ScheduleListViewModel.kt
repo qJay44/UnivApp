@@ -106,7 +106,7 @@ class ScheduleListViewModel : ViewModel() {
         loadDays()
     }
 
-    fun prevWeek() {
+    fun loadPreviousWeek() {
         // Set current day to Monday
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         // Subtract one week
@@ -114,7 +114,7 @@ class ScheduleListViewModel : ViewModel() {
         loadDays()
     }
 
-    fun nextWeek() {
+    fun loadNextWeek() {
         // Set current day to Monday
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         // Add one week

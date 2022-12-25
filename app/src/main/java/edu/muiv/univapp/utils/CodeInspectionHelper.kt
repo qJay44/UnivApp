@@ -2,7 +2,6 @@
 
 package edu.muiv.univapp.utils
 
-import android.os.Environment
 import android.util.Log
 import java.io.File
 import java.io.FileWriter
@@ -16,6 +15,7 @@ class CodeInspectionHelper {
 
     companion object {
 
+        private const val TAG = "CodeInspectionHelper"
         private const val MEASURE_TIME_SIZE_LIMIT = 50
 
         fun newInstance() = CodeInspectionHelper()
@@ -78,7 +78,7 @@ class CodeInspectionHelper {
         return result
     }
 
-    class CustomizedExceptionHandler : UncaughtExceptionHandler {
+    class CustomizedExceptionHandler(private val path: String) : UncaughtExceptionHandler {
         // Getting the default exception handler
         // that's executed when uncaught exception terminates a thread
         private val defaultUEH = Thread.getDefaultUncaughtExceptionHandler()
@@ -103,13 +103,14 @@ class CodeInspectionHelper {
         private fun writeToFile(currentStacktrace: String) {
             try {
                 // Gets the Android external storage directory & create new folder "Crash_Reports"
-                val dir = File(Environment.getExternalStorageDirectory(),
-                "Crash_Reports")
+                val dir = File(path, "Crash_Reports")
                 if (!dir.exists()) dir.mkdirs()
 
                 val df = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.FRANCE)
                 val date = Date()
                 val filename = df.format(date) + ".STACKTRACE"
+
+                Log.d(TAG, "writeToFile: $dir/$filename")
 
                 // Write the file into the folder
                 val reportFile = File(dir, filename)
