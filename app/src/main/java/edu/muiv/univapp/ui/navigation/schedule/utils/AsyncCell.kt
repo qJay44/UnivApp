@@ -33,8 +33,8 @@ open class AsyncCell(context: Context) : FrameLayout(context, null, 0, 0) {
 
     fun bindWhenInflated(bindFunc: AsyncCell.() -> Unit) {
         /**
-         * If layout is inflated execute the [bindFunc] now
-         * Else queue the [bindFunc] to be executed later
+         * If layout is inflated invoke the [bindFunc] now
+         * Else queue the [bindFunc] to be invoked later
          */
 
         if (isInflated)

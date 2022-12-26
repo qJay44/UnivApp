@@ -5,8 +5,6 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
 import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.TextView
@@ -22,6 +20,7 @@ import edu.muiv.univapp.databinding.FragmentScheduleListBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.utils.AsyncCell
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
+import edu.muiv.univapp.ui.navigation.schedule.utils.WeekChangeAnimationListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -44,7 +43,6 @@ class ScheduleListFragment : Fragment() {
     private lateinit var ibPrevWeek: ImageButton
     private lateinit var ibNextWeek: ImageButton
     private var adapter: ScheduleAdapter? = null
-    private var isAnimationEnded = true
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
         ViewModelProvider(this)[ScheduleListViewModel::class.java]
@@ -53,8 +51,10 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
+            WeekChangeAnimationListener.setBindFunc(TAG) { bindAdapter() }
             scheduleListViewModel.loadCalendar()
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -69,38 +69,20 @@ class ScheduleListFragment : Fragment() {
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
 
+        // Previous week animation
         val ibPrevWeekAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
-        ibPrevWeekAnimation.setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(p0: Animation?) {
-                isAnimationEnded = false
-                scheduleListViewModel.loadPreviousWeek()
-            }
-
-            override fun onAnimationEnd(p0: Animation?) {
-                isAnimationEnded = true
-                bindAdapter()
-            }
-
-            override fun onAnimationRepeat(p0: Animation?) {}
-        })
+        ibPrevWeekAnimation.setAnimationListener(
+            WeekChangeAnimationListener { scheduleListViewModel.loadPreviousWeek() }
+        )
 
         ibPrevWeek = binding.ibPrevWeek
         ibPrevWeek.setOnClickListener { rvSchedule.startAnimation(ibPrevWeekAnimation) }
 
+        // Next week animation
         val ibNextWeekAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
-        ibNextWeekAnimation.setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(p0: Animation?) {
-                isAnimationEnded = false
-                scheduleListViewModel.loadNextWeek()
-            }
-
-            override fun onAnimationEnd(p0: Animation?) {
-                isAnimationEnded = true
-                bindAdapter()
-            }
-
-            override fun onAnimationRepeat(p0: Animation?) {}
-        })
+        ibNextWeekAnimation.setAnimationListener(
+            WeekChangeAnimationListener { scheduleListViewModel.loadNextWeek() }
+        )
 
         ibNextWeek = binding.ibNextWeek
         ibNextWeek.setOnClickListener { rvSchedule.startAnimation(ibNextWeekAnimation) }
@@ -160,6 +142,9 @@ class ScheduleListFragment : Fragment() {
                 }
             }
         }
+
+        // Wait for animations availability
+        postponeEnterTransition()
     }
 
     override fun onDestroyView() {
@@ -177,7 +162,11 @@ class ScheduleListFragment : Fragment() {
         }
 
         adapter = ScheduleAdapter(sortedScheduleList)
-        if (isAnimationEnded) bindAdapter()
+
+        bindAdapter()
+
+        // Allow animations to play
+        startPostponedEnterTransition()
     }
 
     private fun bindAdapter() {
@@ -193,6 +182,7 @@ class ScheduleListFragment : Fragment() {
 
         private val scheduleAll: List<ScheduleWithSubjectAndTeacher>
         private val scheduleAllBooleans: List<Boolean>
+
 
         init {
             var currentWeekDay = ""

@@ -111,6 +111,7 @@ class CodeInspectionHelper {
                 val filename = df.format(date) + ".STACKTRACE"
 
                 Log.d(TAG, "writeToFile: $dir/$filename")
+                Log.d(TAG, "stacktrace: $currentStacktrace")
 
                 // Write the file into the folder
                 val reportFile = File(dir, filename)
