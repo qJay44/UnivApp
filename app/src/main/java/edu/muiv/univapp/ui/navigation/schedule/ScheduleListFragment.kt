@@ -52,7 +52,7 @@ class ScheduleListFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-            WeekChangeAnimationListener.setBindFunc(TAG) { bindAdapter() }
+            WeekChangeAnimationListener.setBindFunc(TAG) { attachAdapter() }
             scheduleListViewModel.loadCalendar()
         }
     }
@@ -149,6 +149,7 @@ class ScheduleListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        WeekChangeAnimationListener.resetListener()
         _binding = null
     }
 
@@ -163,16 +164,24 @@ class ScheduleListFragment : Fragment() {
 
         adapter = ScheduleAdapter(sortedScheduleList)
 
-        bindAdapter()
+        // Attach new adapter only if animation ended and wasn't attached in listener
+        with(WeekChangeAnimationListener) {
+            isAdapterUpdated = true
+            if (isAnimationEnded && !isAdapterAttached) {
+                attachAdapter()
+            }
+        }
 
         // Allow animations to play
         startPostponedEnterTransition()
     }
 
-    private fun bindAdapter() {
+    private fun attachAdapter() {
         if (adapter != null) {
             rvSchedule.adapter = adapter
             rvSchedule.scheduleLayoutAnimation()
+        } else {
+            Log.e(TAG, "attachAdapter: Adapter wasn't initialized")
         }
     }
 
@@ -182,7 +191,6 @@ class ScheduleListFragment : Fragment() {
 
         private val scheduleAll: List<ScheduleWithSubjectAndTeacher>
         private val scheduleAllBooleans: List<Boolean>
-
 
         init {
             var currentWeekDay = ""
