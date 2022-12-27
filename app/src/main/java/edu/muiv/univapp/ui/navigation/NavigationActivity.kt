@@ -86,7 +86,7 @@ class NavigationActivity : AppCompatActivity() {
 
                 Toast.makeText(
                     this@NavigationActivity,
-                    "Нажмите НАЗАД снова чтобы выйти",
+                    "Нажмите НАЗАД снова, чтобы выйти",
                     Toast.LENGTH_SHORT
                 ).show()
 
@@ -132,6 +132,7 @@ class NavigationActivity : AppCompatActivity() {
     private fun selectFragment(item: MenuItem) {
         navController.navigate(
             when (item.itemId) {
+                selectedItem -> return
                 R.id.navigation_notifications -> {
                     R.id.action_global_navigation_notifications
                 }

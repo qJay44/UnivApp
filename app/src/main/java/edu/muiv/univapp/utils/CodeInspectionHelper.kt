@@ -89,9 +89,9 @@ class CodeInspectionHelper {
 
             val stringBuffSync = StringWriter()
             val printWriter = PrintWriter(stringBuffSync)
+            e.printStackTrace(printWriter)
             val stacktrace = stringBuffSync.toString()
 
-            e.printStackTrace(printWriter)
             printWriter.close()
 
             writeToFile(stacktrace)

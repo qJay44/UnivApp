@@ -1,5 +1,6 @@
 package edu.muiv.univapp.ui.navigation.schedule
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -89,6 +90,9 @@ class ScheduleListViewModel : ViewModel() {
 
     fun getWeekDayNameByDate(dateString: String): String {
         val dayIndex = days.indexOf(dateString)
+
+        Log.i("ScheduleListFragmentVM", "dateString: $dateString")
+        Log.i("ScheduleListFragmentVM", "Days: ${days.toList()}")
 
         return ScheduleWeekDays.getDayNameByIndex(dayIndex)
     }

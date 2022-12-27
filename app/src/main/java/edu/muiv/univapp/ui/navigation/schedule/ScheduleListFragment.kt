@@ -30,11 +30,6 @@ class ScheduleListFragment : Fragment() {
         private const val TAG = "ScheduleListFragment"
     }
 
-    private enum class HolderViewTypes(val type: Int) {
-        HEADER(0),
-        DEFAULT(1)
-    }
-
     private var _binding: FragmentScheduleListBinding? = null
     private val binding get() = _binding!!
 
@@ -51,10 +46,8 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null) {
-            WeekChangeAnimationListener.setBindFunc(TAG) { attachAdapter() }
+        if (savedInstanceState == null)
             scheduleListViewModel.loadCalendar()
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -68,6 +61,8 @@ class ScheduleListFragment : Fragment() {
 
         rvSchedule = binding.scheduleRecyclerView
         rvSchedule.layoutManager = LinearLayoutManager(context)
+
+        WeekChangeAnimationListener.setBindFunc(TAG) { attachAdapter() }
 
         // Previous week animation
         val ibPrevWeekAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
@@ -230,7 +225,7 @@ class ScheduleListFragment : Fragment() {
                         DefaultItemCell(parent.context).apply { inflate() }
                     )
                 }
-                else -> throw IllegalStateException("onCreateViewHolder: Unexpected view type")
+                else -> throw IllegalStateException("onCreateViewHolder: Got unexpected view type")
             }
         }
 
@@ -247,7 +242,7 @@ class ScheduleListFragment : Fragment() {
                 is ScheduleDefaultHolder -> {
                     setUpDefaultViewHolder(holder, scheduleForUser)
                 }
-                else -> Log.e(TAG, "onBindViewHolder: Got unexpected holder")
+                else -> throw IllegalStateException("onBindViewHolder: Got unexpected holder")
             }
         }
 
@@ -337,4 +332,9 @@ class ScheduleListFragment : Fragment() {
 
     private class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view)
     private class ScheduleDefaultHolder(view: View) : RecyclerView.ViewHolder(view)
+
+    private enum class HolderViewTypes(val type: Int) {
+        HEADER(0),
+        DEFAULT(1)
+    }
 }

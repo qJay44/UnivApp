@@ -44,7 +44,7 @@ class WeekChangeAnimationListener(private val loadWeek: () -> Unit) : AnimationL
 
     override fun onAnimationEnd(p0: Animation?) {
         if (isAdapterUpdated) {
-            BIND_FUNC!!.invoke() ?: Log.e(TAG, "Binding function must be initialized")
+            BIND_FUNC!!.invoke() ?: throw IllegalStateException("Binding function must be initialized")
             isAdapterAttached = true
         }
         isAnimationEnded = true

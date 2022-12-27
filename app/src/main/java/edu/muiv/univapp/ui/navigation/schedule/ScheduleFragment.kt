@@ -18,9 +18,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
-import androidx.annotation.FontRes
+import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
@@ -50,7 +48,7 @@ class ScheduleFragment : Fragment() {
     private lateinit var tvDate                 : TextView
     private lateinit var tvTeacherName          : TextView
     private lateinit var tvRoom                 : TextView
-    private lateinit var btnAttendance          : TextView
+    private lateinit var tvBtnAttendance        : TextView
     private lateinit var etNotes                : EditText
     private lateinit var svScroll               : ScrollView
     private lateinit var llTeacherNotesContainer: LinearLayout
@@ -78,7 +76,7 @@ class ScheduleFragment : Fragment() {
         tvDate = binding.tvDate
         tvTeacherName = binding.tvTeacherName
         tvRoom = binding.tvRoom
-        btnAttendance = binding.btnAttendance
+        tvBtnAttendance = binding.btnAttendance
         etNotes = binding.etNotes
         svScroll = binding.svScroll
         llTeacherNotesContainer = binding.llTeacherNotesContainer
@@ -110,10 +108,10 @@ class ScheduleFragment : Fragment() {
         if (scheduleViewModel.isTeacher) {
             // For teacher
             scheduleViewModel.studentsWillAttend.observe(viewLifecycleOwner) { studentsWillAttend ->
-                btnAttendance.text = studentsWillAttend.size.toString()
+                tvBtnAttendance.text = studentsWillAttend.size.toString()
             }
             // Show student(s) that will attend
-            btnAttendance.setOnClickListener {
+            tvBtnAttendance.setOnClickListener {
                 if (!scheduleViewModel.studentsWillAttend.value.isNullOrEmpty()) {
                     val dialogFragment =
                         AttendanceDialogFragment.newInstance(scheduleViewModel.scheduleID!!)
@@ -125,22 +123,23 @@ class ScheduleFragment : Fragment() {
             scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
                 scheduleViewModel.scheduleAttendance = it
                 val willAttend = it?.willAttend ?: false
-                btnAttendance.text = if (willAttend) {
-                    btnAttendance.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary))
-                    btnAttendance.background = ContextCompat.getDrawable(requireContext(), R.drawable.attendance_button_yes)
+                tvBtnAttendance.text = if (willAttend) {
+                    tvBtnAttendance.textColor(R.color.primary)
+                    tvBtnAttendance.backgroundDrawable(R.drawable.attendance_button_yes)
                     ""
                 } else {
-                    btnAttendance.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-                    btnAttendance.background = ContextCompat.getDrawable(requireContext(), R.drawable.attendance_button_no)
+                    tvBtnAttendance.textColor(android.R.color.white)
+                    tvBtnAttendance.backgroundDrawable(R.drawable.attendance_button_no)
                     "Н"
                 }
             }
-            // Show dialog with choose options
-            btnAttendance.setOnClickListener {
-                val btnAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.attendance_button_animation)
-                it.startAnimation(btnAnimation)
-                showDialog()
-            }
+        }
+
+        // Show dialog with choose options
+        tvBtnAttendance.setOnClickListener { btn ->
+            val btnAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.attendance_button_animation)
+            btn.startAnimation(btnAnimation)
+            showDialog()
         }
 
         // Update notes
@@ -164,6 +163,9 @@ class ScheduleFragment : Fragment() {
         }
 
         etNotes.addTextChangedListener(notesTextWatcher)
+
+        // Wait for animations availability
+        postponeEnterTransition()
     }
 
     override fun onStop() {
@@ -197,6 +199,14 @@ class ScheduleFragment : Fragment() {
         _binding = null
     }
 
+    private fun TextView.textColor(@ColorRes id: Int) {
+        this.setTextColor(ContextCompat.getColor(requireContext(), id))
+    }
+
+    private fun TextView.backgroundDrawable(@DrawableRes id: Int) {
+        this.background = ContextCompat.getDrawable(requireContext(), id)
+    }
+
     private fun TextView.leftDrawable(@DrawableRes id: Int, @DimenRes paddingRes: Int) {
         val drawable = ContextCompat.getDrawable(requireContext(), id)
         val padding = resources.getDimensionPixelSize(paddingRes)
@@ -224,6 +234,9 @@ class ScheduleFragment : Fragment() {
         tvRoom.text = roomField
 
         if (scheduleViewModel.isTeacher) etNotes.setText(schedule.teacherNotes)
+
+        // Allow animations to play
+        startPostponedEnterTransition()
 
         val teacherNotes = schedule.teacherNotes.split("\n")
         for (note in teacherNotes) {
