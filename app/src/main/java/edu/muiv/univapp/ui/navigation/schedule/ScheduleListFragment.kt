@@ -301,7 +301,6 @@ class ScheduleListFragment : Fragment() {
                         "${scheduleForUser.type} | " +
                         "Ауд. ${scheduleForUser.roomNum}"
 
-
                     tvTimeStart.font(R.font.montserrat_medium)
                     tvTimeEnd.font(R.font.montserrat_medium)
                     tvSubjectName.font(R.font.montserrat_semibold)

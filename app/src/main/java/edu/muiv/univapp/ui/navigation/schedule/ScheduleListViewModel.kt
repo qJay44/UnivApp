@@ -91,8 +91,11 @@ class ScheduleListViewModel : ViewModel() {
     fun getWeekDayNameByDate(dateString: String): String {
         val dayIndex = days.indexOf(dateString)
 
-        Log.i("ScheduleListFragmentVM", "dateString: $dateString")
-        Log.i("ScheduleListFragmentVM", "Days: ${days.toList()}")
+        /** FIXME: Resolve case when got unexpected [dateString] */
+        if (dayIndex == -1) {
+            Log.e("ScheduleListFragmentVM", "dateString: $dateString")
+            Log.e("ScheduleListFragmentVM", "Days: ${days.toList()}")
+        }
 
         return ScheduleWeekDays.getDayNameByIndex(dayIndex)
     }
