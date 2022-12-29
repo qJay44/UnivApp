@@ -18,6 +18,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -104,7 +105,6 @@ class ScheduleFragment : Fragment() {
         }
 
         // Update attendance status
-        // TODO: Add date restriction
         if (scheduleViewModel.isTeacher) {
             // For teacher
             scheduleViewModel.studentsWillAttend.observe(viewLifecycleOwner) { studentsWillAttend ->
@@ -133,13 +133,30 @@ class ScheduleFragment : Fragment() {
                     "Н"
                 }
             }
-        }
 
-        // Show dialog with choose options
-        tvBtnAttendance.setOnClickListener { btn ->
-            val btnAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.attendance_button_animation)
-            btn.startAnimation(btnAnimation)
-            showDialog()
+            // Show dialog with choose options
+            tvBtnAttendance.setOnClickListener { btn ->
+                val textTemplate = "Кнопка не доступна"
+                val restrictionText =
+                    when (scheduleViewModel.isAllowedToCheckAttendance) {
+                        "Late" -> "$textTemplate (слишком поздно)"
+                        "Allowed" -> {
+                            val btnAnimation = AnimationUtils.loadAnimation(
+                                requireContext(),
+                                R.anim.attendance_button_animation
+                            )
+                            btn.startAnimation(btnAnimation)
+                            showDialog()
+                            null
+                        }
+                        "Early" -> "$textTemplate (слишком рано)"
+                        else -> throw IllegalStateException("tvBtnAttendance: Got unexpected value")
+                    }
+
+                if (restrictionText != null) {
+                    Toast.makeText(requireContext(), restrictionText, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         // Update notes

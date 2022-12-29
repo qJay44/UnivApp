@@ -22,7 +22,7 @@ import edu.muiv.univapp.utils.UserDataHolder
 class NavigationActivity : AppCompatActivity() {
 
     companion object {
-        private const val TAG = "NavigationActivity"
+        private const val TAG = ".NavigationActivity"
         private const val PREFS_NAME = "USER_INFO"
     }
 
@@ -61,6 +61,9 @@ class NavigationActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment_activity_user) as NavHostFragment
 
         navController = navHostFragment.navController
+
+        // Set selected icon that associate with start destination
+        navView.selectedItemId = R.id.navigation_schedule_list
 
         navView.setOnItemSelectedListener { item ->
             selectFragment(item)

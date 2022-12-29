@@ -12,20 +12,61 @@ import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.model.Subject
 import edu.muiv.univapp.model.Teacher
 import edu.muiv.univapp.utils.UserDataHolder
-import java.util.UUID
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ScheduleViewModel : ViewModel() {
 
+    companion object {
+        // TODO: Change to 15 minutes
+        private const val MIN_TIME_DIFFERENCE = 60
+    }
+
     private val univRepository = UnivRepository.get()
+    private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
+
+    // LiveData variables //
+
     private val scheduleDateLiveData = MutableLiveData<UUID>()
     private val teacherIdLiveData = MutableLiveData<Array<UUID>>()
     private val scheduleToStudentLiveData = MutableLiveData<Map<UUID, UUID>>()
     private val scheduleIdLiveData = MutableLiveData<UUID>()
     private val subjectLiveData = MutableLiveData<UUID>()
+
+    ////////////////////////
+
     var scheduleAttendance: ScheduleAttendance? = null
     var scheduleUserNotes: ScheduleUserNotes? = null
 
     val isTeacher: Boolean by lazy { getUserType() }
+
+    val isAllowedToCheckAttendance: String
+        get() = run {
+            val calendarToday = Calendar.getInstance()
+            val calendarSchedule = Calendar.getInstance().apply {
+                val hourAndMinute = schedule!!.timeStart.split(":")
+
+                time = originalDateFormat.parse(schedule!!.date)!!
+                set(Calendar.HOUR_OF_DAY, hourAndMinute[0].toInt())
+                set(Calendar.MINUTE, hourAndMinute[1].toInt())
+                set(Calendar.SECOND, 0)
+            }
+
+            val currentDateMillis = calendarToday.time.time
+            val scheduleDateMillis = calendarSchedule.time.time
+
+            // From minutes to milliseconds
+            val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000
+
+            // True if current time 15 minutes before the schedule time
+            if (currentDateMillis > scheduleDateMillis) {
+                "Late"
+            } else if (scheduleDateMillis - currentDateMillis <= minTimeDifference) {
+                "Allowed"
+            } else {
+                "Early"
+            }
+        }
 
     var scheduleID: UUID? = null
         set(value) {
@@ -40,6 +81,7 @@ class ScheduleViewModel : ViewModel() {
             loadTeacher(value.teacherID)
             loadSubject(value.subjectID)
         }
+
     // Public LiveData //
 
     val scheduleLiveData: LiveData<Schedule> =
