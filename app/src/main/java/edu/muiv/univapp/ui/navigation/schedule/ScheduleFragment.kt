@@ -134,7 +134,7 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
-            // Show dialog with choose options
+            // Show dialog with choose options if current time respects restrictions
             tvBtnAttendance.setOnClickListener { btn ->
                 val textTemplate = "Кнопка не доступна"
                 val restrictionText =
