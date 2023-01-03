@@ -1,6 +1,9 @@
 package edu.muiv.univapp.api
 
-import com.mobprofs.retrofit.converters.SimpleXmlConverter
+import android.util.Log
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -14,11 +17,32 @@ class ExternalDatabaseFetcher {
 
     init {
         val retrofit = Retrofit.Builder()
-            // TODO: Add base url
-            .baseUrl("base url here")
-            .addConverterFactory(SimpleXmlConverterFactory.)
+            .baseUrl("http://localhost/muiv/hs/PrettyAPI/")
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         externalDatabaseApi = retrofit.create(ExternalDatabaseApi::class.java)
+    }
+
+    fun fetchStudent(login: String, password: String) {
+        val loginResponse = LoginResponse().apply {
+            this.login = login
+            this.password = password
+        }
+
+        val studentRequest = externalDatabaseApi.fetchStudent(loginResponse)
+
+        studentRequest.enqueue(object : Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                val responseBody = response.body()
+                responseBody?.let {
+                    Log.i(TAG, "onResponse: $responseBody")
+                }
+            }
+
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                Log.e(TAG, "onFailure: fail", t)
+            }
+        })
     }
 }

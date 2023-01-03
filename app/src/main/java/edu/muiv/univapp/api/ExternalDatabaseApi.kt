@@ -1,11 +1,11 @@
 package edu.muiv.univapp.api
 
 import retrofit2.Call
-import retrofit2.http.GET
+import retrofit2.http.Body
+import retrofit2.http.POST
 
 interface ExternalDatabaseApi {
 
-    // TODO: Add request
-    @GET("request here")
-    fun fetchStudents(): Call<ExternalDatabaseResponse>
+    @POST("v1/login/")
+    fun fetchStudent(@Body loginResponse: LoginResponse): Call<LoginResponse>
 }
