@@ -1,6 +1,6 @@
 package edu.muiv.univapp.api
 
-class LoginResponse(
+data class LoginResponse(
     var id: String = "",
     var name: String = "",
     var login: String = "",

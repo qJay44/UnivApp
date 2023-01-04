@@ -17,7 +17,7 @@ class ExternalDatabaseFetcher {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://localhost/muiv/hs/PrettyAPI/")
+            .baseUrl("http://localhost:3000/univ/hs/UnivAPI/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -36,7 +36,7 @@ class ExternalDatabaseFetcher {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 val responseBody = response.body()
                 responseBody?.let {
-                    Log.i(TAG, "onResponse: $responseBody")
+                    Log.i(TAG, "onResponse: ${responseBody.id}")
                 }
             }
 
