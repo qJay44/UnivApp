@@ -7,5 +7,5 @@ import retrofit2.http.POST
 interface ExternalDatabaseApi {
 
     @POST("v1/login/")
-    fun fetchStudent(@Body loginResponse: LoginResponse): Call<LoginResponse>
+    fun fetchUser(@Body loginResponse: LoginResponse): Call<LoginResponse>
 }

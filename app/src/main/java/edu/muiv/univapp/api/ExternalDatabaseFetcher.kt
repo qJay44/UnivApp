@@ -24,13 +24,16 @@ class ExternalDatabaseFetcher {
         externalDatabaseApi = retrofit.create(ExternalDatabaseApi::class.java)
     }
 
-    fun fetchStudent(login: String, password: String) {
-        val loginResponse = LoginResponse().apply {
-            this.login = login
-            this.password = password
-        }
+    fun fetchUser(login: String, password: String, isTeacher: Boolean) {
 
-        val studentRequest = externalDatabaseApi.fetchStudent(loginResponse)
+        // POST body
+        val loginResponse = LoginResponse(
+            login = login,
+            password = password,
+            isTeacher = isTeacher
+        )
+
+        val studentRequest = externalDatabaseApi.fetchUser(loginResponse)
 
         studentRequest.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {

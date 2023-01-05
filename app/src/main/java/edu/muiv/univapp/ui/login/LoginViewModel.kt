@@ -48,7 +48,7 @@ class LoginViewModel : ViewModel() {
         login.isTeacher = isTeacher
         userLoginLiveData.value = login
         //
-        ExternalDatabaseFetcher().fetchStudent(login.username, login.password)
+        ExternalDatabaseFetcher().fetchUser(login.username, login.password, isTeacher)
     }
 
     fun addStudent(student: Student) {
