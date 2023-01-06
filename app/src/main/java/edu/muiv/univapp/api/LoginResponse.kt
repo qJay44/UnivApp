@@ -2,8 +2,7 @@ package edu.muiv.univapp.api
 
 data class LoginResponse(
     val id        : String = "",
-    val login     : String = "",
-    val password  : String = "",
+    val token     : String = "",
     val isTeacher : Boolean = false,
     val name      : String = "",
     val surname   : String = "",

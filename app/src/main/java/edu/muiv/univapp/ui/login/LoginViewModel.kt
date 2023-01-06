@@ -19,6 +19,7 @@ class LoginViewModel : ViewModel() {
     private val login = Login()
     private val loginTW = LoginTextWatcher(login)
     private val univRepository = UnivRepository.get()
+    private val univAPI by lazy { ExternalDatabaseFetcher.get() }
     private val userLoginLiveData = MutableLiveData<Login>()
 
     val usernameTW get() = loginTW.usernameTW
@@ -47,8 +48,8 @@ class LoginViewModel : ViewModel() {
     fun loadUser(isTeacher: Boolean) {
         login.isTeacher = isTeacher
         userLoginLiveData.value = login
-        //
-        ExternalDatabaseFetcher().fetchUser(login.username, login.password, isTeacher)
+
+        univAPI.fetchUser(login.username, login.password, isTeacher)
     }
 
     fun addStudent(student: Student) {
