@@ -2,6 +2,8 @@ package edu.muiv.univapp.api
 
 import android.util.Base64
 import android.util.Log
+import edu.muiv.univapp.ui.login.Login
+import edu.muiv.univapp.utils.UserDataHolder
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -27,11 +29,6 @@ class ExternalDatabaseFetcher private constructor() {
         }
     }
 
-//    interface Callbacks {
-//        fun onLoginResponse()
-//        fun onLoginFailure()
-//    }
-
     private val externalDatabaseApi: ExternalDatabaseApi
 
     init {
@@ -43,18 +40,22 @@ class ExternalDatabaseFetcher private constructor() {
         externalDatabaseApi = retrofit.create(ExternalDatabaseApi::class.java)
     }
 
-    private fun createAuthToken(login: String, password: String): String {
+    private fun encodeString(login: String, password: String): String {
         val byteArray = ("$login:$password").toByteArray(Charset.forName("UTF-8"))
 
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    fun fetchUser(login: String, password: String, isTeacher: Boolean) {
+    /**
+     * @param login: object with user input
+     * @param callback: lambda callback receives status code as parameter
+     * */
+    fun fetchUser(login: Login, callback: (Int) -> Unit) {
 
         // POST body
         val loginResponse = LoginResponse(
-            token = createAuthToken(login, password),
-            isTeacher = isTeacher
+            token = encodeString(login.username, login.password),
+            isTeacher = login.isTeacher
         )
 
         val studentRequest = externalDatabaseApi.fetchUser(loginResponse)
@@ -62,11 +63,26 @@ class ExternalDatabaseFetcher private constructor() {
         studentRequest.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 val responseBody = response.body()
-                Log.i(TAG, "onResponse: ${responseBody?.id}")
+                if (responseBody != null) {
+                    if (responseBody.id == "")
+                        // Response is OK but no content
+                        callback.invoke(204)
+                    else {
+                        // Response is OK
+                        callback.invoke(200)
+                        UserDataHolder.initialize(responseBody)
+                    }
+                } else {
+                    // Behave null body the same situation as empty string
+                    callback.invoke(204)
+                    Log.w(TAG, "onResponse: responseBody is null")
+                }
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Log.e(TAG, "onFailure: fail", t)
+                // Unexpected error
+                callback.invoke(500)
             }
         })
     }

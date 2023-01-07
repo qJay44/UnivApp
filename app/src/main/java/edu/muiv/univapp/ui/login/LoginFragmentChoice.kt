@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import edu.muiv.univapp.R
+import edu.muiv.univapp.api.LoginResponse
 import edu.muiv.univapp.ui.navigation.NavigationActivity
 import edu.muiv.univapp.utils.UserDataHolder
 
@@ -109,7 +110,7 @@ class LoginFragmentChoice : Fragment() {
     private fun loadUserPrefs(): Boolean {
         val settings = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return false
         val userInfoAsString = settings.getString("userInfo", null)
-        val userInfo = Gson().fromJson(userInfoAsString, LoginResult::class.java) ?: return false
+        val userInfo = Gson().fromJson(userInfoAsString, LoginResponse::class.java) ?: return false
         UserDataHolder.initialize(userInfo)
 
         return true

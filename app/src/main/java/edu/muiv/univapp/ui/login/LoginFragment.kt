@@ -117,14 +117,23 @@ class LoginFragment : Fragment() {
 
         // Sign-in process //
 
-        loginViewModel.userLiveData.observe(viewLifecycleOwner) { user ->
-            if (user == null) {
-                val msg = "Логин или пароль введены неправильно"
-                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-            } else {
-                loginViewModel.createUserDataHolderInstance(user)
-                val intent = Intent(activity, NavigationActivity::class.java)
-                startActivity(intent)
+        loginViewModel.responseCode.observe(viewLifecycleOwner) { statusCode ->
+            when (statusCode) {
+                // Wrong credentials
+                204 -> {
+                    val msg = "Логин или пароль введены неправильно"
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
+                // Sign-in user
+                200 -> {
+                    val intent = Intent(activity, NavigationActivity::class.java)
+                    startActivity(intent)
+                }
+                // Server failure response
+                500 -> {
+                    val msg = "Произошла неизвестная ошибка, попробуйте снова позже"
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 

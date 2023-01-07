@@ -1,7 +1,9 @@
 package edu.muiv.univapp.utils
 
 import android.util.Log
+import edu.muiv.univapp.api.LoginResponse
 import edu.muiv.univapp.ui.login.LoginResult
+import java.util.*
 
 class UserDataHolder private constructor(val user: LoginResult){
 
@@ -9,8 +11,23 @@ class UserDataHolder private constructor(val user: LoginResult){
         private const val TAG = "UserDataHolder"
         private var INSTANCE: UserDataHolder? = null
 
-        fun initialize(user: LoginResult) {
+        fun initialize(loginResponse: LoginResponse) {
             if (INSTANCE == null) {
+                val user =
+                    with(loginResponse) {
+                        /** Just in case:
+                         * Left side - [LoginResult], right side - [LoginResponse] */
+
+                        LoginResult(
+                            id = UUID.fromString(id),
+                            name = name,
+                            surname = surname,
+                            patronymic = patronymic,
+                            groupName = groupName,
+                            course = course,
+                            semester = semester,
+                        )
+                    }
                 INSTANCE = UserDataHolder(user)
                 Log.i(TAG, user.toString())
             } else {

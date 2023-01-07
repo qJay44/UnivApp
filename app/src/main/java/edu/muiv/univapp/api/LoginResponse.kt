@@ -7,7 +7,7 @@ data class LoginResponse(
     val name      : String = "",
     val surname   : String = "",
     val patronymic: String = "",
-    val groupName : String = "",
-    val course    : String = "",
-    val semester  : String = ""
+    val groupName : String? = "",
+    val course    : String? = "",
+    val semester  : String? = ""
 )
