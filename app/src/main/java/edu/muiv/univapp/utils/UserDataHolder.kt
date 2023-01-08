@@ -10,6 +10,7 @@ class UserDataHolder private constructor(val user: LoginResult){
     companion object {
         private const val TAG = "UserDataHolder"
         private var INSTANCE: UserDataHolder? = null
+        var IS_ONLINE: Boolean = true
 
         fun initialize(loginResponse: LoginResponse) {
             if (INSTANCE == null) {

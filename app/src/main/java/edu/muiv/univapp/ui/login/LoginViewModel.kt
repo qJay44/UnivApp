@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.api.ExternalDatabaseFetcher
+import edu.muiv.univapp.api.LoginResponse
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
@@ -11,6 +12,7 @@ import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.model.Subject
 import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.utils.UserDataHolder
 
 class LoginViewModel : ViewModel() {
 
@@ -44,6 +46,22 @@ class LoginViewModel : ViewModel() {
         univAPI.fetchUser(login) { statusCode ->
             _responseCode.value = statusCode
         }
+    }
+
+    fun loadUserOffline() {
+        val user = LoginResponse(
+            "1de54221-e1c3-4dbc-b90f-8986b1e01342",
+            "",
+            false,
+            "testName",
+            "testSurname",
+            "testPatronymic",
+            "ЭД 23.2/Б1-19",
+            "testCourse",
+            "testSemester"
+        )
+        UserDataHolder.IS_ONLINE = false
+        UserDataHolder.initialize(user)
     }
 
     fun addStudent(student: Student) {

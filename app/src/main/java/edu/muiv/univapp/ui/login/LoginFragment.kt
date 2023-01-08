@@ -7,6 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.Animation.AnimationListener
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -16,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import edu.muiv.univapp.R
 import edu.muiv.univapp.ui.login.utils.DatabaseTestDataBuilder
 import edu.muiv.univapp.ui.navigation.NavigationActivity
+import edu.muiv.univapp.utils.UserDataHolder
 
 class LoginFragment : Fragment() {
 
@@ -42,7 +46,7 @@ class LoginFragment : Fragment() {
     private lateinit var etPassword: EditText
     private lateinit var btnSingIn: Button
     private lateinit var progressBar: ProgressBar
-    private var visibility = View.VISIBLE
+    private lateinit var ibSignInOffline: Button
 
     private val loginViewModel: LoginViewModel by lazy {
         ViewModelProvider(this)[LoginViewModel::class.java]
@@ -108,6 +112,7 @@ class LoginFragment : Fragment() {
         etPassword = view.findViewById(R.id.etPassword)
         btnSingIn = view.findViewById(R.id.btnLogin)
         progressBar = view.findViewById(R.id.pbLoading)
+        ibSignInOffline = view.findViewById(R.id.ibLoginOffline)
 
         return view
     }
@@ -115,35 +120,68 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Sign-in process //
-
-        loginViewModel.responseCode.observe(viewLifecycleOwner) { statusCode ->
-            when (statusCode) {
-                // Wrong credentials
-                204 -> {
-                    val msg = "Логин или пароль введены неправильно"
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                }
-                // Sign-in user
-                200 -> {
-                    val intent = Intent(activity, NavigationActivity::class.java)
-                    startActivity(intent)
-                }
-                // Server failure response
-                500 -> {
-                    val msg = "Произошла неизвестная ошибка, попробуйте снова позже"
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        /////////////////////
-
         etUsername.addTextChangedListener(loginViewModel.usernameTW)
         etPassword.addTextChangedListener(loginViewModel.passwordTW)
 
-        btnSingIn.setOnClickListener {
-            switchVisibility()
+        val pbAnimationFadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+        pbAnimationFadeIn.setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+                progressBar.alpha = 0f
+                progressBar.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                progressBar.alpha = 1f
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {}
+
+        })
+
+        val pbAnimationFadeOut = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+        pbAnimationFadeOut.setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {}
+
+            override fun onAnimationEnd(p0: Animation?) {
+                progressBar.visibility = View.GONE
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {}
+
+        })
+
+        val btnAnimationFadeOut = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+        btnAnimationFadeOut.setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+                progressBar.startAnimation(pbAnimationFadeIn)
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                btnSingIn.visibility = View.INVISIBLE
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {}
+        })
+
+        val btnAnimationFadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+        btnAnimationFadeIn.setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+                btnSingIn.alpha = 0f
+                btnSingIn.visibility = View.VISIBLE
+                progressBar.startAnimation(pbAnimationFadeOut)
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                btnSingIn.alpha = 1f
+                btnSingIn.isEnabled = true
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {}
+        })
+
+        btnSingIn.setOnClickListener { btn ->
+            btn.isEnabled = false
+            btn.startAnimation(btnAnimationFadeOut)
 
             val inputErrorText = loginViewModel.inputValidation()
             Log.i(TAG, "Searching for user...")
@@ -154,9 +192,44 @@ class LoginFragment : Fragment() {
             } else {
                 Toast.makeText(requireContext(), inputErrorText, Toast.LENGTH_SHORT).show()
             }
-
-            switchVisibility()
         }
+
+        ibSignInOffline.setOnClickListener {
+            loginViewModel.loadUserOffline()
+            val intent = Intent(activity, NavigationActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Sign-in process //
+
+        loginViewModel.responseCode.observe(viewLifecycleOwner) { statusCode ->
+            when (statusCode) {
+                // Invalid credentials
+                204 -> {
+                    val msg = "Логин или пароль введены неправильно"
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
+                // Valid credentials, sign-in user
+                200 -> {
+                    UserDataHolder.IS_ONLINE = true
+                    val intent = Intent(activity, NavigationActivity::class.java)
+                    startActivity(intent)
+                }
+                // Server failure response
+                500 -> {
+                    val msg = "Произошла неизвестная ошибка, попробуйте позже"
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
+                // Service is unavailable
+                503 -> {
+                    val msg = "Сервер не доступен, попробуйте позже"
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                }
+            }
+            btnSingIn.startAnimation(btnAnimationFadeIn)
+        }
+
+        /////////////////////
     }
 
     override fun onResume() {
@@ -188,15 +261,5 @@ class LoginFragment : Fragment() {
             putBoolean(PREF_USER_TYPE, isTeacher)
             apply()
         }
-    }
-
-    private fun switchVisibility() {
-        progressBar.visibility = visibility
-
-        visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
-
-        etUsername.visibility = visibility
-        etPassword.visibility = visibility
-        btnSingIn.visibility = visibility
     }
 }

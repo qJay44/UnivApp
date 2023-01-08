@@ -73,8 +73,8 @@ class ExternalDatabaseFetcher private constructor() {
                         UserDataHolder.initialize(responseBody)
                     }
                 } else {
-                    // Behave null body the same situation as empty string
-                    callback.invoke(204)
+                    // Service is unavailable
+                    callback.invoke(503)
                     Log.w(TAG, "onResponse: responseBody is null")
                 }
             }

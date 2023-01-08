@@ -80,7 +80,6 @@ class ScheduleListViewModel : ViewModel() {
         // Subtract extra added day
         calendar.add(Calendar.DAY_OF_MONTH, -1)
 
-
         val firstDay = getSimpleDate(days[0])
         val lastDay = getSimpleDate(days.last())
 
