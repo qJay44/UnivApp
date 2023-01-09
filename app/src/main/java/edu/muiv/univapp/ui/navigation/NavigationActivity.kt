@@ -79,7 +79,8 @@ class NavigationActivity : AppCompatActivity() {
                     return
                 }
                 if (pressedOnce) {
-                    isLoggingOut = true
+                    // Make sure not to clear preferences if user in offline mode
+                    isLoggingOut = UserDataHolder.isOnline
                     UserDataHolder.uninitialize()
                     finish()
                     return
@@ -116,6 +117,7 @@ class NavigationActivity : AppCompatActivity() {
             saveUserPrefs()
     }
 
+    // TODO: Encrypt credentials
     private fun saveUserPrefs() {
         Log.i(TAG, "Saving user info...")
         val settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return
