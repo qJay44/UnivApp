@@ -46,7 +46,7 @@ class LoginFragment : Fragment() {
     private lateinit var etPassword: EditText
     private lateinit var btnSingIn: Button
     private lateinit var progressBar: ProgressBar
-    private lateinit var ibSignInOffline: Button
+    private lateinit var btnSignInOffline: Button
 
     private val loginViewModel: LoginViewModel by lazy {
         ViewModelProvider(this)[LoginViewModel::class.java]
@@ -112,7 +112,7 @@ class LoginFragment : Fragment() {
         etPassword = view.findViewById(R.id.etPassword)
         btnSingIn = view.findViewById(R.id.btnLogin)
         progressBar = view.findViewById(R.id.pbLoading)
-        ibSignInOffline = view.findViewById(R.id.ibLoginOffline)
+        btnSignInOffline = view.findViewById(R.id.btnLoginOffline)
 
         return view
     }
@@ -123,61 +123,21 @@ class LoginFragment : Fragment() {
         etUsername.addTextChangedListener(loginViewModel.usernameTW)
         etPassword.addTextChangedListener(loginViewModel.passwordTW)
 
+        // Progress bar appearing
         val pbAnimationFadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
-        pbAnimationFadeIn.setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(p0: Animation?) {
-                progressBar.alpha = 0f
-                progressBar.visibility = View.VISIBLE
-            }
+        pbAnimationFadeIn.setAnimationListener(ProgressBarAnimationListener(false))
 
-            override fun onAnimationEnd(p0: Animation?) {
-                progressBar.alpha = 1f
-            }
-
-            override fun onAnimationRepeat(p0: Animation?) {}
-
-        })
-
+        // Progress bar disappearing
         val pbAnimationFadeOut = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
-        pbAnimationFadeOut.setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(p0: Animation?) {}
+        pbAnimationFadeOut.setAnimationListener(ProgressBarAnimationListener(true))
 
-            override fun onAnimationEnd(p0: Animation?) {
-                progressBar.visibility = View.GONE
-            }
-
-            override fun onAnimationRepeat(p0: Animation?) {}
-
-        })
-
+        // Button appearing
         val btnAnimationFadeOut = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
-        btnAnimationFadeOut.setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(p0: Animation?) {
-                progressBar.startAnimation(pbAnimationFadeIn)
-            }
+        btnAnimationFadeOut.setAnimationListener(ButtonAnimationListener(true, pbAnimationFadeIn))
 
-            override fun onAnimationEnd(p0: Animation?) {
-                btnSingIn.visibility = View.INVISIBLE
-            }
-
-            override fun onAnimationRepeat(p0: Animation?) {}
-        })
-
+        // Button disappearing
         val btnAnimationFadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
-        btnAnimationFadeIn.setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(p0: Animation?) {
-                btnSingIn.alpha = 0f
-                btnSingIn.visibility = View.VISIBLE
-                progressBar.startAnimation(pbAnimationFadeOut)
-            }
-
-            override fun onAnimationEnd(p0: Animation?) {
-                btnSingIn.alpha = 1f
-                btnSingIn.isEnabled = true
-            }
-
-            override fun onAnimationRepeat(p0: Animation?) {}
-        })
+        btnAnimationFadeIn.setAnimationListener(ButtonAnimationListener(false, pbAnimationFadeOut))
 
         btnSingIn.setOnClickListener { btn ->
             btn.isEnabled = false
@@ -194,7 +154,7 @@ class LoginFragment : Fragment() {
             }
         }
 
-        ibSignInOffline.setOnClickListener {
+        btnSignInOffline.setOnClickListener {
             loginViewModel.loadUserOffline()
             val intent = Intent(activity, NavigationActivity::class.java)
             startActivity(intent)
@@ -227,6 +187,7 @@ class LoginFragment : Fragment() {
                 }
             }
             btnSingIn.startAnimation(btnAnimationFadeIn)
+            btnSingIn.isEnabled = true
         }
 
         /////////////////////
@@ -261,5 +222,53 @@ class LoginFragment : Fragment() {
             putBoolean(PREF_USER_TYPE, isTeacher)
             apply()
         }
+    }
+
+    // Animation for progress bar
+    inner class ProgressBarAnimationListener(private val isFading: Boolean) : AnimationListener {
+        override fun onAnimationStart(p0: Animation?) {
+            if (!isFading) {
+                progressBar.alpha = 0f
+                progressBar.visibility = View.VISIBLE
+            }
+        }
+
+        override fun onAnimationEnd(p0: Animation?) {
+            if (isFading)
+                progressBar.visibility = View.GONE
+            else
+                progressBar.alpha = 1f
+        }
+
+        override fun onAnimationRepeat(p0: Animation?) {}
+    }
+
+    // Animation for sign-in button
+    inner class ButtonAnimationListener(
+        private val isFading: Boolean,
+        private val pbAnimation: Animation
+        ) : AnimationListener {
+
+        override fun onAnimationStart(p0: Animation?) {
+            if (isFading) {
+                // Progress bar fade out
+                progressBar.startAnimation(pbAnimation)
+            } else {
+                btnSingIn.alpha = 0f
+                btnSingIn.visibility = View.VISIBLE
+                // Progress bar fade in
+                progressBar.startAnimation(pbAnimation)
+            }
+        }
+
+        override fun onAnimationEnd(p0: Animation?) {
+            if (isFading) {
+                btnSingIn.visibility = View.INVISIBLE
+            } else {
+                btnSingIn.alpha = 1f
+            }
+        }
+
+        override fun onAnimationRepeat(p0: Animation?) {}
     }
 }
