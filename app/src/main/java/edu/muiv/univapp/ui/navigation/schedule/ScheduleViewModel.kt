@@ -18,8 +18,8 @@ import java.util.*
 class ScheduleViewModel : ViewModel() {
 
     companion object {
-        // TODO: Change to 15 minutes
-        private const val MIN_TIME_DIFFERENCE = 60
+        /** [MIN_TIME_DIFFERENCE] in minutes */
+        private const val MIN_TIME_DIFFERENCE = 15
     }
 
     private val univRepository = UnivRepository.get()
@@ -58,8 +58,10 @@ class ScheduleViewModel : ViewModel() {
             // From minutes to milliseconds
             val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000
 
-            // True if current time 15 minutes before the schedule time
-            if (currentDateMillis > scheduleDateMillis) {
+            // Allow student to use the button only when online and 15 minutes before subject start
+            if (!UserDataHolder.isOnline) {
+                "Offline"
+            } else if (currentDateMillis > scheduleDateMillis) {
                 "Late"
             } else if (scheduleDateMillis - currentDateMillis <= minTimeDifference) {
                 "Allowed"

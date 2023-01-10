@@ -8,4 +8,6 @@ interface ExternalDatabaseApi {
 
     @POST("v1/login/")
     fun fetchUser(@Body loginResponse: LoginResponse): Call<LoginResponse>
+
+    // TODO: Fetch notifications
 }

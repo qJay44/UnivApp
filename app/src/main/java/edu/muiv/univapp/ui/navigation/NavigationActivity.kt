@@ -117,7 +117,6 @@ class NavigationActivity : AppCompatActivity() {
             saveUserPrefs()
     }
 
-    // TODO: Encrypt credentials
     private fun saveUserPrefs() {
         Log.i(TAG, "Saving user info...")
         val settings = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) ?: return

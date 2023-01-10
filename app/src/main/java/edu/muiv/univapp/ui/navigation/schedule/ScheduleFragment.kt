@@ -139,6 +139,7 @@ class ScheduleFragment : Fragment() {
                 val textTemplate = "Кнопка не доступна"
                 val restrictionText =
                     when (scheduleViewModel.isAllowedToCheckAttendance) {
+                        "Offline" -> "$textTemplate (недоступно в оффлайн режиме)"
                         "Late" -> "$textTemplate (слишком поздно)"
                         "Allowed" -> {
                             val btnAnimation = AnimationUtils.loadAnimation(
