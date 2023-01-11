@@ -60,10 +60,17 @@ class NotificationListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        notificationListViewModel.notifications.observe(viewLifecycleOwner) { notifications ->
-            notifications?.let {
-                Log.i(TAG, "Got ${notifications.size} notifications")
+        if (notificationListViewModel.isTeacher) {
+            notificationListViewModel.notificationsForTeacher.observe(viewLifecycleOwner) { notifications ->
+                Log.i(TAG, "Got ${notifications.size} notifications for teacher")
                 updateUI(notifications)
+            }
+        } else {
+            notificationListViewModel.notificationsForStudent.observe(viewLifecycleOwner) { notifications ->
+                notifications?.let {
+                    Log.i(TAG, "Got ${notifications.size} notifications for student")
+                    updateUI(notifications)
+                }
             }
         }
 
@@ -85,7 +92,6 @@ class NotificationListFragment : Fragment() {
                 rvNotifications.viewTreeObserver.removeOnPreDrawListener(this)
 
                 for (view in rvNotifications.children) {
-                    Log.i(TAG, view.id.toString())
                     view.alpha = 0f
                     view.animate().alpha(1f)
                         .setDuration(300)

@@ -5,17 +5,28 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.database.UnivRepository
+import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
 
 class NotificationListViewModel : ViewModel() {
+    private val user by lazy { UserDataHolder.get().user }
     private val repository = UnivRepository.get()
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
-    private val _notifications = MutableLiveData<List<String>>()
+    private val _notificationsForStudent = MutableLiveData<List<String>>()
+    private val _notificationsForTeacher = MutableLiveData<List<String>>()
 
-    val notifications: LiveData<List<Notification>> =
-        Transformations.switchMap(_notifications) { notificationsDays ->
-            repository.getNotifications(notificationsDays)
+    val isTeacher: Boolean
+        get() = user.groupName == null
+
+    val notificationsForStudent: LiveData<List<Notification>> =
+        Transformations.switchMap(_notificationsForStudent) { notificationsDays ->
+            repository.getNotificationsForStudent(notificationsDays, user.groupName!!)
+        }
+
+    val notificationsForTeacher: LiveData<List<Notification>> =
+        Transformations.switchMap(_notificationsForTeacher) { notificationsDays ->
+            repository.getNotificationsForTeacher(notificationsDays)
         }
 
     private fun getMonthDays(calendar: Calendar): List<String> {
@@ -47,6 +58,9 @@ class NotificationListViewModel : ViewModel() {
         val previousMonthDays = getMonthDays(calendar)
         val currentMonthDays = getMonthDays(calendar)
 
-        _notifications.value = previousMonthDays + currentMonthDays
+        if (isTeacher)
+            _notificationsForTeacher.value = previousMonthDays + currentMonthDays
+        else
+            _notificationsForStudent.value = previousMonthDays + currentMonthDays
     }
 }

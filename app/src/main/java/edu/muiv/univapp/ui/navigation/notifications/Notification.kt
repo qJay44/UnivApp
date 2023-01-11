@@ -6,8 +6,10 @@ import java.util.*
 
 @Entity
 data class Notification(
-    @PrimaryKey val id: UUID,
-    var date: String,
-    var title: String,
-    var text: String
+    @PrimaryKey
+    val id          : UUID,
+    var date        : String,
+    var title       : String,
+    var text        : String,
+    var studentGroup: String
 )

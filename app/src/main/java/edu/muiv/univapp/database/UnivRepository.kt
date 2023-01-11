@@ -5,8 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.model.Teacher
-import edu.muiv.univapp.ui.login.Login
-import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
@@ -44,14 +42,6 @@ class UnivRepository private constructor(context: Context){
     private val univDAO = database.univDAO()
     private val executor = Executors.newSingleThreadExecutor()
 
-    fun getUser(login: Login): LiveData<LoginResult> {
-        return if (login.isTeacher) {
-            univDAO.getTeacher(login.username, login.password)
-        } else {
-            univDAO.getStudent(login.username, login.password)
-        }
-    }
-
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>> = univDAO.getTeachersByIDs(IDs)
     fun getScheduleById(id: UUID): LiveData<Schedule> = univDAO.getScheduleById(id)
     fun getScheduleForWeek(groupName: String, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>> = univDAO.getScheduleForWeek(groupName, days)
@@ -60,7 +50,8 @@ class UnivRepository private constructor(context: Context){
     fun getScheduleAttendance(scheduleID: UUID, studentID: UUID): LiveData<ScheduleAttendance?> = univDAO.getScheduleAttendance(scheduleID, studentID)
     fun getWillAttendStudents(scheduleID: UUID): LiveData<List<Student>> = univDAO.getWillAttendStudents(scheduleID)
     fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?> = univDAO.getScheduleUserNotes(scheduleID, studentID)
-    fun getNotifications(days: List<String>): LiveData<List<Notification>> = univDAO.getNotifications(days)
+    fun getNotificationsForStudent(days: List<String>, groupName: String): LiveData<List<Notification>> = univDAO.getNotificationsForStudent(days, groupName)
+    fun getNotificationsForTeacher(days: List<String>): LiveData<List<Notification>> = univDAO.getNotificationsForTeacher(days)
     fun getSubjectsAndTeachers(groupName: String): LiveData<List<SubjectAndTeacher>> = univDAO.getSubjectsAndTeachersByGroupName(groupName)
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>> = univDAO.getProfileAttendance(userID)
 

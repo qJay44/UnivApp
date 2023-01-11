@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.api.LoginResponse
-import edu.muiv.univapp.ui.login.utils.DatabaseTestDataBuilder
 import edu.muiv.univapp.ui.navigation.NavigationActivity
 import edu.muiv.univapp.utils.UserDataHolder
 
@@ -65,43 +64,7 @@ class LoginFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (ADD_TEST_DATA) {
-
-            with (DatabaseTestDataBuilder) {
-                createAll(70)
-
-                for (student in studentList)
-                    loginViewModel.addStudent(student)
-
-                for (teacher in teacherList)
-                    loginViewModel.addTeacher(teacher)
-
-                for (subject1 in subject1List)
-                    loginViewModel.addSubject(subject1)
-
-                for (subject2 in subject2List)
-                    loginViewModel.addSubject(subject2)
-
-                for (schedule in scheduleList)
-                    loginViewModel.addSchedule(schedule)
-
-                for (notification in notificationList)
-                    loginViewModel.addNotification(notification)
-
-                for (profileAttendance in profileAttendanceList)
-                    loginViewModel.addProfileAttendance(profileAttendance)
-
-                Log.w(TAG, "Created new test data:\n" +
-                    "Students: ${studentList.size}\n" +
-                    "Teachers: ${teacherList.size}\n" +
-                    "Subjects: ${subject1List.size + subject2List.size}\n" +
-                    "Schedules: ${scheduleList.size}\n" +
-                    "Notifications: ${notificationList.size}\n" +
-                    "ProfileAttendances: ${profileAttendanceList.size}\n"
-                )
-            }
-        }
+        if (ADD_TEST_DATA) loginViewModel.addAll(70, TAG)
     }
 
     override fun onCreateView(

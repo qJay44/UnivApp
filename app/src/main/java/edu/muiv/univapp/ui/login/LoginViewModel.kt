@@ -1,16 +1,12 @@
 package edu.muiv.univapp.ui.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.api.ExternalDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.ui.navigation.notifications.Notification
-import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
-import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
-import edu.muiv.univapp.model.Student
-import edu.muiv.univapp.model.Subject
-import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.ui.login.utils.DatabaseTestDataBuilder
 
 class LoginViewModel : ViewModel() {
 
@@ -46,27 +42,40 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun addStudent(student: Student) {
-        univRepository.addStudent(student)
-    }
+    fun addAll(amount: Int, tag: String) {
+        with (DatabaseTestDataBuilder) {
+            createAll(amount)
 
-    fun addTeacher(teacher: Teacher) {
-        univRepository.addTeacher(teacher)
-    }
+            for (student in studentList)
+                univRepository.addStudent(student)
 
-    fun addSchedule(schedule: Schedule) {
-        univRepository.addSchedule(schedule)
-    }
+            for (teacher in teacherList)
+                univRepository.addTeacher(teacher)
 
-    fun addNotification(notification: Notification) {
-        univRepository.addNotification(notification)
-    }
+            for (subject1 in subject1List)
+                univRepository.addSubject(subject1)
 
-    fun addProfileAttendance(profileAttendance: ProfileAttendance) {
-        univRepository.addProfileAttendance(profileAttendance)
-    }
+            for (subject2 in subject2List)
+                univRepository.addSubject(subject2)
 
-    fun addSubject(subject: Subject) {
-        univRepository.addSubject(subject)
+            for (schedule in scheduleList)
+                univRepository.addSchedule(schedule)
+
+            for (notification in notificationList)
+                univRepository.addNotification(notification)
+
+            for (profileAttendance in profileAttendanceList)
+                univRepository.addProfileAttendance(profileAttendance)
+
+            Log.w(tag, "Created new test data:\n" +
+                    "Students: ${studentList.size}\n" +
+                    "Teachers: ${teacherList.size}\n" +
+                    "Subjects: ${subject1List.size + subject2List.size}\n" +
+                    "Schedules: ${scheduleList.size}\n" +
+                    "Notifications: ${notificationList.size}\n" +
+                    "ProfileAttendances: ${profileAttendanceList.size}\n"
+            )
+        }
+
     }
 }

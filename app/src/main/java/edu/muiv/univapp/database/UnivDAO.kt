@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.model.Teacher
-import edu.muiv.univapp.ui.login.LoginResult
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
@@ -17,12 +16,6 @@ import java.util.UUID
 
 @Dao
 interface UnivDAO {
-
-    @Query("SELECT * FROM student WHERE login=:username AND password=:password")
-    fun getStudent(username: String, password: String): LiveData<LoginResult>
-
-    @Query("SELECT * FROM teacher WHERE login=:username AND password=:password")
-    fun getTeacher(username: String, password: String): LiveData<LoginResult>
 
     @Query("SELECT * FROM teacher WHERE id IN (:IDs)")
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>>
@@ -71,8 +64,11 @@ interface UnivDAO {
     @Update(entity = Schedule::class)
     fun updateScheduleNotes(schedule: Schedule)
 
+    @Query("SELECT * FROM Notification WHERE date IN (:days) AND studentGroup=:groupName")
+    fun getNotificationsForStudent(days: List<String>, groupName: String): LiveData<List<Notification>>
+
     @Query("SELECT * FROM Notification WHERE date IN (:days)")
-    fun getNotifications(days: List<String>): LiveData<List<Notification>>
+    fun getNotificationsForTeacher(days: List<String>): LiveData<List<Notification>>
 
     @Query(
         "SELECT subjectName, examType, name, surname, patronymic FROM Subject " +

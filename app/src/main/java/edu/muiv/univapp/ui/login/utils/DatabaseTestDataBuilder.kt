@@ -291,14 +291,17 @@ object DatabaseTestDataBuilder {
         calendar.add(Calendar.MONTH, -1)
         var i = 0
         while (calendar.time != currentDay) {
+            val notificationText = randomText()
+            val groupsToUse = if (randInt(0, 1) == 0) groupNames1 else groupNames2
+
             val notification = Notification(
                 UUID.randomUUID(),
                 format.format(calendar.time),
                 "Уведомление №$i",
-                ""
+                notificationText,
+                randArrayElement(groupsToUse)
             )
 
-            notification.text = randomText()
             notificationList += notification
 
             // Next day
