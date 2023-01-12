@@ -67,15 +67,23 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
-    fun updateScheduleNotes(schedule: Schedule) {
-        executor.execute {
-            univDAO.updateScheduleNotes(schedule)
-        }
-    }
 
     fun upsertNotifications(notifications: List<Notification>) {
         executor.execute {
-            univDAO.upsertNotifications(notifications)
+            for (notification in notifications)
+                univDAO.upsertNotifications(notification)
+        }
+    }
+    fun upsertSchedule(scheduleList: List<Schedule>) {
+        executor.execute {
+            for (schedule in scheduleList)
+                univDAO.upsertSchedule(schedule)
+        }
+    }
+
+    fun updateScheduleNotes(schedule: Schedule) {
+        executor.execute {
+            univDAO.updateScheduleNotes(schedule)
         }
     }
 

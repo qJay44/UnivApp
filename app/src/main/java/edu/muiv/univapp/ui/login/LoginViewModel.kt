@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import edu.muiv.univapp.api.ExternalDatabaseFetcher
+import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.login.utils.DatabaseTestDataBuilder
 
@@ -13,7 +13,7 @@ class LoginViewModel : ViewModel() {
     private val login = Login()
     private val loginTW = LoginTextWatcher(login)
     private val univRepository by lazy { UnivRepository.get() }
-    private val univAPI by lazy { ExternalDatabaseFetcher.get() }
+    private val univAPI by lazy { CoreDatabaseFetcher.get() }
 
     private val _responseStatusCode = MutableLiveData<Int>()
 

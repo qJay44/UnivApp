@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
@@ -15,6 +17,7 @@ class ScheduleListViewModel : ViewModel() {
 
     private val user by lazy { UserDataHolder.get().user }
     private val calendar by lazy { Calendar.getInstance() }
+    private val univAPI by lazy { CoreDatabaseFetcher.get() }
     private val univRepository = UnivRepository.get()
 
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
@@ -25,6 +28,7 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val _dayFromTo = MutableLiveData<String>()
+    private val _scheduleFetched = MutableLiveData<Map<Int, List<Schedule>?>>()
 
     ////////////////////////
 
@@ -32,9 +36,6 @@ class ScheduleListViewModel : ViewModel() {
 
     val isTeacher: Boolean
         get() = user.groupName == null
-
-    val dayFromTo: LiveData<String>
-        get() = _dayFromTo
 
     //////////////////////////
 
@@ -49,6 +50,12 @@ class ScheduleListViewModel : ViewModel() {
         Transformations.switchMap(scheduleForStudent) { scheduleGroup ->
             univRepository.getScheduleForWeek(scheduleGroup, days.toList())
         }
+
+    val dayFromTo: LiveData<String>
+        get() = _dayFromTo
+
+    val fetchedSchedule: LiveData<Map<Int, List<Schedule>?>>
+        get() = _scheduleFetched
 
     /////////////////////////////////////
 
@@ -126,5 +133,23 @@ class ScheduleListViewModel : ViewModel() {
         // Add one week
         calendar.add(Calendar.WEEK_OF_MONTH, 1)
         loadDays()
+    }
+
+    fun fetchSchedule() {
+        if (UserDataHolder.isOnline) {
+            if (isTeacher) {
+                univAPI.fetchSchedule(teacherId = user.id) { response ->
+                    _scheduleFetched.value = response
+                }
+            } else {
+                univAPI.fetchSchedule(user.groupName!!) { response ->
+                    _scheduleFetched.value = response
+                }
+            }
+        }
+    }
+
+    fun upsertSchedule(scheduleList: List<Schedule>) {
+        univRepository.upsertSchedule(scheduleList)
     }
 }

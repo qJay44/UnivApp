@@ -46,8 +46,10 @@ class ScheduleListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             scheduleListViewModel.loadCalendar()
+            scheduleListViewModel.fetchSchedule()
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -134,6 +136,32 @@ class ScheduleListFragment : Fragment() {
             scheduleListViewModel.studentSchedule.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
                     updateUI(schedules)
+                }
+            }
+        }
+
+        scheduleListViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
+            // FIXME: This only inserts or updates the rows but do not clear it
+            // (If some rows were deleted in core database)
+
+            /**
+             * Response codes ->
+             * 204: No schedule
+             * 200: Got schedule
+             * 500: Server failure response
+             * 503: Service is unavailable
+             */
+
+            val responseCode = response.keys.first()
+            val scheduleList = response.values.first()
+            val textTemplate = "Fetched notifications: "
+            when (responseCode) {
+                204 -> Log.i(TAG, "$textTemplate Haven't got any schedule ($responseCode)")
+                503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
+                500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
+                200 -> {
+                    Log.i(TAG, "Trying to update database with fetched notifications...")
+                    scheduleListViewModel.upsertSchedule(scheduleList!!)
                 }
             }
         }

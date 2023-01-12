@@ -55,15 +55,6 @@ interface UnivDAO {
     @Query("SELECT * FROM ScheduleUserNotes WHERE scheduleID=:scheduleID AND studentID=:studentID")
     fun getScheduleUserNotes(scheduleID: UUID, studentID: UUID): LiveData<ScheduleUserNotes?>
 
-    @Upsert(entity = ScheduleAttendance::class)
-    fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance)
-
-    @Upsert(entity = ScheduleUserNotes::class)
-    fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes)
-
-    @Update(entity = Schedule::class)
-    fun updateScheduleNotes(schedule: Schedule)
-
     @Query("SELECT * FROM Notification WHERE date IN (:days) AND studentGroup=:groupName")
     fun getNotificationsForStudent(days: List<String>, groupName: String): LiveData<List<Notification>>
 
@@ -79,6 +70,9 @@ interface UnivDAO {
 
     @Query("SELECT * FROM ProfileAttendance WHERE userID=:userID")
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>>
+
+    @Update(entity = Schedule::class)
+    fun updateScheduleNotes(schedule: Schedule)
 
     @Insert
     fun addSchedule(schedule: Schedule)
@@ -98,6 +92,15 @@ interface UnivDAO {
     @Insert
     fun addSubject(subject: Subject)
 
+    @Upsert(entity = ScheduleAttendance::class)
+    fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance)
+
+    @Upsert(entity = ScheduleUserNotes::class)
+    fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes)
+
     @Upsert
-    fun upsertNotifications(notifications: List<Notification>)
+    fun upsertNotifications(notifications: Notification)
+
+    @Upsert
+    fun upsertSchedule(schedule: Schedule)
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import edu.muiv.univapp.api.ExternalDatabaseFetcher
+import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
@@ -12,7 +12,7 @@ import java.util.*
 
 class NotificationListViewModel : ViewModel() {
     private val user by lazy { UserDataHolder.get().user }
-    private val univAPI by lazy { ExternalDatabaseFetcher.get() }
+    private val univAPI by lazy { CoreDatabaseFetcher.get() }
     private val univRepository = UnivRepository.get()
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
     private val _notificationsForStudent = MutableLiveData<List<String>>()

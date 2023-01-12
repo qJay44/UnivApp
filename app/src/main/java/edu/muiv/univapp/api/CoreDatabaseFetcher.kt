@@ -4,6 +4,7 @@ import android.util.Base64
 import android.util.Log
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.utils.UserDataHolder
 import retrofit2.Call
 import retrofit2.Callback
@@ -11,26 +12,27 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.nio.charset.Charset
+import java.util.UUID
 
 
-class ExternalDatabaseFetcher private constructor() {
+class CoreDatabaseFetcher private constructor() {
 
     companion object {
         private const val TAG = "ExternalDatabaseFetcher"
-        private var INSTANCE: ExternalDatabaseFetcher? = null
+        private var INSTANCE: CoreDatabaseFetcher? = null
 
         fun initialize() {
             if (INSTANCE == null) {
-                INSTANCE = ExternalDatabaseFetcher()
+                INSTANCE = CoreDatabaseFetcher()
             }
         }
 
-        fun get(): ExternalDatabaseFetcher {
+        fun get(): CoreDatabaseFetcher {
             return INSTANCE ?: throw IllegalStateException("ExternalDatabaseFetcher must be initialized")
         }
     }
 
-    private val externalDatabaseApi: ExternalDatabaseApi
+    private val coreDatabaseApi: CoreDatabaseApi
 
     init {
         val retrofit = Retrofit.Builder()
@@ -38,7 +40,7 @@ class ExternalDatabaseFetcher private constructor() {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        externalDatabaseApi = retrofit.create(ExternalDatabaseApi::class.java)
+        coreDatabaseApi = retrofit.create(CoreDatabaseApi::class.java)
     }
 
     private fun encodeString(login: String, password: String): String {
@@ -65,9 +67,9 @@ class ExternalDatabaseFetcher private constructor() {
             isTeacher = login.isTeacher
         )
 
-        val studentRequest = externalDatabaseApi.fetchUser(loginResponse)
+        val request = coreDatabaseApi.fetchUser(loginResponse)
 
-        studentRequest.enqueue(object : Callback<LoginResponse> {
+        request.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 val responseBody = response.body()
                 if (responseBody != null) {
@@ -101,8 +103,8 @@ class ExternalDatabaseFetcher private constructor() {
      * 500: Unexpected fail
      */
     fun fetchNotifications(group: String, callback: (Map<Int, List<Notification>?>) -> Unit) {
-        val notificationsRequest = externalDatabaseApi.fetchNotifications(group)
-        notificationsRequest.enqueue(object : Callback<List<Notification>> {
+        val request = coreDatabaseApi.fetchNotifications(group)
+        request.enqueue(object : Callback<List<Notification>> {
             override fun onResponse(
                 call: Call<List<Notification>>,
                 response: Response<List<Notification>>
@@ -116,12 +118,59 @@ class ExternalDatabaseFetcher private constructor() {
                     }
                 } else {
                     callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null")
+                    Log.w(TAG, "onResponse: Notifications fetch: responseBody is null")
                 }
             }
 
             override fun onFailure(call: Call<List<Notification>>, t: Throwable) {
                 Log.e(TAG, "onFailure: Notifications fetch fail", t)
+                callback.invoke(mapOf(500 to null))
+            }
+        })
+    }
+
+    /**
+     * @param group: the group that references in schedule
+     * @param teacherId: the teacher's id that references in schedule
+     * @param callback: lambda callback receives status code and schedule (or null)
+     *
+     * Response codes ->
+     * 204: Response is OK but no content
+     * 200: Response is OK
+     * 503: Service is unavailable
+     * 500: Unexpected fail
+     */
+    fun fetchSchedule(
+        group: String? = null,
+        teacherId: UUID? = null,
+        callback: (Map<Int, List<Schedule>?>) -> Unit
+    ) {
+        val request = if (teacherId == null) {
+            coreDatabaseApi.fetchSchedule(group!!)
+        } else {
+            coreDatabaseApi.fetchSchedule(teacherId)
+        }
+
+        request.enqueue(object : Callback<List<Schedule>> {
+            override fun onResponse(
+                call: Call<List<Schedule>>,
+                response: Response<List<Schedule>>
+            ) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    if (responseBody.isEmpty()) {
+                        callback.invoke(mapOf(204 to null))
+                    } else {
+                        callback.invoke(mapOf(200 to responseBody))
+                    }
+                } else {
+                    callback.invoke(mapOf(503 to null))
+                    Log.w(TAG, "onResponse: Schedule fetch: responseBody is null")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Schedule>>, t: Throwable) {
+                Log.e(TAG, "onFailure: Schedule fetch fail", t)
                 callback.invoke(mapOf(500 to null))
             }
         })

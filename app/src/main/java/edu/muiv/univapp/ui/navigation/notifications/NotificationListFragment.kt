@@ -75,6 +75,9 @@ class NotificationListFragment : Fragment() {
                 }
             }
             notificationListViewModel.fetchedNotifications.observe(viewLifecycleOwner) { response ->
+                // FIXME: This only inserts or updates the rows but do not clear it
+                // (If some rows were deleted in core database)
+
                 /**
                  * Response codes ->
                  * 204: No notifications
