@@ -73,6 +73,12 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
+    fun upsertNotifications(notifications: List<Notification>) {
+        executor.execute {
+            univDAO.upsertNotifications(notifications)
+        }
+    }
+
     fun addSchedule(schedule: Schedule) {
         executor.execute {
             univDAO.addSchedule(schedule)

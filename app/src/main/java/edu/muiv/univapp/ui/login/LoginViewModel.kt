@@ -15,10 +15,10 @@ class LoginViewModel : ViewModel() {
     private val univRepository by lazy { UnivRepository.get() }
     private val univAPI by lazy { ExternalDatabaseFetcher.get() }
 
-    private val _responseCode = MutableLiveData<Int>()
+    private val _responseStatusCode = MutableLiveData<Int>()
 
     val responseCode: LiveData<Int>
-        get() = _responseCode
+        get() = _responseStatusCode
 
     val usernameTW get() = loginTW.usernameTW
     val passwordTW get() = loginTW.passwordTW
@@ -38,7 +38,7 @@ class LoginViewModel : ViewModel() {
         login.isTeacher = isTeacher
 
         univAPI.fetchUser(login) { statusCode ->
-            _responseCode.value = statusCode
+            _responseStatusCode.value = statusCode
         }
     }
 

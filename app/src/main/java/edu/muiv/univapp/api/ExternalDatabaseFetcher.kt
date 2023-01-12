@@ -3,6 +3,7 @@ package edu.muiv.univapp.api
 import android.util.Base64
 import android.util.Log
 import edu.muiv.univapp.ui.login.Login
+import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.utils.UserDataHolder
 import retrofit2.Call
 import retrofit2.Callback
@@ -49,7 +50,13 @@ class ExternalDatabaseFetcher private constructor() {
     /**
      * @param login: object with user input
      * @param callback: lambda callback receives status code as parameter
-     * */
+     *
+     * Response codes ->
+     * 204: Response is OK but no content
+     * 200: Response is OK
+     * 503: Service is unavailable
+     * 500: Unexpected fail
+     */
     fun fetchUser(login: Login, callback: (Int) -> Unit) {
 
         // POST body
@@ -64,25 +71,58 @@ class ExternalDatabaseFetcher private constructor() {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 val responseBody = response.body()
                 if (responseBody != null) {
-                    if (responseBody.id == "")
-                        // Response is OK but no content
+                    if (responseBody.id == "") {
                         callback.invoke(204)
-                    else {
-                        // Response is OK
+                    } else {
                         callback.invoke(200)
                         UserDataHolder.initialize(responseBody)
                     }
                 } else {
-                    // Service is unavailable
                     callback.invoke(503)
                     Log.w(TAG, "onResponse: responseBody is null")
                 }
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Log.e(TAG, "onFailure: fail", t)
-                // Unexpected error
+                Log.e(TAG, "onFailure: User fetch fail", t)
                 callback.invoke(500)
+            }
+        })
+    }
+
+    /**
+     * @param group: the group that references in notification
+     * @param callback: lambda callback receives status code and notifications (or null)
+     *
+     * Response codes ->
+     * 204: Response is OK but no content
+     * 200: Response is OK
+     * 503: Service is unavailable
+     * 500: Unexpected fail
+     */
+    fun fetchNotifications(group: String, callback: (Map<Int, List<Notification>?>) -> Unit) {
+        val notificationsRequest = externalDatabaseApi.fetchNotifications(group)
+        notificationsRequest.enqueue(object : Callback<List<Notification>> {
+            override fun onResponse(
+                call: Call<List<Notification>>,
+                response: Response<List<Notification>>
+            ) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    if (responseBody.isEmpty()) {
+                        callback.invoke(mapOf(204 to null))
+                    } else {
+                        callback.invoke(mapOf(200 to responseBody))
+                    }
+                } else {
+                    callback.invoke(mapOf(503 to null))
+                    Log.w(TAG, "onResponse: responseBody is null")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Notification>>, t: Throwable) {
+                Log.e(TAG, "onFailure: Notifications fetch fail", t)
+                callback.invoke(mapOf(500 to null))
             }
         })
     }

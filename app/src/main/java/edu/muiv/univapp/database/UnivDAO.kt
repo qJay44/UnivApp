@@ -97,4 +97,7 @@ interface UnivDAO {
 
     @Insert
     fun addSubject(subject: Subject)
+
+    @Upsert
+    fun upsertNotifications(notifications: List<Notification>)
 }

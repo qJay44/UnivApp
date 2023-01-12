@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import edu.muiv.univapp.api.ExternalDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
@@ -11,22 +12,27 @@ import java.util.*
 
 class NotificationListViewModel : ViewModel() {
     private val user by lazy { UserDataHolder.get().user }
-    private val repository = UnivRepository.get()
+    private val univAPI by lazy { ExternalDatabaseFetcher.get() }
+    private val univRepository = UnivRepository.get()
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
     private val _notificationsForStudent = MutableLiveData<List<String>>()
     private val _notificationsForTeacher = MutableLiveData<List<String>>()
+    private val _notificationsFetched = MutableLiveData<Map<Int, List<Notification>?>>()
 
     val isTeacher: Boolean
         get() = user.groupName == null
 
+    val fetchedNotifications: LiveData<Map<Int, List<Notification>?>>
+        get() = _notificationsFetched
+
     val notificationsForStudent: LiveData<List<Notification>> =
         Transformations.switchMap(_notificationsForStudent) { notificationsDays ->
-            repository.getNotificationsForStudent(notificationsDays, user.groupName!!)
+            univRepository.getNotificationsForStudent(notificationsDays, user.groupName!!)
         }
 
     val notificationsForTeacher: LiveData<List<Notification>> =
         Transformations.switchMap(_notificationsForTeacher) { notificationsDays ->
-            repository.getNotificationsForTeacher(notificationsDays)
+            univRepository.getNotificationsForTeacher(notificationsDays)
         }
 
     private fun getMonthDays(calendar: Calendar): List<String> {
@@ -62,5 +68,17 @@ class NotificationListViewModel : ViewModel() {
             _notificationsForTeacher.value = previousMonthDays + currentMonthDays
         else
             _notificationsForStudent.value = previousMonthDays + currentMonthDays
+    }
+
+    fun fetchNotifications() {
+        if (UserDataHolder.isOnline) {
+            univAPI.fetchNotifications(user.groupName!!) { response ->
+                _notificationsFetched.value = response
+            }
+        }
+    }
+
+    fun upsertNotifications(notifications: List<Notification>) {
+        univRepository.upsertNotifications(notifications)
     }
 }

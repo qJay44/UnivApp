@@ -37,8 +37,10 @@ class NotificationListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             notificationListViewModel.loadNotifications()
+            notificationListViewModel.fetchNotifications()
+        }
     }
 
     override fun onCreateView(
@@ -70,6 +72,28 @@ class NotificationListFragment : Fragment() {
                 notifications?.let {
                     Log.i(TAG, "Got ${notifications.size} notifications for student")
                     updateUI(notifications)
+                }
+            }
+            notificationListViewModel.fetchedNotifications.observe(viewLifecycleOwner) { response ->
+                /**
+                 * Response codes ->
+                 * 204: No notifications
+                 * 200: Got notifications
+                 * 500: Server failure response
+                 * 503: Service is unavailable
+                 */
+
+                val responseCode = response.keys.first()
+                val notifications = response.values.first()
+                val textTemplate = "Fetched notifications: "
+                when (responseCode) {
+                    204 -> Log.i(TAG, "$textTemplate Haven't got any notifications ($responseCode)")
+                    503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
+                    500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
+                    200 -> {
+                        Log.i(TAG, "Trying to update database with fetched notifications...")
+                        notificationListViewModel.upsertNotifications(notifications!!)
+                    }
                 }
             }
         }
