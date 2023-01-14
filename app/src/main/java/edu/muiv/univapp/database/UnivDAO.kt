@@ -24,7 +24,7 @@ interface UnivDAO {
     fun getScheduleById(id: UUID): LiveData<Schedule>
 
     @Query(
-        "SELECT schedule.id, date, timeStart, timeEnd, roomNum, type, subjectName, groupName, name, surname, patronymic FROM Schedule " +
+        "SELECT schedule.id, date, timeStart, timeEnd, roomNum, type, teacherNotes, subject.id AS subjectID, subjectName, groupName, teacher.id AS teacherID, name, surname, patronymic FROM Schedule " +
         "INNER JOIN Subject ON schedule.subjectID=subject.id " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
         "WHERE subject.groupName=:groupName AND date IN (:days) ORDER BY date"
@@ -32,12 +32,12 @@ interface UnivDAO {
     fun getScheduleForWeek(groupName: String, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
     @Query(
-        "SELECT schedule.id, teacher.id, date, timeStart, timeEnd, roomNum, type, subjectName, groupName, name, surname, patronymic FROM Schedule " +
-        "INNER JOIN Teacher ON schedule.teacherID=:teacherID " +
+        "SELECT schedule.id, teacher.id AS teacherID, date, timeStart, timeEnd, roomNum, type, teacherNotes, subject.id AS subjectID, subjectName, groupName, name, surname, patronymic FROM Schedule " +
+        "INNER JOIN Teacher ON schedule.teacherID=:teacherIdParam " +
         "INNER JOIN Subject ON teacher.id=subject.teacherID " +
-        "WHERE schedule.teacherID=:teacherID AND subject.teacherID=:teacherID AND date IN (:days) ORDER BY date"
+        "WHERE schedule.teacherID=:teacherIdParam AND subject.teacherID=:teacherIdParam AND date IN (:days) ORDER BY date"
     )
-    fun getScheduleForWeek(teacherID: UUID, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
+    fun getScheduleForWeek(teacherIdParam: UUID, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
     @Query("SELECT * FROM Subject WHERE id=:id")
     fun getSubjectById(id: UUID): LiveData<Subject>
@@ -70,6 +70,9 @@ interface UnivDAO {
 
     @Query("SELECT * FROM ProfileAttendance WHERE userID=:userID")
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>>
+
+    @Query("DELETE FROM Schedule WHERE id IN (:idList)")
+    fun deleteScheduleById(idList: List<UUID>)
 
     @Update(entity = Schedule::class)
     fun updateScheduleNotes(schedule: Schedule)

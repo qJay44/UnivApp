@@ -4,7 +4,7 @@ import android.util.Base64
 import android.util.Log
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
-import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import retrofit2.Call
 import retrofit2.Callback
@@ -93,8 +93,8 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     /**
-     * @param group: the group that references in notification
-     * @param callback: lambda callback receives status code and notifications (or null)
+     * @param group: the group that references in notification.
+     * @param callback: lambda callback receives status code and notifications (or null).
      *
      * Response codes ->
      * 204: Response is OK but no content
@@ -130,9 +130,9 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     /**
-     * @param group: the group that references in schedule
-     * @param teacherId: the teacher's id that references in schedule
-     * @param callback: lambda callback receives status code and schedule (or null)
+     * @param group: the group that references in schedule.
+     * @param teacherId: the teacher's id that references in schedule.
+     * @param callback: lambda callback receives status code and schedule (or null).
      *
      * Response codes ->
      * 204: Response is OK but no content
@@ -143,7 +143,7 @@ class CoreDatabaseFetcher private constructor() {
     fun fetchSchedule(
         group: String? = null,
         teacherId: UUID? = null,
-        callback: (Map<Int, List<Schedule>?>) -> Unit
+        callback: (Map<Int, List<ScheduleWithSubjectAndTeacher>?>) -> Unit
     ) {
         val request = if (teacherId == null) {
             coreDatabaseApi.fetchSchedule(group!!)
@@ -151,10 +151,10 @@ class CoreDatabaseFetcher private constructor() {
             coreDatabaseApi.fetchSchedule(teacherId)
         }
 
-        request.enqueue(object : Callback<List<Schedule>> {
+        request.enqueue(object : Callback<List<ScheduleWithSubjectAndTeacher>> {
             override fun onResponse(
-                call: Call<List<Schedule>>,
-                response: Response<List<Schedule>>
+                call: Call<List<ScheduleWithSubjectAndTeacher>>,
+                response: Response<List<ScheduleWithSubjectAndTeacher>>
             ) {
                 val responseBody = response.body()
                 if (responseBody != null) {
@@ -169,7 +169,7 @@ class CoreDatabaseFetcher private constructor() {
                 }
             }
 
-            override fun onFailure(call: Call<List<Schedule>>, t: Throwable) {
+            override fun onFailure(call: Call<List<ScheduleWithSubjectAndTeacher>>, t: Throwable) {
                 Log.e(TAG, "onFailure: Schedule fetch fail", t)
                 callback.invoke(mapOf(500 to null))
             }

@@ -55,6 +55,12 @@ class UnivRepository private constructor(context: Context){
     fun getSubjectsAndTeachers(groupName: String): LiveData<List<SubjectAndTeacher>> = univDAO.getSubjectsAndTeachersByGroupName(groupName)
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>> = univDAO.getProfileAttendance(userID)
 
+    fun deleteScheduleById(idList: List<UUID>) {
+        executor.execute {
+            univDAO.deleteScheduleById(idList)
+        }
+    }
+
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
             univDAO.upsertScheduleAttendance(scheduleAttendance)
@@ -74,10 +80,24 @@ class UnivRepository private constructor(context: Context){
                 univDAO.upsertNotifications(notification)
         }
     }
-    fun upsertSchedule(scheduleList: List<Schedule>) {
+    fun upsertSchedule(scheduleList: List<ScheduleWithSubjectAndTeacher>) {
         executor.execute {
-            for (schedule in scheduleList)
-                univDAO.upsertSchedule(schedule)
+            for (schedule in scheduleList) {
+                with(schedule) {
+                    val sch = Schedule(
+                        id,
+                        date,
+                        timeStart,
+                        timeEnd,
+                        roomNum,
+                        type,
+                        teacherNotes,
+                        subjectID,
+                        teacherID
+                    )
+                    univDAO.upsertSchedule(sch)
+                }
+            }
         }
     }
 

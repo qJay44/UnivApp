@@ -1,15 +1,12 @@
 package edu.muiv.univapp.ui.navigation.schedule
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
-import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,7 +25,11 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val _dayFromTo = MutableLiveData<String>()
-    private val _scheduleFetched = MutableLiveData<Map<Int, List<Schedule>?>>()
+    private val _scheduleFetched = MutableLiveData<Map<Int, List<ScheduleWithSubjectAndTeacher>?>>()
+
+    private var scheduleIdListNew: MutableList<UUID>? = null
+    private var scheduleIdListOld: MutableList<UUID>? = null
+    private var scheduleIdListToDelete: MutableList<UUID>? = null
 
     ////////////////////////
 
@@ -54,7 +55,7 @@ class ScheduleListViewModel : ViewModel() {
     val dayFromTo: LiveData<String>
         get() = _dayFromTo
 
-    val fetchedSchedule: LiveData<Map<Int, List<Schedule>?>>
+    val fetchedSchedule: LiveData<Map<Int, List<ScheduleWithSubjectAndTeacher>?>>
         get() = _scheduleFetched
 
     /////////////////////////////////////
@@ -92,6 +93,43 @@ class ScheduleListViewModel : ViewModel() {
 
         _dayFromTo.value = "$firstDay - $lastDay"
         loadSchedule()
+    }
+
+    private fun deleteScheduleById(idList: List<UUID>) {
+        univRepository.deleteScheduleById(idList)
+    }
+
+    private fun updateDatabase() {
+        scheduleIdListToDelete = mutableListOf()
+        for (oldId in scheduleIdListOld!!) {
+            if (oldId !in scheduleIdListNew!!) {
+                scheduleIdListToDelete!!.add(oldId)
+            }
+        }
+        deleteScheduleById(scheduleIdListToDelete!!)
+
+        scheduleIdListNew = null
+        scheduleIdListOld = null
+        scheduleIdListToDelete = null
+    }
+
+    fun createScheduleIdList(scheduleList: List<ScheduleWithSubjectAndTeacher>, type: Int) {
+        viewModelScope.launch {
+            when (type) {
+                // The list from API call
+                ScheduleListTypes.NEW.type -> {
+                    scheduleIdListNew = mutableListOf()
+                    scheduleList.forEach { scheduleIdListNew!!.add(it.id) }
+                    if (!scheduleIdListOld.isNullOrEmpty()) updateDatabase()
+                }
+                // The list from the app database
+                ScheduleListTypes.OLD.type -> {
+                    scheduleIdListOld = mutableListOf()
+                    scheduleList.forEach { scheduleIdListOld!!.add(it.id) }
+                    if (!scheduleIdListNew.isNullOrEmpty()) updateDatabase()
+                }
+            }
+        }
     }
 
     fun getWeekDayNameByDate(dateString: String): String {
@@ -149,7 +187,7 @@ class ScheduleListViewModel : ViewModel() {
         }
     }
 
-    fun upsertSchedule(scheduleList: List<Schedule>) {
+    fun upsertSchedule(scheduleList: List<ScheduleWithSubjectAndTeacher>) {
         univRepository.upsertSchedule(scheduleList)
     }
 }

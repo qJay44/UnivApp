@@ -1,7 +1,7 @@
 package edu.muiv.univapp.api
 
 import edu.muiv.univapp.ui.navigation.notifications.Notification
-import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -18,8 +18,8 @@ interface CoreDatabaseApi {
     fun fetchNotifications(@Query("group") group: String): Call<List<Notification>>
 
     @GET("v1/schedule/")
-    fun fetchSchedule(@Query("group") group: String): Call<List<Schedule>>
+    fun fetchSchedule(@Query("group") group: String): Call<List<ScheduleWithSubjectAndTeacher>>
 
     @GET("v1/schedule/")
-    fun fetchSchedule(@Query("teacherId") teacherId: UUID): Call<List<Schedule>>
+    fun fetchSchedule(@Query("teacherId") teacherId: UUID): Call<List<ScheduleWithSubjectAndTeacher>>
 }

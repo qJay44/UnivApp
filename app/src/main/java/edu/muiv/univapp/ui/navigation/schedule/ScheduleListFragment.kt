@@ -21,6 +21,7 @@ import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeach
 import edu.muiv.univapp.ui.navigation.schedule.utils.AsyncCell
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
 import edu.muiv.univapp.ui.navigation.schedule.utils.WeekChangeAnimationListener
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -141,8 +142,6 @@ class ScheduleListFragment : Fragment() {
         }
 
         scheduleListViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
-            // FIXME: This only inserts or updates the rows but do not clear it
-            // (If some rows were deleted in core database)
 
             /**
              * Response codes ->
@@ -161,7 +160,11 @@ class ScheduleListFragment : Fragment() {
                 500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
                 200 -> {
                     Log.i(TAG, "Trying to update database with fetched notifications...")
+
                     scheduleListViewModel.upsertSchedule(scheduleList!!)
+                    scheduleListViewModel.createScheduleIdList(
+                        scheduleList, ScheduleListTypes.NEW.type
+                    )
                 }
             }
         }
@@ -178,6 +181,10 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
         Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
+
+        scheduleListViewModel.createScheduleIdList(
+            scheduleForUserList, ScheduleListTypes.OLD.type
+        )
 
         // Without this sorting 01.01 (2023) will be earlier than 10.12 (2022)
         val sortedScheduleList = scheduleForUserList.sortedBy {
