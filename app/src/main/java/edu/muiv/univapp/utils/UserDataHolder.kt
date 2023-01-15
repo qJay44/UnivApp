@@ -13,7 +13,10 @@ class UserDataHolder private constructor(val user: LoginResult){
         val isOnline: Boolean
             get() = run {
                 val command = "ping -c 1 localhost:3000"
-                Runtime.getRuntime().exec(command).waitFor() == 0
+                val latency = Runtime.getRuntime().exec(command).waitFor()
+                Log.i(TAG, "Server latency: $latency ms")
+
+                latency <= 100
             }
 
         fun initialize(loginResponse: LoginResponse) {

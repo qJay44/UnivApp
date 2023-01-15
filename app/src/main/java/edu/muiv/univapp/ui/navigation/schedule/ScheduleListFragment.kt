@@ -105,7 +105,7 @@ class ScheduleListFragment : Fragment() {
 
                 val schedule = adapter!!.getScheduleByPosition(position)
                 val action = ScheduleListFragmentDirections
-                    .actionNavigationScheduleListToNavigationSchedule(schedule.id.toString())
+                    .actionNavigationScheduleListToNavigationSchedule(schedule.id)
                 view.findNavController().navigate(action)
                 Log.i(TAG, "Selected schedule (date: ${schedule.date})")
 

@@ -27,9 +27,9 @@ class ScheduleListViewModel : ViewModel() {
     private val _dayFromTo = MutableLiveData<String>()
     private val _scheduleFetched = MutableLiveData<Map<Int, List<ScheduleWithSubjectAndTeacher>?>>()
 
-    private var scheduleIdListNew: MutableList<UUID>? = null
-    private var scheduleIdListOld: MutableList<UUID>? = null
-    private var scheduleIdListToDelete: MutableList<UUID>? = null
+    private var scheduleIdListNew: MutableList<String>? = null
+    private var scheduleIdListOld: MutableList<String>? = null
+    private var scheduleIdListToDelete: MutableList<String>? = null
 
     ////////////////////////
 
@@ -95,7 +95,7 @@ class ScheduleListViewModel : ViewModel() {
         loadSchedule()
     }
 
-    private fun deleteScheduleById(idList: List<UUID>) {
+    private fun deleteScheduleById(idList: List<String>) {
         univRepository.deleteScheduleById(idList)
     }
 
@@ -174,6 +174,7 @@ class ScheduleListViewModel : ViewModel() {
     }
 
     fun fetchSchedule() {
+        // TODO: Check app database
         if (UserDataHolder.isOnline) {
             if (isTeacher) {
                 univAPI.fetchSchedule(teacherId = user.id) { response ->

@@ -72,7 +72,7 @@ interface UnivDAO {
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>>
 
     @Query("DELETE FROM Schedule WHERE id IN (:idList)")
-    fun deleteScheduleById(idList: List<UUID>)
+    fun deleteScheduleById(idList: List<String>)
 
     @Update(entity = Schedule::class)
     fun updateScheduleNotes(schedule: Schedule)

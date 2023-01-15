@@ -18,7 +18,7 @@ import java.util.UUID
 class CoreDatabaseFetcher private constructor() {
 
     companion object {
-        private const val TAG = "ExternalDatabaseFetcher"
+        private const val TAG = "CoreDatabaseFetcher"
         private var INSTANCE: CoreDatabaseFetcher? = null
 
         fun initialize() {
@@ -28,7 +28,7 @@ class CoreDatabaseFetcher private constructor() {
         }
 
         fun get(): CoreDatabaseFetcher {
-            return INSTANCE ?: throw IllegalStateException("ExternalDatabaseFetcher must be initialized")
+            return INSTANCE ?: throw IllegalStateException("CoreDatabaseFetcher must be initialized")
         }
     }
 
@@ -75,13 +75,15 @@ class CoreDatabaseFetcher private constructor() {
                 if (responseBody != null) {
                     if (responseBody.id == "") {
                         callback.invoke(204)
+                        Log.i(TAG, "onResponse: response has no content (fetchUser)")
                     } else {
                         callback.invoke(200)
                         UserDataHolder.initialize(responseBody)
+                        Log.i(TAG, "onResponse: OK (fetchUser)")
                     }
                 } else {
                     callback.invoke(503)
-                    Log.w(TAG, "onResponse: responseBody is null")
+                    Log.w(TAG, "onResponse: responseBody is null (fetchUser)")
                 }
             }
 
@@ -113,12 +115,14 @@ class CoreDatabaseFetcher private constructor() {
                 if (responseBody != null) {
                     if (responseBody.isEmpty()) {
                         callback.invoke(mapOf(204 to null))
+                        Log.i(TAG, "onResponse: response has no content (fetchNotifications)")
                     } else {
                         callback.invoke(mapOf(200 to responseBody))
+                        Log.i(TAG, "onResponse: OK (fetchNotifications)")
                     }
                 } else {
                     callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: Notifications fetch: responseBody is null")
+                    Log.w(TAG, "onResponse: responseBody is null (fetchNotifications)")
                 }
             }
 
@@ -160,12 +164,14 @@ class CoreDatabaseFetcher private constructor() {
                 if (responseBody != null) {
                     if (responseBody.isEmpty()) {
                         callback.invoke(mapOf(204 to null))
+                        Log.i(TAG, "onResponse: response has no content (fetchSchedule)")
                     } else {
                         callback.invoke(mapOf(200 to responseBody))
+                        Log.i(TAG, "onResponse: OK (fetchSchedule)")
                     }
                 } else {
                     callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: Schedule fetch: responseBody is null")
+                    Log.w(TAG, "onResponse: responseBody is null (fetchSchedule)")
                 }
             }
 
