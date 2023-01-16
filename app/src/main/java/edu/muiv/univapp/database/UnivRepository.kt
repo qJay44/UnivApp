@@ -79,10 +79,21 @@ class UnivRepository private constructor(context: Context){
                 univDAO.upsertNotifications(notification)
         }
     }
+
     fun upsertSchedule(scheduleList: List<ScheduleWithSubjectAndTeacher>) {
         executor.execute {
-            for (schedule in scheduleList) {
-                with(schedule) {
+            for (scheduleWithSubjectAndTeacher in scheduleList) {
+                with(scheduleWithSubjectAndTeacher) {
+                    val tch = Teacher(
+                        UUID.fromString(teacherID),
+                        teacherName,
+                        teacherSurname,
+                        teacherPatronymic,
+                        "",
+                        ""
+                    )
+                    univDAO.upsertTeacher(tch)
+
                     val sch = Schedule(
                         UUID.fromString(id),
                         date,

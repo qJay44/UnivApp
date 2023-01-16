@@ -50,8 +50,8 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     /**
-     * @param login: object with user input
-     * @param callback: lambda callback receives status code as parameter
+     * @param login: object with user input.
+     * @param callback: lambda callback receives status code as parameter.
      *
      * Response codes ->
      * 204: Response is OK but no content

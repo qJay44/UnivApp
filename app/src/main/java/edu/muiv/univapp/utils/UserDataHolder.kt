@@ -10,7 +10,7 @@ class UserDataHolder private constructor(val user: LoginResult){
     companion object {
         private const val TAG = "UserDataHolder"
         private var INSTANCE: UserDataHolder? = null
-        val isOnline: Boolean
+        val isServerOnline: Boolean
             get() = run {
                 val command = "ping -c 1 localhost:3000"
                 val latency = Runtime.getRuntime().exec(command).waitFor()

@@ -59,7 +59,7 @@ class ScheduleViewModel : ViewModel() {
             val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000
 
             // Allow student to use the button only when online and 15 minutes before subject start
-            if (!UserDataHolder.isOnline) {
+            if (!UserDataHolder.isServerOnline) {
                 "Offline"
             } else if (currentDateMillis > scheduleDateMillis) {
                 "Late"

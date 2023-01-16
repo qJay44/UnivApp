@@ -80,7 +80,7 @@ class NavigationActivity : AppCompatActivity() {
                 }
                 if (pressedOnce) {
                     // Make sure not to clear preferences if user in offline mode
-                    isLoggingOut = UserDataHolder.isOnline
+                    isLoggingOut = UserDataHolder.isServerOnline
                     UserDataHolder.uninitialize()
                     finish()
                     return

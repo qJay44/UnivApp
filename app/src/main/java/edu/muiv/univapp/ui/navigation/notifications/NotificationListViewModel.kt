@@ -71,7 +71,7 @@ class NotificationListViewModel : ViewModel() {
     }
 
     fun fetchNotifications() {
-        if (UserDataHolder.isOnline) {
+        if (UserDataHolder.isServerOnline) {
             univAPI.fetchNotifications(user.groupName!!) { response ->
                 _notificationsFetched.value = response
             }

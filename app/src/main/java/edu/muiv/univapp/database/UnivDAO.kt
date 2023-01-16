@@ -106,4 +106,7 @@ interface UnivDAO {
 
     @Upsert
     fun upsertSchedule(schedule: Schedule)
+
+    @Upsert
+    fun upsertTeacher(teacher: Teacher)
 }
