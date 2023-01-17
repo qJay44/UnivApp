@@ -110,7 +110,7 @@ class ScheduleListViewModel : ViewModel() {
         }
         deleteScheduleById()
 
-        // Nullify lists since they will be not need anymore
+        // Nullify lists to free some memory
         scheduleIdListNew = null
         scheduleIdListOld = null
         scheduleIdListToDelete = null

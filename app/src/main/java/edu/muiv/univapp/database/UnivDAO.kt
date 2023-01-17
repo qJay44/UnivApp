@@ -62,7 +62,7 @@ interface UnivDAO {
     fun getNotificationsForTeacher(days: List<String>): LiveData<List<Notification>>
 
     @Query(
-        "SELECT subjectName, examType, name, surname, patronymic FROM Subject " +
+        "SELECT Subject.* , name, surname, patronymic FROM Subject " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
         "WHERE groupName=:groupName"
     )
@@ -76,6 +76,9 @@ interface UnivDAO {
 
     @Query("DELETE FROM Notification WHERE id IN (:idList)")
     fun deleteNotificationsById(idList: List<String>)
+
+    @Query("DELETE FROM Subject WHERE id IN (:idList)")
+    fun deleteSubjectsById(idList: List<String>)
 
     @Update(entity = Schedule::class)
     fun updateScheduleNotes(schedule: Schedule)
@@ -112,4 +115,7 @@ interface UnivDAO {
 
     @Upsert
     fun upsertTeacher(teacher: Teacher)
+
+    @Upsert
+    fun upsertSubject(subject: Subject)
 }

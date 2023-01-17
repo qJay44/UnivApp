@@ -1,23 +1,29 @@
 package edu.muiv.univapp.ui.navigation.profile
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
+import edu.muiv.univapp.utils.FetchedListType
 import edu.muiv.univapp.utils.UserDataHolder
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ProfileViewModel : ViewModel() {
-    private val repository = UnivRepository.get()
+    private val univRepository = UnivRepository.get()
     private val user = UserDataHolder.get().user
+    private val univApi by lazy { CoreDatabaseFetcher.get() }
 
     // LiveData variables //
 
-    private val _subjects = MutableLiveData<String>()
+    private val groupName = MutableLiveData<String>()
     private val _profileAttendance = MutableLiveData<UUID>()
+    private val _subjectsFetched = MutableLiveData<Map<Int, List<SubjectAndTeacher>?>>()
 
     ////////////////////////
+
+    private var subjectsIdsNew: MutableList<String>? = null
+    private var subjectsIdsOld: MutableList<String>? = null
+    private var subjectsIdsToDelete: MutableList<String>? = null
 
     private var scheduleAllSize = 0
     private var visitAmount = 0
@@ -38,19 +44,72 @@ class ProfileViewModel : ViewModel() {
 
     val profileAttendance: LiveData<List<ProfileAttendance>> =
         Transformations.switchMap(_profileAttendance) { userID ->
-            repository.getProfileAttendance(userID)
+            univRepository.getProfileAttendance(userID)
         }
 
     val subjectAndTeacherList: LiveData<List<SubjectAndTeacher>> =
-        Transformations.switchMap(_subjects) { groupName ->
-            repository.getSubjectsAndTeachers(groupName)
+        Transformations.switchMap(groupName) { groupName ->
+            univRepository.getSubjectsAndTeachers(groupName)
         }
+
+    val fetchedSubjects: LiveData<Map<Int, List<SubjectAndTeacher>?>>
+        get() = _subjectsFetched
 
     /////////////////////////////////////
 
+    private fun deleteSubjectsById() {
+        univRepository.deleteSubjectsById(subjectsIdsToDelete!!)
+    }
+
+    private fun findIdsToDelete() {
+        // To find deleted ids just compare old ones with new
+        subjectsIdsToDelete = mutableListOf()
+        for (oldId in subjectsIdsOld!!) {
+            if (oldId !in subjectsIdsNew!!) {
+                subjectsIdsToDelete!!.add(oldId)
+            }
+        }
+        deleteSubjectsById()
+
+
+        // Nullify lists to free some memory
+        subjectsIdsNew = null
+        subjectsIdsOld = null
+        subjectsIdsToDelete = null
+    }
+
+    fun createSubjectsIdsList(subjectAndTeacherList: List<SubjectAndTeacher>, type: Int) {
+        viewModelScope.launch {
+            when (type) {
+                // The list from API call
+                FetchedListType.NEW.type -> {
+                    subjectsIdsNew = mutableListOf()
+                    subjectAndTeacherList.forEach { subjectsIdsNew!!.add(it.subjectID) }
+                    if (!subjectsIdsOld.isNullOrEmpty()) findIdsToDelete()
+                }
+                // The list from the app database
+                FetchedListType.OLD.type -> {
+                    subjectsIdsOld = mutableListOf()
+                    subjectAndTeacherList.forEach { subjectsIdsOld!!.add(it.subjectID) }
+                    if (!subjectsIdsNew.isNullOrEmpty()) findIdsToDelete()
+                }
+            }
+        }
+    }
+
     fun loadSubjects() {
         user.groupName?.let {
-            _subjects.value = it
+            groupName.value = it
+        }
+    }
+
+    fun fetchProfileSubjects() {
+        if (UserDataHolder.isServerOnline) {
+            user.groupName?.let {
+                univApi.fetchProfileSubjects(it) { response ->
+                    _subjectsFetched.value = response
+                }
+            }
         }
     }
 
@@ -68,5 +127,9 @@ class ProfileViewModel : ViewModel() {
 
     fun resetVisitAmount() {
         visitAmount = 0
+    }
+
+    fun upsertSubject(subjectAndTeacherList: List<SubjectAndTeacher>) {
+        univRepository.upsertSubject(subjectAndTeacherList)
     }
 }

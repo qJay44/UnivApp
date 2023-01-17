@@ -4,6 +4,7 @@ import android.util.Base64
 import android.util.Log
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
+import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import retrofit2.Call
@@ -177,6 +178,45 @@ class CoreDatabaseFetcher private constructor() {
 
             override fun onFailure(call: Call<List<ScheduleWithSubjectAndTeacher>>, t: Throwable) {
                 Log.e(TAG, "onFailure: Schedule fetch fail", t)
+                callback.invoke(mapOf(500 to null))
+            }
+        })
+    }
+
+    /**
+     * @param group: the group that references in subject.
+     * @param callback: lambda callback receives status code and [SubjectAndTeacher] (or null).
+     *
+     * Response codes ->
+     * 204: Response is OK but no content
+     * 200: Response is OK
+     * 503: Service is unavailable
+     * 500: Unexpected fail
+     */
+    fun fetchProfileSubjects(group: String, callback: (Map<Int, List<SubjectAndTeacher>?>) -> Unit) {
+        val request = coreDatabaseApi.fetchProfileSubjects(group)
+        request.enqueue(object : Callback<List<SubjectAndTeacher>> {
+            override fun onResponse(
+                call: Call<List<SubjectAndTeacher>>,
+                response: Response<List<SubjectAndTeacher>>
+            ) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    if (responseBody.isEmpty()) {
+                        callback.invoke(mapOf(204 to null))
+                        Log.i(TAG, "onResponse: response has no content (fetchProfileSubjects)")
+                    } else {
+                        callback.invoke(mapOf(200 to responseBody))
+                        Log.i(TAG, "onResponse: OK (fetchProfileSubjects)")
+                    }
+                } else {
+                    callback.invoke(mapOf(503 to null))
+                    Log.w(TAG, "onResponse: responseBody is null (fetchProfileSubjects)")
+                }
+            }
+
+            override fun onFailure(call: Call<List<SubjectAndTeacher>>, t: Throwable) {
+                Log.e(TAG, "onFailure: ProfileSubjects fetch fail", t)
                 callback.invoke(mapOf(500 to null))
             }
         })

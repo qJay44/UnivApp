@@ -67,6 +67,12 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
+    fun deleteSubjectsById(idList: List<String>) {
+        executor.execute {
+            univDAO.deleteSubjectsById(idList)
+        }
+    }
+
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
             univDAO.upsertScheduleAttendance(scheduleAttendance)
@@ -120,6 +126,24 @@ class UnivRepository private constructor(context: Context){
     fun updateScheduleNotes(schedule: Schedule) {
         executor.execute {
             univDAO.updateScheduleNotes(schedule)
+        }
+    }
+
+    fun upsertSubject(subjectAndTeacherList: List<SubjectAndTeacher>) {
+        executor.execute {
+            for (st in subjectAndTeacherList) {
+                with(st) {
+                    val subject = Subject(
+                        subjectID,
+                        subjectName,
+                        subjectGroupName,
+                        teacherID,
+                        subjectExamType
+                    )
+
+                    univDAO.upsertSubject(subject)
+                }
+            }
         }
     }
 

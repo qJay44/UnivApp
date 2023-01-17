@@ -2,13 +2,12 @@ package edu.muiv.univapp.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.UUID
 
 @Entity
 data class Subject(
-    @PrimaryKey val id: UUID,
+    @PrimaryKey val id: String,
     val subjectName: String,
     val groupName: String,
-    val teacherID: UUID,
+    val teacherID: String,
     val examType: String
 )

@@ -65,7 +65,7 @@ class NotificationListViewModel : ViewModel() {
         }
         deleteNotificationsById()
 
-        // Nullify lists since they will be not need anymore
+        // Nullify lists to free some memory
         notificationsIdNew = null
         notificationsIdOld = null
         notificationsIdToDelete = null

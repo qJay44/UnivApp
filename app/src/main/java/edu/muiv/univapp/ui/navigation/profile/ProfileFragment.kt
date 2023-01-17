@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentProfileBinding
+import edu.muiv.univapp.utils.FetchedListType
 
 class ProfileFragment : Fragment() {
 
@@ -40,6 +41,7 @@ class ProfileFragment : Fragment() {
         if (savedInstanceState == null) {
             profileViewModel.loadSubjects()
             profileViewModel.loadProfileAttendance()
+            profileViewModel.fetchProfileSubjects()
         } else {
             profileViewModel.resetVisitAmount()
         }
@@ -87,6 +89,38 @@ class ProfileFragment : Fragment() {
             tvAttendancePercent.text = attendancePercentText
             tvAttendanceAmount.text = attendanceAmountText
         }
+
+        profileViewModel.fetchedSubjects.observe(viewLifecycleOwner) { response ->
+
+            /**
+             * Response codes ->
+             * 204: No subjects
+             * 200: Got subjects
+             * 500: Server failure response
+             * 503: Service is unavailable
+             */
+
+            val responseCode = response.keys.first()
+            val subjectAndTeacherList = response.values.first()
+            val textTemplate = "Fetched subjects: "
+
+            when (responseCode) {
+                204 -> Log.i(TAG, "$textTemplate Haven't got any subjects ($responseCode)")
+                503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
+                500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
+                200 -> {
+                    Log.i(TAG, "Trying to update database with fetched subjects...")
+
+                    // Update database with fetched subjects
+                    profileViewModel.upsertSubject(subjectAndTeacherList!!)
+
+                    // Create a list with ids of fetched subjects
+                    profileViewModel.createSubjectsIdsList(
+                        subjectAndTeacherList, FetchedListType.NEW.type
+                    )
+                }
+            }
+        }
         postponeEnterTransition()
     }
 
@@ -96,6 +130,11 @@ class ProfileFragment : Fragment() {
     }
 
     private fun updateUI(subjectAndTeacherList: List<SubjectAndTeacher>) {
+        // Create a list of queried subjects ids
+        profileViewModel.createSubjectsIdsList(
+            subjectAndTeacherList, FetchedListType.OLD.type
+        )
+
         adapter = DisciplineAdapter(subjectAndTeacherList)
         rvSubject.adapter = adapter
     }
