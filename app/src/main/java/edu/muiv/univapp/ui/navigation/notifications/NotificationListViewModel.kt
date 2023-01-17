@@ -1,12 +1,11 @@
 package edu.muiv.univapp.ui.navigation.notifications
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
+import edu.muiv.univapp.utils.FetchedListType
 import edu.muiv.univapp.utils.UserDataHolder
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -15,9 +14,14 @@ class NotificationListViewModel : ViewModel() {
     private val univAPI by lazy { CoreDatabaseFetcher.get() }
     private val univRepository = UnivRepository.get()
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
+
     private val _notificationsForStudent = MutableLiveData<List<String>>()
     private val _notificationsForTeacher = MutableLiveData<List<String>>()
     private val _notificationsFetched = MutableLiveData<Map<Int, List<Notification>?>>()
+
+    private var notificationsIdNew: MutableList<String>? = null
+    private var notificationsIdOld: MutableList<String>? = null
+    private var notificationsIdToDelete: MutableList<String>? = null
 
     val isTeacher: Boolean
         get() = user.groupName == null
@@ -45,6 +49,45 @@ class NotificationListViewModel : ViewModel() {
         }
 
         return days.toList()
+    }
+
+    private fun deleteNotificationsById() {
+        univRepository.deleteNotificationsById(notificationsIdToDelete!!)
+    }
+
+    private fun findIdsToDelete() {
+        // To find deleted ids just compare old ones with new
+        notificationsIdToDelete = mutableListOf()
+        for (oldId in notificationsIdOld!!) {
+            if (oldId !in notificationsIdNew!!) {
+                notificationsIdToDelete!!.add(oldId)
+            }
+        }
+        deleteNotificationsById()
+
+        // Nullify lists since they will be not need anymore
+        notificationsIdNew = null
+        notificationsIdOld = null
+        notificationsIdToDelete = null
+    }
+
+    fun createNotificationsIdList(notifications: List<Notification>, type: Int) {
+        viewModelScope.launch {
+            when (type) {
+                // The list from API call
+                FetchedListType.NEW.type -> {
+                    notificationsIdNew = mutableListOf()
+                    notifications.forEach { notificationsIdNew!!.add(it.id) }
+                    if (!notificationsIdOld.isNullOrEmpty()) findIdsToDelete()
+                }
+                // The list from the app database
+                FetchedListType.OLD.type -> {
+                    notificationsIdOld = mutableListOf()
+                    notifications.forEach { notificationsIdOld!!.add(it.id) }
+                    if (!notificationsIdNew.isNullOrEmpty()) findIdsToDelete()
+                }
+            }
+        }
     }
 
     fun getSimpleDate(dateString: String): String {

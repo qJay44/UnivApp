@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
+import edu.muiv.univapp.utils.FetchedListType
 import edu.muiv.univapp.utils.UserDataHolder
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -95,19 +96,21 @@ class ScheduleListViewModel : ViewModel() {
         loadSchedule()
     }
 
-    private fun deleteScheduleById(idList: List<String>) {
-        univRepository.deleteScheduleById(idList)
+    private fun deleteScheduleById() {
+        univRepository.deleteScheduleById(scheduleIdListToDelete!!)
     }
 
-    private fun updateDatabase() {
+    private fun findIdsToDelete() {
+        // To find deleted ids just compare old ones with new
         scheduleIdListToDelete = mutableListOf()
         for (oldId in scheduleIdListOld!!) {
             if (oldId !in scheduleIdListNew!!) {
                 scheduleIdListToDelete!!.add(oldId)
             }
         }
-        deleteScheduleById(scheduleIdListToDelete!!)
+        deleteScheduleById()
 
+        // Nullify lists since they will be not need anymore
         scheduleIdListNew = null
         scheduleIdListOld = null
         scheduleIdListToDelete = null
@@ -117,16 +120,16 @@ class ScheduleListViewModel : ViewModel() {
         viewModelScope.launch {
             when (type) {
                 // The list from API call
-                ScheduleListTypes.NEW.type -> {
+                FetchedListType.NEW.type -> {
                     scheduleIdListNew = mutableListOf()
                     scheduleList.forEach { scheduleIdListNew!!.add(it.id) }
-                    if (!scheduleIdListOld.isNullOrEmpty()) updateDatabase()
+                    if (!scheduleIdListOld.isNullOrEmpty()) findIdsToDelete()
                 }
                 // The list from the app database
-                ScheduleListTypes.OLD.type -> {
+                FetchedListType.OLD.type -> {
                     scheduleIdListOld = mutableListOf()
                     scheduleList.forEach { scheduleIdListOld!!.add(it.id) }
-                    if (!scheduleIdListNew.isNullOrEmpty()) updateDatabase()
+                    if (!scheduleIdListNew.isNullOrEmpty()) findIdsToDelete()
                 }
             }
         }
@@ -141,7 +144,7 @@ class ScheduleListViewModel : ViewModel() {
             Log.e("ScheduleListFragmentVM", "Days: ${days.toList()}")
         }
 
-        return ScheduleWeekDays.getDayNameByIndex(dayIndex)
+        return ScheduleWeekDay.getDayNameByIndex(dayIndex)
     }
 
     fun getSimpleDate(dateString: String): String {

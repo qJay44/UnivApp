@@ -21,6 +21,7 @@ import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeach
 import edu.muiv.univapp.ui.navigation.schedule.utils.AsyncCell
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
 import edu.muiv.univapp.ui.navigation.schedule.utils.WeekChangeAnimationListener
+import edu.muiv.univapp.utils.FetchedListType
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -161,9 +162,12 @@ class ScheduleListFragment : Fragment() {
                 200 -> {
                     Log.i(TAG, "Trying to update database with fetched notifications...")
 
+                    // Update database with fetched schedule
                     scheduleListViewModel.upsertSchedule(scheduleList!!)
+
+                    // Create a list with ids of fetched schedule
                     scheduleListViewModel.createScheduleIdList(
-                        scheduleList, ScheduleListTypes.NEW.type
+                        scheduleList, FetchedListType.NEW.type
                     )
                 }
             }
@@ -182,8 +186,10 @@ class ScheduleListFragment : Fragment() {
     private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
         Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
 
+
+        // Create a list of queried schedule ids
         scheduleListViewModel.createScheduleIdList(
-            scheduleForUserList, ScheduleListTypes.OLD.type
+            scheduleForUserList, FetchedListType.OLD.type
         )
 
         // Without this sorting 01.01 (2023) will be earlier than 10.12 (2022)
@@ -250,12 +256,12 @@ class ScheduleListFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
-                HolderViewTypes.HEADER.type -> {
+                HolderViewType.HEADER.type -> {
                     ScheduleHolderHeader(
                         HeaderItemCell(parent.context).apply { inflate() }
                     )
                 }
-                HolderViewTypes.DEFAULT.type -> {
+                HolderViewType.DEFAULT.type -> {
                     ScheduleDefaultHolder(
                         DefaultItemCell(parent.context).apply { inflate() }
                     )
@@ -286,8 +292,8 @@ class ScheduleListFragment : Fragment() {
         override fun getItemViewType(position: Int): Int {
             // Which holder to create
             return when (scheduleAllBooleans.elementAt(position)) {
-                true  -> HolderViewTypes.HEADER.type
-                false -> HolderViewTypes.DEFAULT.type
+                true  -> HolderViewType.HEADER.type
+                false -> HolderViewType.DEFAULT.type
             }
         }
 
@@ -367,7 +373,7 @@ class ScheduleListFragment : Fragment() {
     private class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view)
     private class ScheduleDefaultHolder(view: View) : RecyclerView.ViewHolder(view)
 
-    private enum class HolderViewTypes(val type: Int) {
+    private enum class HolderViewType(val type: Int) {
         HEADER(0),
         DEFAULT(1)
     }

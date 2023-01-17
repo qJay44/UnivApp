@@ -156,6 +156,7 @@ object DatabaseTestDataBuilder {
         "09:50", "11:30", "13:10", "15:15", "16:55", "18:35"
     )
 
+    @Suppress("SpellCheckingInspection")
     private val scheduleTypes: Array<String> = arrayOf(
         "Лекция", "СПЗ"
     )
@@ -173,6 +174,7 @@ object DatabaseTestDataBuilder {
         "commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit" +
         "esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
 
+    @Suppress("SpellCheckingInspection")
     private val subjectNames1: Array<String> = arrayOf(
         "Адаптация типовых конфигураций корпоративных информационных систем",
         "Библиотеки стандартных подсистем",
@@ -184,6 +186,7 @@ object DatabaseTestDataBuilder {
         "Цифровой маркетинг"
     )
 
+    @Suppress("SpellCheckingInspection")
     private val subjectNames2: Array<String> = arrayOf(
         "Теория бухгалтерского учета",
         "Налоги и налогообложение",
@@ -197,6 +200,7 @@ object DatabaseTestDataBuilder {
         "Комплексный экономический анализ хозяйственной деятельности"
     )
 
+    @Suppress("SpellCheckingInspection")
     private val examTypes: Array<String> = arrayOf(
         "Зачет", "Экзамен"
     )
@@ -295,7 +299,7 @@ object DatabaseTestDataBuilder {
             val groupsToUse = if (randInt(0, 1) == 0) groupNames1 else groupNames2
 
             val notification = Notification(
-                UUID.randomUUID(),
+                UUID.randomUUID().toString(),
                 format.format(calendar.time),
                 "Уведомление №$i",
                 notificationText,

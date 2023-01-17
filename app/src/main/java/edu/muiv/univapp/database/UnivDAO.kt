@@ -74,6 +74,9 @@ interface UnivDAO {
     @Query("DELETE FROM Schedule WHERE id IN (:idList)")
     fun deleteScheduleById(idList: List<String>)
 
+    @Query("DELETE FROM Notification WHERE id IN (:idList)")
+    fun deleteNotificationsById(idList: List<String>)
+
     @Update(entity = Schedule::class)
     fun updateScheduleNotes(schedule: Schedule)
 

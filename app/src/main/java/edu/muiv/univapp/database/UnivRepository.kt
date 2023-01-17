@@ -61,6 +61,12 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
+    fun deleteNotificationsById(idList: List<String>) {
+        executor.execute {
+            univDAO.deleteNotificationsById(idList)
+        }
+    }
+
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
             univDAO.upsertScheduleAttendance(scheduleAttendance)

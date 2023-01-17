@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
 import edu.muiv.univapp.databinding.FragmentNotificationsListBinding
+import edu.muiv.univapp.utils.FetchedListType
 
 class NotificationListFragment : Fragment() {
 
@@ -75,8 +76,6 @@ class NotificationListFragment : Fragment() {
                 }
             }
             notificationListViewModel.fetchedNotifications.observe(viewLifecycleOwner) { response ->
-                // FIXME: This only inserts or updates the rows but do not clear it
-                // (If some rows were deleted in core database)
 
                 /**
                  * Response codes ->
@@ -95,7 +94,14 @@ class NotificationListFragment : Fragment() {
                     500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
                     200 -> {
                         Log.i(TAG, "Trying to update database with fetched notifications...")
+
+                        // Update database with fetched notifications
                         notificationListViewModel.upsertNotifications(notifications!!)
+
+                        // Create a list with ids of fetched notifications
+                        notificationListViewModel.createNotificationsIdList(
+                            notifications, FetchedListType.NEW.type
+                        )
                     }
                 }
             }
@@ -112,6 +118,11 @@ class NotificationListFragment : Fragment() {
 
     private fun updateUI(notifications: List<Notification>) {
         adapter.submitList(notifications)
+
+        // Create a list of queried notifications ids
+        notificationListViewModel.createNotificationsIdList(
+            notifications, FetchedListType.OLD.type
+        )
 
         // Appearance of the items
         rvNotifications.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
