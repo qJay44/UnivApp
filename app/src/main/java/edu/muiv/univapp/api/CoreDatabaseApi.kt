@@ -1,6 +1,7 @@
 package edu.muiv.univapp.api
 
 import edu.muiv.univapp.ui.navigation.notifications.Notification
+import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import retrofit2.Call
@@ -26,4 +27,7 @@ interface CoreDatabaseApi {
 
     @GET("v1/profile/subjects/")
     fun fetchProfileSubjects(@Query("group") groupName: String): Call<List<SubjectAndTeacher>>
+
+    @GET("v1/profile/attendance/")
+    fun fetchProfileAttendance(@Query("userId") userId: String): Call<List<ProfileAttendance>>
 }

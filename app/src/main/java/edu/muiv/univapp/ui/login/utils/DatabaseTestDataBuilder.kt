@@ -268,8 +268,8 @@ object DatabaseTestDataBuilder {
                         roomNum = ++roomCounter,
                         type = randArrayElement(scheduleTypes),
                         teacherNotes = randomText(50),
-                        subjectID = subject.id,
-                        teacherID = subject.teacherID
+                        subjectID = UUID.fromString(subject.id),
+                        teacherID = UUID.fromString(subject.teacherID)
                     )
 
                     scheduleList += schedule
@@ -324,9 +324,9 @@ object DatabaseTestDataBuilder {
                         || student.groupName == pair.second.groupName) {
 
                         val profileAttendance = ProfileAttendance(
-                            id = UUID.randomUUID(),
-                            scheduleID = schedule.value.id,
-                            userID = student.id,
+                            id = UUID.randomUUID().toString(),
+                            scheduleID = schedule.value.id.toString(),
+                            userID = student.id.toString(),
                             visited = boolList.shuffled().last()
                         )
                         profileAttendanceList += profileAttendance
@@ -358,10 +358,10 @@ object DatabaseTestDataBuilder {
 
                 // For IT faculty
                 val subject1 = Subject(
-                    id = UUID.randomUUID(),
+                    id = UUID.randomUUID().toString(),
                     subjectName = ITSubjectName,
                     groupName = ITGroupName,
-                    teacherID = teacher.id,
+                    teacherID = teacher.id.toString(),
                     examType = examTypes[examTypeIndex]
                 )
                 subject1List += subject1
@@ -373,10 +373,10 @@ object DatabaseTestDataBuilder {
                 examTypeIndex = randInt(0, 1)
                 // For Economics faculty
                 val subject2 = Subject(
-                    id = UUID.randomUUID(),
+                    id = UUID.randomUUID().toString(),
                     subjectName = EconomicSubjectName,
                     groupName = EconomicGroupName,
-                    teacherID = teacher.id,
+                    teacherID = teacher.id.toString(),
                     examType = examTypes[examTypeIndex]
                 )
                 subject2List += subject2

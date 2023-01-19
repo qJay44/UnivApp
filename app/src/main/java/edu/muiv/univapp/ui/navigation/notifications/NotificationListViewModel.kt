@@ -51,6 +51,14 @@ class NotificationListViewModel : ViewModel() {
         return days.toList()
     }
 
+    private fun fetchNotifications() {
+        if (UserDataHolder.isServerOnline) {
+            univAPI.fetchNotifications(user.groupName!!) { response ->
+                _notificationsFetched.value = response
+            }
+        }
+    }
+
     private fun deleteNotificationsById() {
         univRepository.deleteNotificationsById(notificationsIdToDelete!!)
     }
@@ -78,13 +86,17 @@ class NotificationListViewModel : ViewModel() {
                 FetchedListType.NEW.type -> {
                     notificationsIdNew = mutableListOf()
                     notifications.forEach { notificationsIdNew!!.add(it.id) }
-                    if (!notificationsIdOld.isNullOrEmpty()) findIdsToDelete()
+
+                    /** Find ids that were removed in the core database */
+                    findIdsToDelete()
                 }
                 // The list from the app database
                 FetchedListType.OLD.type -> {
                     notificationsIdOld = mutableListOf()
                     notifications.forEach { notificationsIdOld!!.add(it.id) }
-                    if (!notificationsIdNew.isNullOrEmpty()) findIdsToDelete()
+
+                    /** Try to get new [Notification] */
+                    fetchNotifications()
                 }
             }
         }
@@ -111,14 +123,6 @@ class NotificationListViewModel : ViewModel() {
             _notificationsForTeacher.value = previousMonthDays + currentMonthDays
         else
             _notificationsForStudent.value = previousMonthDays + currentMonthDays
-    }
-
-    fun fetchNotifications() {
-        if (UserDataHolder.isServerOnline) {
-            univAPI.fetchNotifications(user.groupName!!) { response ->
-                _notificationsFetched.value = response
-            }
-        }
     }
 
     fun upsertNotifications(notifications: List<Notification>) {

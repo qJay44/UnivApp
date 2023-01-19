@@ -73,6 +73,12 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
+    fun deleteProfileAttendanceById(idList: List<String>) {
+        executor.execute {
+            univDAO.deleteProfileAttendanceById(idList)
+        }
+    }
+
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
             univDAO.upsertScheduleAttendance(scheduleAttendance)
@@ -123,12 +129,6 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
-    fun updateScheduleNotes(schedule: Schedule) {
-        executor.execute {
-            univDAO.updateScheduleNotes(schedule)
-        }
-    }
-
     fun upsertSubject(subjectAndTeacherList: List<SubjectAndTeacher>) {
         executor.execute {
             for (st in subjectAndTeacherList) {
@@ -144,6 +144,19 @@ class UnivRepository private constructor(context: Context){
                     univDAO.upsertSubject(subject)
                 }
             }
+        }
+    }
+
+    fun upsertProfileAttendance(profileAttendanceList: List<ProfileAttendance>) {
+        executor.execute {
+            for (pa in profileAttendanceList)
+                univDAO.upsertProfileAttendance(pa)
+        }
+    }
+
+    fun updateScheduleNotes(schedule: Schedule) {
+        executor.execute {
+            univDAO.updateScheduleNotes(schedule)
         }
     }
 

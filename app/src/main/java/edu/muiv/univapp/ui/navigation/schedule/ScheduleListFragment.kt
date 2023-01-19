@@ -50,7 +50,6 @@ class ScheduleListFragment : Fragment() {
 
         if (savedInstanceState == null) {
             scheduleListViewModel.loadCalendar()
-            scheduleListViewModel.fetchSchedule()
         }
     }
 
@@ -146,8 +145,8 @@ class ScheduleListFragment : Fragment() {
 
             /**
              * Response codes ->
-             * 204: No schedule
-             * 200: Got schedule
+             * 204: No [ScheduleWithSubjectAndTeacher]
+             * 200: Got [ScheduleWithSubjectAndTeacher]
              * 500: Server failure response
              * 503: Service is unavailable
              */
@@ -186,7 +185,6 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
         Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
-
 
         // Create a list of queried schedule ids
         scheduleListViewModel.createScheduleIdList(

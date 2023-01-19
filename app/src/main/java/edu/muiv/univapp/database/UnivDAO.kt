@@ -80,6 +80,9 @@ interface UnivDAO {
     @Query("DELETE FROM Subject WHERE id IN (:idList)")
     fun deleteSubjectsById(idList: List<String>)
 
+    @Query("DELETE FROM ProfileAttendance WHERE id IN (:idList)")
+    fun deleteProfileAttendanceById(idList: List<String>)
+
     @Update(entity = Schedule::class)
     fun updateScheduleNotes(schedule: Schedule)
 
@@ -118,4 +121,7 @@ interface UnivDAO {
 
     @Upsert
     fun upsertSubject(subject: Subject)
+
+    @Upsert
+    fun upsertProfileAttendance(profileAttendance: ProfileAttendance)
 }

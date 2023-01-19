@@ -4,6 +4,7 @@ import android.util.Base64
 import android.util.Log
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
+import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
@@ -217,6 +218,45 @@ class CoreDatabaseFetcher private constructor() {
 
             override fun onFailure(call: Call<List<SubjectAndTeacher>>, t: Throwable) {
                 Log.e(TAG, "onFailure: ProfileSubjects fetch fail", t)
+                callback.invoke(mapOf(500 to null))
+            }
+        })
+    }
+
+    /**
+     * @param userId: the user id that references in [ProfileAttendance].
+     * @param callback: lambda callback receives status code and a list of [ProfileAttendance] (or null).
+     *
+     * Response codes ->
+     * 204: Response is OK but no content
+     * 200: Response is OK
+     * 503: Service is unavailable
+     * 500: Unexpected fail
+     */
+    fun fetchProfileAttendance(userId: String, callback: (Map<Int, List<ProfileAttendance>?>) -> Unit) {
+        val request = coreDatabaseApi.fetchProfileAttendance(userId)
+        request.enqueue(object : Callback<List<ProfileAttendance>> {
+            override fun onResponse(
+                call: Call<List<ProfileAttendance>>,
+                response: Response<List<ProfileAttendance>>
+            ) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    if (responseBody.isEmpty()) {
+                        callback.invoke(mapOf(204 to null))
+                        Log.i(TAG, "onResponse: response has no content (fetchProfileAttendance)")
+                    } else {
+                        callback.invoke(mapOf(200 to responseBody))
+                        Log.i(TAG, "onResponse: OK (fetchProfileAttendance)")
+                    }
+                } else {
+                    callback.invoke(mapOf(503 to null))
+                    Log.w(TAG, "onResponse: responseBody is null (fetchProfileAttendance)")
+                }
+            }
+
+            override fun onFailure(call: Call<List<ProfileAttendance>>, t: Throwable) {
+                Log.e(TAG, "onFailure: ProfileAttendance fetch fail", t)
                 callback.invoke(mapOf(500 to null))
             }
         })

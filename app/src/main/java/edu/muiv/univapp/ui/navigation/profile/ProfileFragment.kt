@@ -41,7 +41,6 @@ class ProfileFragment : Fragment() {
         if (savedInstanceState == null) {
             profileViewModel.loadSubjects()
             profileViewModel.loadProfileAttendance()
-            profileViewModel.fetchProfileSubjects()
         } else {
             profileViewModel.resetVisitAmount()
         }
@@ -75,6 +74,7 @@ class ProfileFragment : Fragment() {
 
         profileViewModel.profileAttendance.observe(viewLifecycleOwner) { userProfile ->
             profileViewModel.loadProfileProperties(userProfile)
+            profileViewModel.createProfileAttendanceIdsList(userProfile, FetchedListType.OLD.type)
 
             val attendancePercent = profileViewModel.attendancePercent
             val attendancePercentBaseString = resources.getString(R.string.user_attendance_percent)
@@ -94,8 +94,8 @@ class ProfileFragment : Fragment() {
 
             /**
              * Response codes ->
-             * 204: No subjects
-             * 200: Got subjects
+             * 204: No [SubjectAndTeacher]
+             * 200: Got [SubjectAndTeacher]
              * 500: Server failure response
              * 503: Service is unavailable
              */
@@ -117,6 +117,38 @@ class ProfileFragment : Fragment() {
                     // Create a list with ids of fetched subjects
                     profileViewModel.createSubjectsIdsList(
                         subjectAndTeacherList, FetchedListType.NEW.type
+                    )
+                }
+            }
+        }
+
+        profileViewModel.fetchedProfileAttendance.observe(viewLifecycleOwner) { response ->
+
+            /**
+             * Response codes ->
+             * 204: No [ProfileAttendance]
+             * 200: Got [ProfileAttendance]
+             * 500: Server failure response
+             * 503: Service is unavailable
+             */
+
+            val responseCode = response.keys.first()
+            val profileAttendanceList = response.values.first()
+            val textTemplate = "Fetched profile attendance: "
+
+            when (responseCode) {
+                204 -> Log.i(TAG, "$textTemplate Haven't got any profile attendance ($responseCode)")
+                503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
+                500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
+                200 -> {
+                    Log.i(TAG, "Trying to update database with fetched profile attendance...")
+
+                    // Update database with fetched subjects
+                    profileViewModel.upsertProfileAttendance(profileAttendanceList!!)
+
+                    // Create a list with ids of fetched subjects
+                    profileViewModel.createProfileAttendanceIdsList(
+                        profileAttendanceList, FetchedListType.NEW.type
                     )
                 }
             }

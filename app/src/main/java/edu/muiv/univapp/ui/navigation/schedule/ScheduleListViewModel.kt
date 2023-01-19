@@ -96,6 +96,20 @@ class ScheduleListViewModel : ViewModel() {
         loadSchedule()
     }
 
+    private fun fetchSchedule() {
+        if (UserDataHolder.isServerOnline) {
+            if (isTeacher) {
+                univAPI.fetchSchedule(teacherId = user.id) { response ->
+                    _scheduleFetched.value = response
+                }
+            } else {
+                univAPI.fetchSchedule(user.groupName!!) { response ->
+                    _scheduleFetched.value = response
+                }
+            }
+        }
+    }
+
     private fun deleteScheduleById() {
         univRepository.deleteScheduleById(scheduleIdListToDelete!!)
     }
@@ -123,13 +137,17 @@ class ScheduleListViewModel : ViewModel() {
                 FetchedListType.NEW.type -> {
                     scheduleIdListNew = mutableListOf()
                     scheduleList.forEach { scheduleIdListNew!!.add(it.id) }
-                    if (!scheduleIdListOld.isNullOrEmpty()) findIdsToDelete()
+
+                    /** Find ids that were removed in the core database */
+                    findIdsToDelete()
                 }
                 // The list from the app database
                 FetchedListType.OLD.type -> {
                     scheduleIdListOld = mutableListOf()
                     scheduleList.forEach { scheduleIdListOld!!.add(it.id) }
-                    if (!scheduleIdListNew.isNullOrEmpty()) findIdsToDelete()
+
+                    /** Try to get new [ScheduleWithSubjectAndTeacher] */
+                    fetchSchedule()
                 }
             }
         }
@@ -174,20 +192,6 @@ class ScheduleListViewModel : ViewModel() {
         // Add one week
         calendar.add(Calendar.WEEK_OF_MONTH, 1)
         loadDays()
-    }
-
-    fun fetchSchedule() {
-        if (UserDataHolder.isServerOnline) {
-            if (isTeacher) {
-                univAPI.fetchSchedule(teacherId = user.id) { response ->
-                    _scheduleFetched.value = response
-                }
-            } else {
-                univAPI.fetchSchedule(user.groupName!!) { response ->
-                    _scheduleFetched.value = response
-                }
-            }
-        }
     }
 
     fun upsertSchedule(scheduleList: List<ScheduleWithSubjectAndTeacher>) {

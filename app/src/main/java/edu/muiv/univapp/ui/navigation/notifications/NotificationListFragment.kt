@@ -40,7 +40,6 @@ class NotificationListFragment : Fragment() {
 
         if (savedInstanceState == null) {
             notificationListViewModel.loadNotifications()
-            notificationListViewModel.fetchNotifications()
         }
     }
 
@@ -79,8 +78,8 @@ class NotificationListFragment : Fragment() {
 
                 /**
                  * Response codes ->
-                 * 204: No notifications
-                 * 200: Got notifications
+                 * 204: No [Notification]
+                 * 200: Got [Notification]
                  * 500: Server failure response
                  * 503: Service is unavailable
                  */
