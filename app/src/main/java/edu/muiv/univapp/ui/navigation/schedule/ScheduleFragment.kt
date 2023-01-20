@@ -134,6 +134,42 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
+            if (UserDataHolder.isServerOnline) {
+                if (scheduleViewModel.isTeacher) {
+                    scheduleViewModel
+
+                } else {
+                    scheduleViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
+                        /**
+                         * Response codes ->
+                         * 204: No [ScheduleAttendance]
+                         * 200: Got [ScheduleAttendance]
+                         * 500: Server failure response
+                         * 503: Service is unavailable
+                         */
+
+                        val responseCode = response.keys.first()
+                        val scheduleAttendance = response.values.first()
+                        val textTemplate = "Fetched schedule attendance: "
+
+                        when (responseCode) {
+                            204 -> Log.i(TAG, "$textTemplate Haven't got any schedule attendance ($responseCode)")
+                            503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
+                            500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
+                            200 -> {
+                                Log.i(
+                                    TAG,
+                                    "Trying to update database with fetched notifications..."
+                                )
+
+                                // Update database with fetched schedule attendance
+                                scheduleViewModel.upsertAttendance(scheduleAttendance!!)
+                            }
+                        }
+                    }
+                }
+            }
+
             // Show dialog with choose options if current time respects restrictions
             tvBtnAttendance.setOnClickListener { btn ->
                 val textTemplate = "Кнопка не доступна"
@@ -299,9 +335,9 @@ class ScheduleFragment : Fragment() {
                 }
             } else {
                 ScheduleAttendance(
-                    UUID.randomUUID(),
-                    scheduleViewModel.scheduleID!!,
-                    UserDataHolder.get().user.id,
+                    UUID.randomUUID().toString(),
+                    scheduleViewModel.scheduleID!!.toString(),
+                    UserDataHolder.get().user.id.toString(),
                     willAttend
                 )
             }

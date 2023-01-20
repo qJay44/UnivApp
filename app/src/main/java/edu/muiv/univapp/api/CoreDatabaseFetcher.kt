@@ -6,6 +6,7 @@ import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
 import retrofit2.Call
@@ -16,6 +17,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.nio.charset.Charset
 import java.util.UUID
 
+/**
+* Response codes ->
+* 204: Response is OK but no content
+* 200: Response is OK
+* 503: Service is unavailable
+* 500: Unexpected fail
+*/
 
 class CoreDatabaseFetcher private constructor() {
 
@@ -54,12 +62,6 @@ class CoreDatabaseFetcher private constructor() {
     /**
      * @param login: object with user input.
      * @param callback: lambda callback receives status code as parameter.
-     *
-     * Response codes ->
-     * 204: Response is OK but no content
-     * 200: Response is OK
-     * 503: Service is unavailable
-     * 500: Unexpected fail
      */
     fun fetchUser(login: Login, callback: (Int) -> Unit) {
 
@@ -97,14 +99,8 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     /**
-     * @param group: the group that references in notification.
+     * @param group: the group that references in [Notification].
      * @param callback: lambda callback receives status code and notifications (or null).
-     *
-     * Response codes ->
-     * 204: Response is OK but no content
-     * 200: Response is OK
-     * 503: Service is unavailable
-     * 500: Unexpected fail
      */
     fun fetchNotifications(group: String, callback: (Map<Int, List<Notification>?>) -> Unit) {
         val request = coreDatabaseApi.fetchNotifications(group)
@@ -136,15 +132,9 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     /**
-     * @param group: the group that references in schedule.
-     * @param teacherId: the teacher's id that references in schedule.
+     * @param group: the group that references in [ScheduleWithSubjectAndTeacher].
+     * @param teacherId: the teacher's id that references in [ScheduleWithSubjectAndTeacher].
      * @param callback: lambda callback receives status code and schedule (or null).
-     *
-     * Response codes ->
-     * 204: Response is OK but no content
-     * 200: Response is OK
-     * 503: Service is unavailable
-     * 500: Unexpected fail
      */
     fun fetchSchedule(
         group: String? = null,
@@ -185,14 +175,8 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     /**
-     * @param group: the group that references in subject.
+     * @param group: the group that references in [SubjectAndTeacher].
      * @param callback: lambda callback receives status code and [SubjectAndTeacher] (or null).
-     *
-     * Response codes ->
-     * 204: Response is OK but no content
-     * 200: Response is OK
-     * 503: Service is unavailable
-     * 500: Unexpected fail
      */
     fun fetchProfileSubjects(group: String, callback: (Map<Int, List<SubjectAndTeacher>?>) -> Unit) {
         val request = coreDatabaseApi.fetchProfileSubjects(group)
@@ -226,12 +210,6 @@ class CoreDatabaseFetcher private constructor() {
     /**
      * @param userId: the user id that references in [ProfileAttendance].
      * @param callback: lambda callback receives status code and a list of [ProfileAttendance] (or null).
-     *
-     * Response codes ->
-     * 204: Response is OK but no content
-     * 200: Response is OK
-     * 503: Service is unavailable
-     * 500: Unexpected fail
      */
     fun fetchProfileAttendance(userId: String, callback: (Map<Int, List<ProfileAttendance>?>) -> Unit) {
         val request = coreDatabaseApi.fetchProfileAttendance(userId)
@@ -257,6 +235,45 @@ class CoreDatabaseFetcher private constructor() {
 
             override fun onFailure(call: Call<List<ProfileAttendance>>, t: Throwable) {
                 Log.e(TAG, "onFailure: ProfileAttendance fetch fail", t)
+                callback.invoke(mapOf(500 to null))
+            }
+        })
+    }
+
+    /**
+     * @param scheduleId: the schedule id that references in [ScheduleAttendance]
+     * @param userId: the same as [scheduleId]
+     * @param callback: lambda callback receives status code and [ScheduleAttendance] (or null)
+     */
+    fun fetchScheduleAttendanceForStudent(
+        scheduleId: String,
+        userId: String,
+        callback: (Map<Int, ScheduleAttendance?>) -> Unit
+    ) {
+        val params = hashMapOf("scheduleId" to scheduleId, "userId" to userId)
+        val request = coreDatabaseApi.fetchScheduleAttendance(params)
+        request.enqueue(object : Callback<ScheduleAttendance> {
+            override fun onResponse(
+                call: Call<ScheduleAttendance>,
+                response: Response<ScheduleAttendance>
+            ) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    if (responseBody.id == "") {
+                        callback.invoke(mapOf(204 to null))
+                        Log.i(TAG, "onResponse: response has no content (fetchScheduleAttendance)")
+                    } else {
+                        callback.invoke(mapOf(200 to responseBody))
+                        Log.i(TAG, "onResponse: OK (fetchScheduleAttendance)")
+                    }
+                } else {
+                    callback.invoke(mapOf(503 to null))
+                    Log.w(TAG, "onResponse: responseBody is null (fetchScheduleAttendance)")
+                }
+            }
+
+            override fun onFailure(call: Call<ScheduleAttendance>, t: Throwable) {
+                Log.e(TAG, "onFailure: Schedule attendance fetch fail", t)
                 callback.invoke(mapOf(500 to null))
             }
         })

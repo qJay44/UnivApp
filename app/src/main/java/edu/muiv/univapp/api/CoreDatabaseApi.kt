@@ -3,12 +3,14 @@ package edu.muiv.univapp.api
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 import java.util.UUID
 
 interface CoreDatabaseApi {
@@ -30,4 +32,7 @@ interface CoreDatabaseApi {
 
     @GET("v1/profile/attendance/")
     fun fetchProfileAttendance(@Query("userId") userId: String): Call<List<ProfileAttendance>>
+
+    @GET("v1/schedule/attendance")
+    fun fetchScheduleAttendance(@QueryMap params: Map<String, String>): Call<ScheduleAttendance>
 }

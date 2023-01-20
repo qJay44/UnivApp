@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
@@ -21,7 +22,7 @@ class ScheduleViewModel : ViewModel() {
         /** [MIN_TIME_DIFFERENCE] in minutes */
         private const val MIN_TIME_DIFFERENCE = 15
     }
-
+    private val univApi by lazy { CoreDatabaseFetcher.get() }
     private val univRepository = UnivRepository.get()
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
 
@@ -32,6 +33,8 @@ class ScheduleViewModel : ViewModel() {
     private val scheduleToStudentLiveData = MutableLiveData<Map<UUID, UUID>>()
     private val scheduleIdLiveData = MutableLiveData<UUID>()
     private val subjectLiveData = MutableLiveData<UUID>()
+
+    private val _fetchedScheduleAttendance = MutableLiveData<Map<Int, ScheduleAttendance?>>()
 
     ////////////////////////
 
@@ -120,6 +123,9 @@ class ScheduleViewModel : ViewModel() {
             univRepository.getSubjectById(id)
         }
 
+    val fetchedSchedule: LiveData<Map<Int, ScheduleAttendance?>>
+        get() = _fetchedScheduleAttendance
+
     /////////////////////
 
     private fun getUserType(): Boolean = UserDataHolder.get().user.groupName == null
@@ -134,6 +140,16 @@ class ScheduleViewModel : ViewModel() {
             scheduleIdLiveData.value = scheduleID
         else
             scheduleToStudentLiveData.value = idMap
+
+        if (UserDataHolder.isServerOnline) {
+            if (isTeacher)
+                // TODO: Add request for teacher
+                univApi
+            else
+                univApi.fetchScheduleAttendanceForStudent(scheduleID.toString(), userID.toString()) { response ->
+                    _fetchedScheduleAttendance.value = response
+                }
+        }
     }
 
     private fun loadTeacher(id: UUID) {
