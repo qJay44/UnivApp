@@ -245,7 +245,7 @@ class CoreDatabaseFetcher private constructor() {
      * @param userId: the same as [scheduleId]
      * @param callback: lambda callback receives status code and [ScheduleAttendance] (or null)
      */
-    fun fetchScheduleAttendanceForStudent(
+    fun fetchScheduleAttendance(
         scheduleId: String,
         userId: String,
         callback: (Map<Int, ScheduleAttendance?>) -> Unit
@@ -275,6 +275,28 @@ class CoreDatabaseFetcher private constructor() {
             override fun onFailure(call: Call<ScheduleAttendance>, t: Throwable) {
                 Log.e(TAG, "onFailure: Schedule attendance fetch fail", t)
                 callback.invoke(mapOf(500 to null))
+            }
+        })
+    }
+
+    /**
+     * @param scheduleAttendance: request body to send
+     * @param callback: lambda callback receives response status code
+     */
+    fun updateScheduleAttendance(scheduleAttendance: ScheduleAttendance, callback: (Int) -> Unit) {
+        val request = coreDatabaseApi.updateScheduleAttendance(scheduleAttendance)
+        request.enqueue(object : Callback<ScheduleAttendance> {
+            override fun onResponse(
+                call: Call<ScheduleAttendance>,
+                response: Response<ScheduleAttendance>
+            ) {
+                Log.i(TAG, "onResponse: OK (updateScheduleAttendance)")
+                callback.invoke(response.code())
+            }
+
+            override fun onFailure(call: Call<ScheduleAttendance>, t: Throwable) {
+                Log.e(TAG, "onFailure: Schedule attendance update fail", t)
+                callback.invoke(500)
             }
         })
     }

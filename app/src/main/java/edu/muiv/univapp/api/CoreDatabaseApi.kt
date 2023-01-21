@@ -6,11 +6,7 @@ import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
-import retrofit2.http.QueryMap
+import retrofit2.http.*
 import java.util.UUID
 
 interface CoreDatabaseApi {
@@ -35,4 +31,7 @@ interface CoreDatabaseApi {
 
     @GET("v1/schedule/attendance")
     fun fetchScheduleAttendance(@QueryMap params: Map<String, String>): Call<ScheduleAttendance>
+
+    @PUT("v1/schedule/attendance/update")
+    fun updateScheduleAttendance(@Body scheduleAttendance: ScheduleAttendance): Call<ScheduleAttendance>
 }

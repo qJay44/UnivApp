@@ -207,6 +207,14 @@ class ScheduleFragment : Fragment() {
             tvSubjectName.text = subject.subjectName
         }
 
+        // Request status
+        scheduleViewModel.updateStatus.observe(viewLifecycleOwner) { responseCode ->
+            when (responseCode) {
+                200 -> Log.i(TAG, "Update response: Successfully updated schedule attendance")
+                500 -> Log.e(TAG, "Update response: Schedule attendance update failed")
+            }
+        }
+
         val notesTextWatcher = object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 notesText = p0.toString()
