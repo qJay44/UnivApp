@@ -118,6 +118,9 @@ class ProfileFragment : Fragment() {
                     profileViewModel.createSubjectsIdsList(
                         subjectAndTeacherList, FetchedListType.NEW.type
                     )
+
+                    // Prevent from endless updates
+                    profileViewModel.fetchedSubjects.removeObservers(viewLifecycleOwner)
                 }
             }
         }
@@ -150,6 +153,9 @@ class ProfileFragment : Fragment() {
                     profileViewModel.createProfileAttendanceIdsList(
                         profileAttendanceList, FetchedListType.NEW.type
                     )
+
+                    // Prevent from endless updates
+                    profileViewModel.fetchedProfileAttendance.removeObservers(viewLifecycleOwner)
                 }
             }
         }

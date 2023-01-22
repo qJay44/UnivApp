@@ -124,7 +124,7 @@ class ScheduleViewModel : ViewModel() {
             univRepository.getSubjectById(id)
         }
 
-    val fetchedSchedule: LiveData<Map<Int, ScheduleAttendance?>>
+    val fetchedScheduleAttendance: LiveData<Map<Int, ScheduleAttendance?>>
         get() = _fetchedScheduleAttendance
 
     val updateStatus: LiveData<Int>

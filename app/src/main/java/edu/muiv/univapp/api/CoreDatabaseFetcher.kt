@@ -242,15 +242,15 @@ class CoreDatabaseFetcher private constructor() {
 
     /**
      * @param scheduleId: the schedule id that references in [ScheduleAttendance]
-     * @param userId: the same as [scheduleId]
+     * @param studentId: the same as [scheduleId]
      * @param callback: lambda callback receives status code and [ScheduleAttendance] (or null)
      */
     fun fetchScheduleAttendance(
         scheduleId: String,
-        userId: String,
+        studentId: String,
         callback: (Map<Int, ScheduleAttendance?>) -> Unit
     ) {
-        val params = hashMapOf("scheduleId" to scheduleId, "userId" to userId)
+        val params = hashMapOf("scheduleId" to scheduleId, "studentId" to studentId)
         val request = coreDatabaseApi.fetchScheduleAttendance(params)
         request.enqueue(object : Callback<ScheduleAttendance> {
             override fun onResponse(

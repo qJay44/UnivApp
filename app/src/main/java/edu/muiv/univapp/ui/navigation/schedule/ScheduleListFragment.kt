@@ -131,12 +131,16 @@ class ScheduleListFragment : Fragment() {
             scheduleListViewModel.teacherSchedulesLiveData.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
                     updateUI(schedules)
+                    // Create a list of queried schedule ids
+                    scheduleListViewModel.createScheduleIdList(schedules, FetchedListType.OLD.type)
                 }
             }
         } else {
             scheduleListViewModel.studentSchedule.observe(viewLifecycleOwner) { schedules ->
                 schedules?.let {
                     updateUI(schedules)
+                    // Create a list of queried schedule ids
+                    scheduleListViewModel.createScheduleIdList(schedules, FetchedListType.OLD.type)
                 }
             }
         }
@@ -169,6 +173,9 @@ class ScheduleListFragment : Fragment() {
                     scheduleListViewModel.createScheduleIdList(
                         scheduleList, FetchedListType.NEW.type
                     )
+
+                    // Prevent from endless updates
+                    scheduleListViewModel.fetchedSchedule.removeObservers(viewLifecycleOwner)
                 }
             }
         }
@@ -185,11 +192,6 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
         Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
-
-        // Create a list of queried schedule ids
-        scheduleListViewModel.createScheduleIdList(
-            scheduleForUserList, FetchedListType.OLD.type
-        )
 
         // Without this sorting 01.01 (2023) will be earlier than 10.12 (2022)
         val sortedScheduleList = scheduleForUserList.sortedBy {

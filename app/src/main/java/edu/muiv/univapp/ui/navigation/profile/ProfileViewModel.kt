@@ -176,7 +176,6 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-
     fun loadProfileAttendance() {
         _profileAttendance.value = user.id
     }

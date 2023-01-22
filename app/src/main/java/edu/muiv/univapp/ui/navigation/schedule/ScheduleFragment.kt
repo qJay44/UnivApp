@@ -62,6 +62,7 @@ class ScheduleFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val args: ScheduleFragmentArgs by navArgs()
         scheduleViewModel.scheduleID = UUID.fromString(args.scheduleId)
+        Log.i(TAG, "onCreate: ${args.scheduleId}")
     }
 
     override fun onCreateView(
@@ -139,7 +140,7 @@ class ScheduleFragment : Fragment() {
                     scheduleViewModel
 
                 } else {
-                    scheduleViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
+                    scheduleViewModel.fetchedScheduleAttendance.observe(viewLifecycleOwner) { response ->
                         /**
                          * Response codes ->
                          * 204: No [ScheduleAttendance]
@@ -159,7 +160,7 @@ class ScheduleFragment : Fragment() {
                             200 -> {
                                 Log.i(
                                     TAG,
-                                    "Trying to update database with fetched notifications..."
+                                    "Trying to update database with fetched schedule attendance..."
                                 )
 
                                 // Update database with fetched schedule attendance
