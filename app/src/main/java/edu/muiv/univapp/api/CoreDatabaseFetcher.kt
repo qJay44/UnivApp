@@ -2,6 +2,7 @@ package edu.muiv.univapp.api
 
 import android.util.Base64
 import android.util.Log
+import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
@@ -245,13 +246,13 @@ class CoreDatabaseFetcher private constructor() {
      * @param studentId: the same as [scheduleId]
      * @param callback: lambda callback receives status code and [ScheduleAttendance] (or null)
      */
-    fun fetchScheduleAttendance(
+    fun fetchScheduleAttendanceForStudent(
         scheduleId: String,
         studentId: String,
         callback: (Map<Int, ScheduleAttendance?>) -> Unit
     ) {
         val params = hashMapOf("scheduleId" to scheduleId, "studentId" to studentId)
-        val request = coreDatabaseApi.fetchScheduleAttendance(params)
+        val request = coreDatabaseApi.fetchScheduleAttendanceForStudent(params)
         request.enqueue(object : Callback<ScheduleAttendance> {
             override fun onResponse(
                 call: Call<ScheduleAttendance>,
@@ -261,19 +262,55 @@ class CoreDatabaseFetcher private constructor() {
                 if (responseBody != null) {
                     if (responseBody.id == "") {
                         callback.invoke(mapOf(204 to null))
-                        Log.i(TAG, "onResponse: response has no content (fetchScheduleAttendance)")
+                        Log.i(TAG, "onResponse: response has no content (fetchScheduleAttendanceForStudent)")
                     } else {
                         callback.invoke(mapOf(200 to responseBody))
-                        Log.i(TAG, "onResponse: OK (fetchScheduleAttendance)")
+                        Log.i(TAG, "onResponse: OK (fetchScheduleAttendanceForStudent)")
                     }
                 } else {
                     callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null (fetchScheduleAttendance)")
+                    Log.w(TAG, "onResponse: responseBody is null (fetchScheduleAttendanceForStudent)")
                 }
             }
 
             override fun onFailure(call: Call<ScheduleAttendance>, t: Throwable) {
-                Log.e(TAG, "onFailure: Schedule attendance fetch fail", t)
+                Log.e(TAG, "onFailure: Schedule attendance for student fetch fail", t)
+                callback.invoke(mapOf(500 to null))
+            }
+        })
+    }
+
+    /**
+     * @param scheduleId: the schedule id that references in [ScheduleAttendance]
+     * @param callback: lambda callback receives status code and a list of [Student] (or null)
+     */
+    fun fetchScheduleAttendanceForTeacher(
+        scheduleId: String,
+        callback: (Map<Int, List<ScheduleAttendanceForTeacherResponse>?>) -> Unit
+    ) {
+        val request = coreDatabaseApi.fetchScheduleAttendanceForTeacher(scheduleId)
+        request.enqueue(object : Callback<List<ScheduleAttendanceForTeacherResponse>> {
+            override fun onResponse(
+                call: Call<List<ScheduleAttendanceForTeacherResponse>>,
+                response: Response<List<ScheduleAttendanceForTeacherResponse>>
+            ) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    if (responseBody.isEmpty()) {
+                        callback.invoke(mapOf(204 to null))
+                        Log.i(TAG, "onResponse: response has no content (fetchScheduleAttendanceForTeacher)")
+                    } else {
+                        callback.invoke(mapOf(200 to responseBody))
+                        Log.i(TAG, "onResponse: OK (fetchScheduleAttendanceForTeacher)")
+                    }
+                } else {
+                    callback.invoke(mapOf(503 to null))
+                    Log.w(TAG, "onResponse: responseBody is null (fetchScheduleAttendanceForTeacher)")
+                }
+            }
+
+            override fun onFailure(call: Call<List<ScheduleAttendanceForTeacherResponse>>, t: Throwable) {
+                Log.e(TAG, "onFailure: Schedule attendance for teacher fetch fail", t)
                 callback.invoke(mapOf(500 to null))
             }
         })

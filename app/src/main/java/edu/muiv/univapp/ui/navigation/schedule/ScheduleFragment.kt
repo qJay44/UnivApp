@@ -140,7 +140,7 @@ class ScheduleFragment : Fragment() {
                     scheduleViewModel
 
                 } else {
-                    scheduleViewModel.fetchedScheduleAttendance.observe(viewLifecycleOwner) { response ->
+                    scheduleViewModel.fetchedScheduleAttendanceForStudent.observe(viewLifecycleOwner) { response ->
                         /**
                          * Response codes ->
                          * 204: No [ScheduleAttendance]
@@ -167,6 +167,10 @@ class ScheduleFragment : Fragment() {
                                 scheduleViewModel.upsertAttendance(scheduleAttendance!!)
                             }
                         }
+                    }
+
+                    scheduleViewModel.fetchForTeacherStatus.observe(viewLifecycleOwner) { result ->
+                        Log.i(TAG, "Fetch for teacher: $result")
                     }
                 }
             }
@@ -209,7 +213,7 @@ class ScheduleFragment : Fragment() {
         }
 
         // Request status
-        scheduleViewModel.updateStatus.observe(viewLifecycleOwner) { responseCode ->
+        scheduleViewModel.upsertAttendanceStatus.observe(viewLifecycleOwner) { responseCode ->
             when (responseCode) {
                 200 -> Log.i(TAG, "Update response: Successfully updated schedule attendance")
                 500 -> Log.e(TAG, "Update response: Schedule attendance update failed")

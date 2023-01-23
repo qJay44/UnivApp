@@ -29,8 +29,11 @@ interface CoreDatabaseApi {
     @GET("v1/profile/attendance/")
     fun fetchProfileAttendance(@Query("userId") userId: String): Call<List<ProfileAttendance>>
 
-    @GET("v1/schedule/attendance")
-    fun fetchScheduleAttendance(@QueryMap params: Map<String, String>): Call<ScheduleAttendance>
+    @GET("v1/schedule/attendance/student")
+    fun fetchScheduleAttendanceForStudent(@QueryMap params: Map<String, String>): Call<ScheduleAttendance>
+
+    @GET("v1/schedule/attendance/teacher")
+    fun fetchScheduleAttendanceForTeacher(@Query("scheduleId") scheduleId: String): Call<List<ScheduleAttendanceForTeacherResponse>>
 
     @PUT("v1/schedule/attendance/update")
     fun updateScheduleAttendance(@Body scheduleAttendance: ScheduleAttendance): Call<ScheduleAttendance>

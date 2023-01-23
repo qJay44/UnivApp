@@ -34,8 +34,9 @@ class ScheduleViewModel : ViewModel() {
     private val scheduleIdLiveData = MutableLiveData<UUID>()
     private val subjectLiveData = MutableLiveData<UUID>()
 
-    private val _fetchedScheduleAttendance = MutableLiveData<Map<Int, ScheduleAttendance?>>()
-    private val _updateStatus = MutableLiveData<Int>()
+    private val _fetchedScheduleAttendanceForStudent = MutableLiveData<Map<Int, ScheduleAttendance?>>()
+    private val _upsertAttendanceStatus = MutableLiveData<Int>()
+    private val _fetchForTeacherStatus = MutableLiveData<String>()
 
     ////////////////////////
 
@@ -124,11 +125,14 @@ class ScheduleViewModel : ViewModel() {
             univRepository.getSubjectById(id)
         }
 
-    val fetchedScheduleAttendance: LiveData<Map<Int, ScheduleAttendance?>>
-        get() = _fetchedScheduleAttendance
+    val fetchedScheduleAttendanceForStudent: LiveData<Map<Int, ScheduleAttendance?>>
+        get() = _fetchedScheduleAttendanceForStudent
 
-    val updateStatus: LiveData<Int>
-        get() = _updateStatus
+    val upsertAttendanceStatus: LiveData<Int>
+        get() = _upsertAttendanceStatus
+
+    val fetchForTeacherStatus: LiveData<String>
+        get() = _fetchForTeacherStatus
 
     /////////////////////
 
@@ -146,8 +150,25 @@ class ScheduleViewModel : ViewModel() {
             scheduleToStudentLiveData.value = idMap
 
         if (UserDataHolder.isServerOnline) {
-            univApi.fetchScheduleAttendance(scheduleID.toString(), userID.toString()) { response ->
-                _fetchedScheduleAttendance.value = response
+            if (isTeacher) {
+                univApi.fetchScheduleAttendanceForTeacher(scheduleID.toString()) { response ->
+                    val responseCode = response.keys.first()
+                    val scheduleAttendance = response.values.first()
+
+                    when (responseCode) {
+                        200 -> {
+                            univRepository.upsertScheduleAttendance(scheduleAttendance!!)
+                            _fetchForTeacherStatus.value = "Upserting ${scheduleAttendance.size} for teacher"
+                        }
+                        else -> {
+                            _fetchForTeacherStatus.value = "Invalid code for upserting ($responseCode)"
+                        }
+                    }
+                }
+            } else {
+                univApi.fetchScheduleAttendanceForStudent(scheduleID.toString(), userID.toString()) { response ->
+                    _fetchedScheduleAttendanceForStudent.value = response
+                }
             }
         }
     }
@@ -164,7 +185,7 @@ class ScheduleViewModel : ViewModel() {
     fun upsertAttendance(scheduleAttendance: ScheduleAttendance) {
         univRepository.upsertScheduleAttendance(scheduleAttendance)
         univApi.updateScheduleAttendance(scheduleAttendance) { response ->
-            _updateStatus.value = response
+            _upsertAttendanceStatus.value = response
         }
     }
 

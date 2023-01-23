@@ -3,6 +3,7 @@ package edu.muiv.univapp.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
+import edu.muiv.univapp.api.ScheduleAttendanceForTeacherResponse
 import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.model.Teacher
 import edu.muiv.univapp.ui.navigation.notifications.Notification
@@ -82,6 +83,22 @@ class UnivRepository private constructor(context: Context){
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
             univDAO.upsertScheduleAttendance(scheduleAttendance)
+        }
+    }
+
+    fun upsertScheduleAttendance(scheduleAttendanceList: List<ScheduleAttendanceForTeacherResponse>) {
+        executor.execute {
+            for (sa in scheduleAttendanceList) {
+                with(sa) {
+                    val scheduleAttendance = ScheduleAttendance(
+                        scheduleAttendanceId,
+                        scheduleID,
+                        studentID,
+                        willAttend
+                    )
+                    univDAO.upsertScheduleAttendance(scheduleAttendance)
+                }
+            }
         }
     }
 
