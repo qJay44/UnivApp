@@ -37,6 +37,7 @@ class ScheduleViewModel : ViewModel() {
     private val _fetchedScheduleAttendanceForStudent = MutableLiveData<Map<Int, ScheduleAttendance?>>()
     private val _upsertAttendanceStatus = MutableLiveData<Int>()
     private val _fetchForTeacherStatus = MutableLiveData<String>()
+    private val _updateScheduleStatus = MutableLiveData<Int>()
 
     ////////////////////////
 
@@ -134,6 +135,9 @@ class ScheduleViewModel : ViewModel() {
     val fetchForTeacherStatus: LiveData<String>
         get() = _fetchForTeacherStatus
 
+    val updateScheduleStatus: LiveData<Int>
+        get() = _updateScheduleStatus
+
     /////////////////////
 
     private fun getUserType(): Boolean = UserDataHolder.get().user.groupName == null
@@ -192,5 +196,11 @@ class ScheduleViewModel : ViewModel() {
     fun upsertScheduleUserNotes(scheduleUserNotes: ScheduleUserNotes) {
         if (isTeacher) univRepository.updateScheduleNotes(schedule!!)
         else univRepository.upsertScheduleUserNotes(scheduleUserNotes)
+    }
+
+    fun updateScheduleInCoreDatabase() {
+        univApi.updateSchedule(schedule!!) { response ->
+            _updateScheduleStatus.value = response
+        }
     }
 }

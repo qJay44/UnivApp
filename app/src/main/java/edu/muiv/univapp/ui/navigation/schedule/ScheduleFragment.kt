@@ -137,8 +137,9 @@ class ScheduleFragment : Fragment() {
 
             if (UserDataHolder.isServerOnline) {
                 if (scheduleViewModel.isTeacher) {
-                    scheduleViewModel
-
+                    scheduleViewModel.fetchForTeacherStatus.observe(viewLifecycleOwner) { result ->
+                        Log.i(TAG, "Fetch for teacher: $result")
+                    }
                 } else {
                     scheduleViewModel.fetchedScheduleAttendanceForStudent.observe(viewLifecycleOwner) { response ->
                         /**
@@ -167,10 +168,6 @@ class ScheduleFragment : Fragment() {
                                 scheduleViewModel.upsertAttendance(scheduleAttendance!!)
                             }
                         }
-                    }
-
-                    scheduleViewModel.fetchForTeacherStatus.observe(viewLifecycleOwner) { result ->
-                        Log.i(TAG, "Fetch for teacher: $result")
                     }
                 }
             }
@@ -212,13 +209,22 @@ class ScheduleFragment : Fragment() {
             tvSubjectName.text = subject.subjectName
         }
 
-        // Request status
+        // Update schedule attendance status
         scheduleViewModel.upsertAttendanceStatus.observe(viewLifecycleOwner) { responseCode ->
             when (responseCode) {
                 200 -> Log.i(TAG, "Update response: Successfully updated schedule attendance")
                 500 -> Log.e(TAG, "Update response: Schedule attendance update failed")
             }
         }
+
+        // Update schedule attendance status
+        scheduleViewModel.updateScheduleStatus.observe(viewLifecycleOwner) { responseCode ->
+            when (responseCode) {
+                200 -> Log.i(TAG, "Update response: Successfully updated schedule")
+                500 -> Log.e(TAG, "Update response: Schedule update failed")
+            }
+        }
+
 
         val notesTextWatcher = object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -255,8 +261,10 @@ class ScheduleFragment : Fragment() {
                 notesText
             )
         }
-        if (scheduleViewModel.isTeacher && notesText != null)
+        if (scheduleViewModel.isTeacher && notesText != null) {
             scheduleViewModel.schedule!!.teacherNotes = notesText as String
+            scheduleViewModel.updateScheduleInCoreDatabase()
+        }
 
         scheduleViewModel.upsertScheduleUserNotes(notes)
     }

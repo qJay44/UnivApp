@@ -3,6 +3,7 @@ package edu.muiv.univapp.api
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import retrofit2.Call
@@ -37,4 +38,7 @@ interface CoreDatabaseApi {
 
     @PUT("v1/schedule/attendance/update")
     fun updateScheduleAttendance(@Body scheduleAttendance: ScheduleAttendance): Call<ScheduleAttendance>
+
+    @PUT("v1/schedule/update")
+    fun updateSchedule(@Body schedule: Schedule): Call<Schedule>
 }

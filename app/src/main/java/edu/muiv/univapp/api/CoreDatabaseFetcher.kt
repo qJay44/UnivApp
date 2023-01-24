@@ -7,6 +7,7 @@ import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
 import edu.muiv.univapp.ui.navigation.profile.SubjectAndTeacher
+import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
@@ -333,6 +334,25 @@ class CoreDatabaseFetcher private constructor() {
 
             override fun onFailure(call: Call<ScheduleAttendance>, t: Throwable) {
                 Log.e(TAG, "onFailure: Schedule attendance update fail", t)
+                callback.invoke(500)
+            }
+        })
+    }
+
+    /**
+     * @param schedule: request body to send
+     * @param callback: lambda callback receives response status code
+     */
+    fun updateSchedule(schedule: Schedule, callback: (Int) -> Unit) {
+        val request = coreDatabaseApi.updateSchedule(schedule)
+        request.enqueue(object : Callback<Schedule> {
+            override fun onResponse(call: Call<Schedule>, response: Response<Schedule>) {
+                Log.i(TAG, "onResponse: OK (updateSchedule)")
+                callback.invoke(response.code())
+            }
+
+            override fun onFailure(call: Call<Schedule>, t: Throwable) {
+                Log.e(TAG, "onFailure: Schedule update fail", t)
                 callback.invoke(500)
             }
         })
