@@ -6,6 +6,7 @@ import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.FetchedListType
+import edu.muiv.univapp.utils.TwoListsDifferenceString
 import edu.muiv.univapp.utils.UserDataHolder
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -13,9 +14,10 @@ import java.util.*
 
 class ScheduleListViewModel : ViewModel() {
 
-    private val user by lazy { UserDataHolder.get().user }
+    private val user     by lazy { UserDataHolder.get().user }
     private val calendar by lazy { Calendar.getInstance() }
-    private val univAPI by lazy { CoreDatabaseFetcher.get() }
+    private val univAPI  by lazy { CoreDatabaseFetcher.get() }
+    private val listDiff by lazy { TwoListsDifferenceString() }
     private val univRepository = UnivRepository.get()
 
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
@@ -27,10 +29,6 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val _dayFromTo = MutableLiveData<String>()
     private val _scheduleFetched = MutableLiveData<Map<Int, List<ScheduleWithSubjectAndTeacher>?>>()
-
-    private var scheduleIdListNew: MutableList<String>? = null
-    private var scheduleIdListOld: MutableList<String>? = null
-    private var scheduleIdListToDelete: MutableList<String>? = null
 
     ////////////////////////
 
@@ -110,43 +108,17 @@ class ScheduleListViewModel : ViewModel() {
         }
     }
 
-    private fun deleteScheduleById() {
-        univRepository.deleteScheduleById(scheduleIdListToDelete!!)
-    }
-
-    private fun findIdsToDelete() {
-        // To find deleted ids just compare old ones with new
-        scheduleIdListToDelete = mutableListOf()
-        for (oldId in scheduleIdListOld!!) {
-            if (oldId !in scheduleIdListNew!!) {
-                scheduleIdListToDelete!!.add(oldId)
-            }
-        }
-        deleteScheduleById()
-
-        // Nullify lists to free some memory
-        scheduleIdListNew = null
-        scheduleIdListOld = null
-        scheduleIdListToDelete = null
-    }
-
     fun createScheduleIdList(scheduleList: List<ScheduleWithSubjectAndTeacher>, type: Int) {
         viewModelScope.launch {
             when (type) {
                 // The list from API call
                 FetchedListType.NEW.type -> {
-                    scheduleIdListNew = mutableListOf()
-                    scheduleList.forEach { scheduleIdListNew!!.add(it.id) }
-
-                    /** Find ids that were removed in the core database */
-                    findIdsToDelete()
+                    listDiff.newList = scheduleList.map { it.id }
+                    univRepository.deleteScheduleById(listDiff.deleteList)
                 }
                 // The list from the app database
                 FetchedListType.OLD.type -> {
-                    scheduleIdListOld = mutableListOf()
-                    scheduleList.forEach { scheduleIdListOld!!.add(it.id) }
-
-                    /** Try to get new [ScheduleWithSubjectAndTeacher] */
+                    listDiff.oldList = scheduleList.map { it.id }
                     fetchSchedule()
                 }
             }

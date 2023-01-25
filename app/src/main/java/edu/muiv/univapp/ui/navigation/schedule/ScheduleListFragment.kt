@@ -157,7 +157,7 @@ class ScheduleListFragment : Fragment() {
 
             val responseCode = response.keys.first()
             val scheduleList = response.values.first()
-            val textTemplate = "Fetched notifications: "
+            val textTemplate = "Fetched schedules: "
 
             when (responseCode) {
                 204 -> Log.i(TAG, "$textTemplate Haven't got any schedule ($responseCode)")
