@@ -61,7 +61,8 @@ class ProfileViewModel : ViewModel() {
     /////////////////////////////////////
 
     private fun fetchProfileSubjects() {
-        if (UserDataHolder.isServerOnline) {
+        // Only if online and didn't fetch yet
+        if (UserDataHolder.isServerOnline && _subjectsFetched.value == null) {
             user.groupName?.let {
                 univApi.fetchProfileSubjects(it) { response ->
                     _subjectsFetched.value = response
@@ -71,7 +72,8 @@ class ProfileViewModel : ViewModel() {
     }
 
     private fun fetchProfileAttendance() {
-        if (UserDataHolder.isServerOnline) {
+        // Only if online and didn't fetch yet
+        if (UserDataHolder.isServerOnline && _profileAttendanceFetched.value == null) {
             univApi.fetchProfileAttendance(user.id.toString()) { response ->
                 _profileAttendanceFetched.value = response
             }

@@ -118,9 +118,6 @@ class ProfileFragment : Fragment() {
                     profileViewModel.createSubjectsIdsList(
                         subjectAndTeacherList, FetchedListType.NEW.type
                     )
-
-                    // Prevent from endless updates
-                    profileViewModel.fetchedSubjects.removeObservers(viewLifecycleOwner)
                 }
             }
         }

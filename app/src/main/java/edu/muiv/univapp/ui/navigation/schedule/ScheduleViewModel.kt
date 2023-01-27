@@ -47,7 +47,7 @@ class ScheduleViewModel : ViewModel() {
     val isTeacher: Boolean by lazy { getUserType() }
 
     val isAllowedToCheckAttendance: String
-        get() = run {
+        get() {
             val calendarToday = Calendar.getInstance()
             val calendarSchedule = Calendar.getInstance().apply {
                 val hourAndMinute = schedule!!.timeStart.split(":")
@@ -65,7 +65,7 @@ class ScheduleViewModel : ViewModel() {
             val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000
 
             // Allow student to use the button only when online and 15 minutes before subject start
-            if (!UserDataHolder.isServerOnline) {
+            return if (!UserDataHolder.isServerOnline) {
                 "Offline"
             } else if (currentDateMillis > scheduleDateMillis) {
                 "Late"

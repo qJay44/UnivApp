@@ -101,9 +101,6 @@ class NotificationListFragment : Fragment() {
                         notificationListViewModel.createNotificationsIdList(
                             notifications, FetchedListType.NEW.type
                         )
-
-                        // Prevent from endless updates
-                        notificationListViewModel.fetchedNotifications.removeObservers(viewLifecycleOwner)
                     }
                 }
             }

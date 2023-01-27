@@ -146,7 +146,6 @@ class ScheduleListFragment : Fragment() {
         }
 
         scheduleListViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
-
             /**
              * Response codes ->
              * 204: No [ScheduleWithSubjectAndTeacher]
@@ -173,9 +172,6 @@ class ScheduleListFragment : Fragment() {
                     scheduleListViewModel.createScheduleIdList(
                         scheduleList, FetchedListType.NEW.type
                     )
-
-                    // Prevent from endless updates
-                    scheduleListViewModel.fetchedSchedule.removeObservers(viewLifecycleOwner)
                 }
             }
         }
