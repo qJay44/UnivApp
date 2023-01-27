@@ -74,7 +74,6 @@ class CoreDatabaseFetcher private constructor() {
         )
 
         val request = coreDatabaseApi.fetchUser(loginResponse)
-
         request.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 val responseBody = response.body()
@@ -149,31 +148,33 @@ class CoreDatabaseFetcher private constructor() {
             coreDatabaseApi.fetchSchedule(teacherId)
         }
 
-        request.enqueue(object : Callback<List<ScheduleWithSubjectAndTeacher>> {
-            override fun onResponse(
-                call: Call<List<ScheduleWithSubjectAndTeacher>>,
-                response: Response<List<ScheduleWithSubjectAndTeacher>>
-            ) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    if (responseBody.isEmpty()) {
-                        callback.invoke(mapOf(204 to null))
-                        Log.i(TAG, "onResponse: response has no content (fetchSchedule)")
-                    } else {
-                        callback.invoke(mapOf(200 to responseBody))
-                        Log.i(TAG, "onResponse: OK (fetchSchedule)")
-                    }
-                } else {
-                    callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null (fetchSchedule)")
-                }
-            }
-
-            override fun onFailure(call: Call<List<ScheduleWithSubjectAndTeacher>>, t: Throwable) {
-                Log.e(TAG, "onFailure: Schedule fetch fail", t)
-                callback.invoke(mapOf(500 to null))
-            }
-        })
+//        request.enqueue(object : Callback<List<ScheduleWithSubjectAndTeacher>> {
+//            override fun onResponse(
+//                call: Call<List<ScheduleWithSubjectAndTeacher>>,
+//                response: Response<List<ScheduleWithSubjectAndTeacher>>
+//            ) {
+//                val responseBody = response.body()
+//                if (responseBody != null) {
+//                    if (responseBody.isEmpty()) {
+//                        callback.invoke(mapOf(204 to null))
+//                        Log.i(TAG, "onResponse: response has no content (fetchSchedule)")
+//                    } else {
+//                        callback.invoke(mapOf(200 to responseBody))
+//                        Log.i(TAG, "onResponse: OK (fetchSchedule)")
+//                    }
+//                } else {
+//                    callback.invoke(mapOf(503 to null))
+//                    Log.w(TAG, "onResponse: responseBody is null (fetchSchedule)")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<List<ScheduleWithSubjectAndTeacher>>, t: Throwable) {
+//                Log.e(TAG, "onFailure: Schedule fetch fail", t)
+//                callback.invoke(mapOf(500 to null))
+//            }
+//        })
+        request.enqueue(DefaultGetRequest<List<ScheduleWithSubjectAndTeacher>>(
+            callback, true, "fetchSchedule"))
     }
 
     /**
@@ -357,4 +358,45 @@ class CoreDatabaseFetcher private constructor() {
             }
         })
     }
+
+    // TODO: refactor other fetch functions
+    // FIXME: fetch is called twice
+
+    private class DefaultGetRequest<T> (
+        private val callback: (Map<Int, T?>) -> Unit,
+        private val isList  : Boolean,
+        private val funcName: String
+        ) : Callback<T> {
+
+        override fun onResponse(call: Call<T>, response: Response<T>) {
+            val responseBody = response.body()
+            if (responseBody != null) {
+                val hasContent = if (isList) {
+                    val useAsList = responseBody as ArrayList<*>
+                    "id=null" !in useAsList.component1().toString()
+                } else {
+                    val useAsObject = responseBody as GenericResponse
+                    useAsObject.id == ""
+                }
+
+                if (!hasContent) {
+                    callback.invoke(mapOf(204 to null))
+                    Log.i(TAG, "onResponse: response has no content ($funcName)")
+                } else {
+                    callback.invoke(mapOf(200 to responseBody))
+                    Log.i(TAG, "onResponse: OK ($funcName)")
+                }
+            } else {
+                callback.invoke(mapOf(503 to null))
+                Log.w(TAG, "onResponse: responseBody is null ($funcName)")
+            }
+        }
+
+        override fun onFailure(call: Call<T>, t: Throwable) {
+            Log.e(TAG, "onFailure: (fetchTest)", t)
+            callback.invoke(mapOf(500 to null))
+        }
+    }
+
+    private data class GenericResponse(val id: String)
 }
