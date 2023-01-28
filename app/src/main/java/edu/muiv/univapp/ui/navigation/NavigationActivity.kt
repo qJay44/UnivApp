@@ -62,8 +62,8 @@ class NavigationActivity : AppCompatActivity() {
 
         navController = navHostFragment.navController
 
-        // Set selected icon that associate with start destination
-        navView.selectedItemId = R.id.navigation_schedule_list
+        // Set selected item that associate with start destination
+        navView.selectedItemId = selectedItem
 
         navView.setOnItemSelectedListener { item ->
             selectFragment(item)

@@ -2,7 +2,6 @@ package edu.muiv.univapp.api
 
 import android.util.Base64
 import android.util.Log
-import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
 import edu.muiv.univapp.ui.navigation.profile.ProfileAttendance
@@ -61,10 +60,6 @@ class CoreDatabaseFetcher private constructor() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    /**
-     * @param login: object with user input.
-     * @param callback: lambda callback receives status code as parameter.
-     */
     fun fetchUser(login: Login, callback: (Int) -> Unit) {
 
         // POST body
@@ -93,50 +88,20 @@ class CoreDatabaseFetcher private constructor() {
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                Log.e(TAG, "onFailure: User fetch fail", t)
+                Log.e(TAG, "onFailure: fetch fail (fetchUser)", t)
                 callback.invoke(500)
             }
         })
     }
 
-    /**
-     * @param group: the group that references in [Notification].
-     * @param callback: lambda callback receives status code and notifications (or null).
-     */
+    //================== GET requests ==================//
+
     fun fetchNotifications(group: String, callback: (Map<Int, List<Notification>?>) -> Unit) {
         val request = coreDatabaseApi.fetchNotifications(group)
-        request.enqueue(object : Callback<List<Notification>> {
-            override fun onResponse(
-                call: Call<List<Notification>>,
-                response: Response<List<Notification>>
-            ) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    if (responseBody.isEmpty()) {
-                        callback.invoke(mapOf(204 to null))
-                        Log.i(TAG, "onResponse: response has no content (fetchNotifications)")
-                    } else {
-                        callback.invoke(mapOf(200 to responseBody))
-                        Log.i(TAG, "onResponse: OK (fetchNotifications)")
-                    }
-                } else {
-                    callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null (fetchNotifications)")
-                }
-            }
-
-            override fun onFailure(call: Call<List<Notification>>, t: Throwable) {
-                Log.e(TAG, "onFailure: Notifications fetch fail", t)
-                callback.invoke(mapOf(500 to null))
-            }
-        })
+        request.enqueue(DefaultGetRequest<List<Notification>>(
+            callback, true, "fetchNotification"))
     }
 
-    /**
-     * @param group: the group that references in [ScheduleWithSubjectAndTeacher].
-     * @param teacherId: the teacher's id that references in [ScheduleWithSubjectAndTeacher].
-     * @param callback: lambda callback receives status code and schedule (or null).
-     */
     fun fetchSchedule(
         group: String? = null,
         teacherId: UUID? = null,
@@ -152,77 +117,18 @@ class CoreDatabaseFetcher private constructor() {
             callback, true, "fetchSchedule"))
     }
 
-    /**
-     * @param group: the group that references in [SubjectAndTeacher].
-     * @param callback: lambda callback receives status code and [SubjectAndTeacher] (or null).
-     */
     fun fetchProfileSubjects(group: String, callback: (Map<Int, List<SubjectAndTeacher>?>) -> Unit) {
         val request = coreDatabaseApi.fetchProfileSubjects(group)
-        request.enqueue(object : Callback<List<SubjectAndTeacher>> {
-            override fun onResponse(
-                call: Call<List<SubjectAndTeacher>>,
-                response: Response<List<SubjectAndTeacher>>
-            ) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    if (responseBody.isEmpty()) {
-                        callback.invoke(mapOf(204 to null))
-                        Log.i(TAG, "onResponse: response has no content (fetchProfileSubjects)")
-                    } else {
-                        callback.invoke(mapOf(200 to responseBody))
-                        Log.i(TAG, "onResponse: OK (fetchProfileSubjects)")
-                    }
-                } else {
-                    callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null (fetchProfileSubjects)")
-                }
-            }
-
-            override fun onFailure(call: Call<List<SubjectAndTeacher>>, t: Throwable) {
-                Log.e(TAG, "onFailure: ProfileSubjects fetch fail", t)
-                callback.invoke(mapOf(500 to null))
-            }
-        })
+        request.enqueue(DefaultGetRequest<List<SubjectAndTeacher>>(
+            callback, true, "fetchProfileSubjects"))
     }
 
-    /**
-     * @param userId: the user id that references in [ProfileAttendance].
-     * @param callback: lambda callback receives status code and a list of [ProfileAttendance] (or null).
-     */
     fun fetchProfileAttendance(userId: String, callback: (Map<Int, List<ProfileAttendance>?>) -> Unit) {
         val request = coreDatabaseApi.fetchProfileAttendance(userId)
-        request.enqueue(object : Callback<List<ProfileAttendance>> {
-            override fun onResponse(
-                call: Call<List<ProfileAttendance>>,
-                response: Response<List<ProfileAttendance>>
-            ) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    if (responseBody.isEmpty()) {
-                        callback.invoke(mapOf(204 to null))
-                        Log.i(TAG, "onResponse: response has no content (fetchProfileAttendance)")
-                    } else {
-                        callback.invoke(mapOf(200 to responseBody))
-                        Log.i(TAG, "onResponse: OK (fetchProfileAttendance)")
-                    }
-                } else {
-                    callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null (fetchProfileAttendance)")
-                }
-            }
-
-            override fun onFailure(call: Call<List<ProfileAttendance>>, t: Throwable) {
-                Log.e(TAG, "onFailure: ProfileAttendance fetch fail", t)
-                callback.invoke(mapOf(500 to null))
-            }
-        })
+        request.enqueue(DefaultGetRequest<List<ProfileAttendance>>(
+            callback, true, "fetchProfileAttendance"))
     }
 
-    /**
-     * @param scheduleId: the schedule id that references in [ScheduleAttendance]
-     * @param studentId: the same as [scheduleId]
-     * @param callback: lambda callback receives status code and [ScheduleAttendance] (or null)
-     */
     fun fetchScheduleAttendanceForStudent(
         scheduleId: String,
         studentId: String,
@@ -230,73 +136,22 @@ class CoreDatabaseFetcher private constructor() {
     ) {
         val params = hashMapOf("scheduleId" to scheduleId, "studentId" to studentId)
         val request = coreDatabaseApi.fetchScheduleAttendanceForStudent(params)
-        request.enqueue(object : Callback<ScheduleAttendance> {
-            override fun onResponse(
-                call: Call<ScheduleAttendance>,
-                response: Response<ScheduleAttendance>
-            ) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    if (responseBody.id == "") {
-                        callback.invoke(mapOf(204 to null))
-                        Log.i(TAG, "onResponse: response has no content (fetchScheduleAttendanceForStudent)")
-                    } else {
-                        callback.invoke(mapOf(200 to responseBody))
-                        Log.i(TAG, "onResponse: OK (fetchScheduleAttendanceForStudent)")
-                    }
-                } else {
-                    callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null (fetchScheduleAttendanceForStudent)")
-                }
-            }
-
-            override fun onFailure(call: Call<ScheduleAttendance>, t: Throwable) {
-                Log.e(TAG, "onFailure: Schedule attendance for student fetch fail", t)
-                callback.invoke(mapOf(500 to null))
-            }
-        })
+        request.enqueue(DefaultGetRequest<ScheduleAttendance>(
+            callback, false, "fetchScheduleAttendanceForStudent"))
     }
 
-    /**
-     * @param scheduleId: the schedule id that references in [ScheduleAttendance]
-     * @param callback: lambda callback receives status code and a list of [Student] (or null)
-     */
     fun fetchScheduleAttendanceForTeacher(
         scheduleId: String,
         callback: (Map<Int, List<ScheduleAttendanceForTeacherResponse>?>) -> Unit
     ) {
         val request = coreDatabaseApi.fetchScheduleAttendanceForTeacher(scheduleId)
-        request.enqueue(object : Callback<List<ScheduleAttendanceForTeacherResponse>> {
-            override fun onResponse(
-                call: Call<List<ScheduleAttendanceForTeacherResponse>>,
-                response: Response<List<ScheduleAttendanceForTeacherResponse>>
-            ) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    if (responseBody.isEmpty()) {
-                        callback.invoke(mapOf(204 to null))
-                        Log.i(TAG, "onResponse: response has no content (fetchScheduleAttendanceForTeacher)")
-                    } else {
-                        callback.invoke(mapOf(200 to responseBody))
-                        Log.i(TAG, "onResponse: OK (fetchScheduleAttendanceForTeacher)")
-                    }
-                } else {
-                    callback.invoke(mapOf(503 to null))
-                    Log.w(TAG, "onResponse: responseBody is null (fetchScheduleAttendanceForTeacher)")
-                }
-            }
-
-            override fun onFailure(call: Call<List<ScheduleAttendanceForTeacherResponse>>, t: Throwable) {
-                Log.e(TAG, "onFailure: Schedule attendance for teacher fetch fail", t)
-                callback.invoke(mapOf(500 to null))
-            }
-        })
+        request.enqueue(DefaultGetRequest<List<ScheduleAttendanceForTeacherResponse>>(
+            callback, true, "fetchScheduleAttendanceForTeacher"))
     }
 
-    /**
-     * @param scheduleAttendance: request body to send
-     * @param callback: lambda callback receives response status code
-     */
+    //==================================================//
+    //================== PUT requests ==================//
+
     fun updateScheduleAttendance(scheduleAttendance: ScheduleAttendance, callback: (Int) -> Unit) {
         val request = coreDatabaseApi.updateScheduleAttendance(scheduleAttendance)
         request.enqueue(object : Callback<ScheduleAttendance> {
@@ -315,10 +170,6 @@ class CoreDatabaseFetcher private constructor() {
         })
     }
 
-    /**
-     * @param schedule: request body to send
-     * @param callback: lambda callback receives response status code
-     */
     fun updateSchedule(schedule: Schedule, callback: (Int) -> Unit) {
         val request = coreDatabaseApi.updateSchedule(schedule)
         request.enqueue(object : Callback<Schedule> {
@@ -334,7 +185,7 @@ class CoreDatabaseFetcher private constructor() {
         })
     }
 
-    // TODO: refactor other fetch functions
+    //==================================================//
 
     private class DefaultGetRequest<T> (
         private val callback: (Map<Int, T?>) -> Unit,
