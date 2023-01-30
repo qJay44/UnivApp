@@ -76,6 +76,5 @@ class LoginViewModel : ViewModel() {
                     "ProfileAttendances: ${profileAttendanceList.size}\n"
             )
         }
-
     }
 }

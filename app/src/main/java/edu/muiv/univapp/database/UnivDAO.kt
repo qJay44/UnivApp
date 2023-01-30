@@ -27,15 +27,15 @@ interface UnivDAO {
         "SELECT schedule.id, date, timeStart, timeEnd, roomNum, type, teacherNotes, subject.id AS subjectID, subjectName, groupName, teacher.id AS teacherID, name, surname, patronymic FROM Schedule " +
         "INNER JOIN Subject ON schedule.subjectID=subject.id " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
-        "WHERE subject.groupName=:groupName AND date IN (:days) ORDER BY date"
+        "WHERE subject.groupName=:groupName AND date IN (:days)"
     )
     fun getScheduleForWeek(groupName: String, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
     @Query(
         "SELECT schedule.id, teacher.id AS teacherID, date, timeStart, timeEnd, roomNum, type, teacherNotes, subject.id AS subjectID, subjectName, groupName, name, surname, patronymic FROM Schedule " +
-        "INNER JOIN Teacher ON schedule.teacherID=:teacherIdParam " +
-        "INNER JOIN Subject ON teacher.id=subject.teacherID " +
-        "WHERE schedule.teacherID=:teacherIdParam AND subject.teacherID=:teacherIdParam AND date IN (:days) ORDER BY date"
+        "INNER JOIN Subject ON schedule.subjectID=subject.id " +
+        "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
+        "WHERE schedule.teacherID=:teacherIdParam AND date IN (:days) GROUP BY date, timeStart"
     )
     fun getScheduleForWeek(teacherIdParam: UUID, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
