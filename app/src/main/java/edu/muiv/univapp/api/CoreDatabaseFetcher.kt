@@ -198,7 +198,7 @@ class CoreDatabaseFetcher private constructor() {
             if (responseBody != null) {
                 val hasContent = if (isList) {
                     val useAsList = responseBody as ArrayList<*>
-                    useAsList.size != 0
+                    useAsList.isNotEmpty()
                 } else {
                     val useAsObject = responseBody as GenericResponse
                     useAsObject.id != ""

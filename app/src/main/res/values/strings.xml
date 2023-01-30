@@ -53,4 +53,5 @@
     <string name="title_profile">Profile</string>
     <string name="patch_top">вверхная плашка</string>
     <string name="text_login_title">РАСПИСАНИЕ ЗАНЯТИЙ</string>
+    <string name="no_schedule_text">Расписание отсутствует</string>
 </resources>

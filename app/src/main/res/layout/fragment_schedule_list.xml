@@ -67,6 +67,19 @@
             android:layoutAnimation="@anim/layout_animation"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+        <TextView
+            android:id="@+id/tvNoSchedule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingBottom="55dp"
+            android:text="@string/no_schedule_text"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:textAlignment="center"
+            android:textColor="#6E6E6E"
+            android:fontFamily="@font/montserrat_medium" />
+
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

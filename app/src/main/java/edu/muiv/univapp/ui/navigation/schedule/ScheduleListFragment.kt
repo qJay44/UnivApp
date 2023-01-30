@@ -35,10 +35,11 @@ class ScheduleListFragment : Fragment() {
     private var _binding: FragmentScheduleListBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var tvWeekDays: TextView
-    private lateinit var rvSchedule: RecyclerView
-    private lateinit var ibPrevWeek: ImageButton
-    private lateinit var ibNextWeek: ImageButton
+    private lateinit var tvWeekDays  : TextView
+    private lateinit var rvSchedule  : RecyclerView
+    private lateinit var ibPrevWeek  : ImageButton
+    private lateinit var ibNextWeek  : ImageButton
+    private lateinit var tvNoSchedule: TextView
     private var adapter: ScheduleAdapter? = null
 
     private val scheduleListViewModel: ScheduleListViewModel by lazy {
@@ -86,6 +87,7 @@ class ScheduleListFragment : Fragment() {
         ibNextWeek.setOnClickListener { rvSchedule.startAnimation(ibNextWeekAnimation) }
 
         tvWeekDays = binding.tvWeekDays
+        tvNoSchedule = binding.tvNoSchedule
 
         // Swipes //
 
@@ -188,6 +190,9 @@ class ScheduleListFragment : Fragment() {
 
     private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
         Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
+
+        // Show text if no schedule
+        tvNoSchedule.visibility = if (scheduleForUserList.isEmpty()) View.VISIBLE else View.GONE
 
         // Without this sorting 01.01 (2023) will be earlier than 10.12 (2022)
         val sortedScheduleList = scheduleForUserList.sortedBy {
