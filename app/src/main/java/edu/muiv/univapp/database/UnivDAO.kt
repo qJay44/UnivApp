@@ -16,6 +16,7 @@ import java.util.UUID
 
 @Dao
 interface UnivDAO {
+    // Do not forget: place " " at the end if there is new line comes after
 
     @Query("SELECT * FROM teacher WHERE id IN (:IDs)")
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>>
@@ -24,7 +25,11 @@ interface UnivDAO {
     fun getScheduleById(id: UUID): LiveData<Schedule>
 
     @Query(
-        "SELECT schedule.id, date, timeStart, timeEnd, roomNum, type, teacherNotes, subject.id AS subjectID, subjectName, groupName, teacher.id AS teacherID, name, surname, patronymic FROM Schedule " +
+        "SELECT " +
+                "schedule.id, date, timeStart, timeEnd, roomNum, type, teacherNotes," +
+                "subject.id AS subjectID, subjectName, groupName, teacher.id AS teacherID," +
+                "name, surname, patronymic " +
+        "FROM Schedule " +
         "INNER JOIN Subject ON schedule.subjectID=subject.id " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
         "WHERE subject.groupName=:groupName AND date IN (:days)"
@@ -32,7 +37,10 @@ interface UnivDAO {
     fun getScheduleForWeek(groupName: String, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
     @Query(
-        "SELECT schedule.id, teacher.id AS teacherID, date, timeStart, timeEnd, roomNum, type, teacherNotes, subject.id AS subjectID, subjectName, groupName, name, surname, patronymic FROM Schedule " +
+        "SELECT " +
+                "schedule.id, teacher.id AS teacherID, date, timeStart, timeEnd, roomNum, type," +
+                "teacherNotes, subject.id AS subjectID, subjectName, groupName, name, surname, patronymic " +
+        "FROM Schedule " +
         "INNER JOIN Subject ON schedule.subjectID=subject.id " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
         "WHERE schedule.teacherID=:teacherIdParam AND date IN (:days) GROUP BY date, timeStart"

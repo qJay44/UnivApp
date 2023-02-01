@@ -191,9 +191,6 @@ class ScheduleListFragment : Fragment() {
     private fun updateUI(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>) {
         Log.i(TAG, "Got ${scheduleForUserList.size} schedules for user")
 
-        // Show text if no schedule
-        tvNoSchedule.visibility = if (scheduleForUserList.isEmpty()) View.VISIBLE else View.GONE
-
         // Without this sorting 01.01 (2023) will be earlier than 10.12 (2022)
         val sortedScheduleList = scheduleForUserList.sortedBy {
             val df = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
@@ -212,6 +209,14 @@ class ScheduleListFragment : Fragment() {
 
         // Allow animations to play
         startPostponedEnterTransition()
+
+        // Post processing
+        postUpdateUI(scheduleForUserList.isEmpty())
+    }
+
+    private fun postUpdateUI(noSchedules: Boolean) {
+        // Show text if no schedule
+        tvNoSchedule.visibility = if (noSchedules) View.VISIBLE else View.GONE
     }
 
     private fun attachAdapter() {
@@ -259,7 +264,7 @@ class ScheduleListFragment : Fragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
                 HolderViewType.HEADER.type -> {
-                    ScheduleHolderHeader(
+                    ScheduleHeaderHolder(
                         HeaderItemCell(parent.context).apply { inflate() }
                     )
                 }
@@ -275,15 +280,15 @@ class ScheduleListFragment : Fragment() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val scheduleForUser = scheduleAll.elementAt(position)
             when (holder) {
-                is ScheduleHolderHeader -> {
-                    setUpHeaderViewHolder(
+                is ScheduleHeaderHolder -> {
+                    setupHeaderViewHolder(
                         holder,
                         scheduleListViewModel.getSimpleDate(scheduleForUser.date),
                         scheduleListViewModel.getWeekDayNameByDate(scheduleForUser.date)
                     )
                 }
                 is ScheduleDefaultHolder -> {
-                    setUpDefaultViewHolder(holder, scheduleForUser)
+                    setupDefaultViewHolder(holder, scheduleForUser)
                 }
                 else -> throw IllegalStateException("onBindViewHolder: Got unexpected holder")
             }
@@ -306,8 +311,8 @@ class ScheduleListFragment : Fragment() {
         }
 
         // Header holder binding
-        private fun setUpHeaderViewHolder(
-            holder: ScheduleHolderHeader,
+        private fun setupHeaderViewHolder(
+            holder: ScheduleHeaderHolder,
             formattedDate: String,
             weekDayName: String
         ) {
@@ -323,7 +328,7 @@ class ScheduleListFragment : Fragment() {
         }
 
         // Default holder binding
-        private fun setUpDefaultViewHolder(
+        private fun setupDefaultViewHolder(
             holder: ScheduleDefaultHolder,
             scheduleForUser: ScheduleWithSubjectAndTeacher
         ) {
@@ -372,7 +377,7 @@ class ScheduleListFragment : Fragment() {
         fun getScheduleByPosition(pos: Int) = scheduleAll.elementAt(pos)
     }
 
-    private class ScheduleHolderHeader(view: View) : RecyclerView.ViewHolder(view)
+    private class ScheduleHeaderHolder(view: View) : RecyclerView.ViewHolder(view)
     private class ScheduleDefaultHolder(view: View) : RecyclerView.ViewHolder(view)
 
     private enum class HolderViewType(val type: Int) {
