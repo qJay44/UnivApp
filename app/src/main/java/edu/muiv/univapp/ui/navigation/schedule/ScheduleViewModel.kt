@@ -12,6 +12,7 @@ import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleUserNotes
 import edu.muiv.univapp.model.Student
 import edu.muiv.univapp.model.Subject
 import edu.muiv.univapp.model.Teacher
+import edu.muiv.univapp.ui.navigation.schedule.utils.AttendanceStatus
 import edu.muiv.univapp.utils.UserDataHolder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -46,7 +47,7 @@ class ScheduleViewModel : ViewModel() {
 
     val isTeacher: Boolean by lazy { getUserType() }
 
-    val isAllowedToCheckAttendance: String
+    val isAllowedToCheckAttendance: String?
         get() {
             val calendarToday = Calendar.getInstance()
             val calendarSchedule = Calendar.getInstance().apply {
@@ -60,19 +61,13 @@ class ScheduleViewModel : ViewModel() {
 
             val currentDateMillis = calendarToday.time.time
             val scheduleDateMillis = calendarSchedule.time.time
+            val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000 // milliseconds
 
-            // From minutes to milliseconds
-            val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000
-
-            // Allow student to use the button only when online and 15 minutes before subject start
-            return if (!UserDataHolder.isServerOnline) {
-                "Offline"
-            } else if (currentDateMillis > scheduleDateMillis) {
-                "Late"
-            } else if (scheduleDateMillis - currentDateMillis <= minTimeDifference) {
-                "Allowed"
-            } else {
-                "Early"
+            return when {
+                !UserDataHolder.isServerOnline -> AttendanceStatus.OFFLINE.status
+                currentDateMillis > scheduleDateMillis -> AttendanceStatus.LATE.status
+                scheduleDateMillis - currentDateMillis <= minTimeDifference -> AttendanceStatus.ALLOWED.status
+                else -> AttendanceStatus.EARLY.status
             }
         }
 

@@ -3,20 +3,30 @@ package edu.muiv.univapp.utils
 import android.util.Log
 import edu.muiv.univapp.api.LoginResponse
 import edu.muiv.univapp.ui.login.LoginResult
+import java.net.URL
 import java.util.*
 
 class UserDataHolder private constructor(val user: LoginResult){
 
     companion object {
         private const val TAG = "UserDataHolder"
+        private val URL = URL("http://localhost:3000")
         private var INSTANCE: UserDataHolder? = null
-        val isServerOnline: Boolean
-            get() = run {
-                val command = "ping -c 1 localhost:3000"
-                val latency = Runtime.getRuntime().exec(command).waitFor()
-                Log.i(TAG, "Server latency: $latency ms")
 
-                latency <= 100
+        val isServerOnline: Boolean
+            get() {
+                return try {
+                    URL.openConnection().apply {
+                        connectTimeout = 3000
+                        connect()
+                    }
+                    Log.i(TAG, "isServerOnline: true")
+
+                    true
+                } catch (e: Exception) {
+                    Log.i(TAG, "isServerOnline: false")
+                    false
+                }
             }
 
         fun initialize(loginResponse: LoginResponse) {

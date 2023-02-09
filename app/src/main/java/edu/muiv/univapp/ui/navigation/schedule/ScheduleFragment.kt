@@ -154,6 +154,9 @@ class ScheduleFragment : Fragment() {
                         val scheduleAttendance = response.values.first()
                         val textTemplate = "Fetched schedule attendance: "
 
+                        // TODO: enum class for status codes
+                        // TODO: refactor other enums
+
                         when (responseCode) {
                             204 -> Log.i(TAG, "$textTemplate Haven't got any schedule attendance ($responseCode)")
                             503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
@@ -172,28 +175,21 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
+            val btnAttendanceAnimation = AnimationUtils.loadAnimation(
+                requireContext(),
+                R.anim.attendance_button_animation
+            )
+
             // Show dialog with choose options if current time respects restrictions
             tvBtnAttendance.setOnClickListener { btn ->
                 val textTemplate = "Кнопка не доступна"
-                val restrictionText =
-                    when (scheduleViewModel.isAllowedToCheckAttendance) {
-                        "Offline" -> "$textTemplate (недоступно в оффлайн режиме)"
-                        "Late" -> "$textTemplate (слишком поздно)"
-                        "Allowed" -> {
-                            val btnAnimation = AnimationUtils.loadAnimation(
-                                requireContext(),
-                                R.anim.attendance_button_animation
-                            )
-                            btn.startAnimation(btnAnimation)
-                            showDialog()
-                            null
-                        }
-                        "Early" -> "$textTemplate (слишком рано)"
-                        else -> throw IllegalStateException("tvBtnAttendance: Got unexpected value")
-                    }
+                val restrictionText = scheduleViewModel.isAllowedToCheckAttendance
 
                 if (restrictionText != null) {
-                    Toast.makeText(requireContext(), restrictionText, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "$textTemplate $restrictionText", Toast.LENGTH_SHORT).show()
+                } else {
+                    btn.startAnimation(btnAttendanceAnimation)
+                    showDialog()
                 }
             }
         }
