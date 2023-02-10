@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.databinding.FragmentProfileBinding
 import edu.muiv.univapp.utils.FetchedListType
 
@@ -74,7 +75,7 @@ class ProfileFragment : Fragment() {
 
         profileViewModel.profileAttendance.observe(viewLifecycleOwner) { userProfile ->
             profileViewModel.loadProfileProperties(userProfile)
-            profileViewModel.createProfileAttendanceIdsList(userProfile, FetchedListType.OLD.type)
+            profileViewModel.createProfileAttendanceIdsList(userProfile, FetchedListType.OLD)
 
             val attendancePercent = profileViewModel.attendancePercent
             val attendancePercentBaseString = resources.getString(R.string.user_attendance_percent)
@@ -91,69 +92,44 @@ class ProfileFragment : Fragment() {
         }
 
         profileViewModel.fetchedSubjects.observe(viewLifecycleOwner) { response ->
-
-            /**
-             * Response codes ->
-             * 204: No [SubjectAndTeacher]
-             * 200: Got [SubjectAndTeacher]
-             * 500: Server failure response
-             * 503: Service is unavailable
-             */
-
-            val responseCode = response.keys.first()
+            val statusCode = response.keys.first()
             val subjectAndTeacherList = response.values.first()
-            val textTemplate = "Fetched subjects: "
 
-            when (responseCode) {
-                204 -> Log.i(TAG, "$textTemplate Haven't got any subjects ($responseCode)")
-                503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
-                500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
-                200 -> {
-                    Log.i(TAG, "Trying to update database with fetched subjects...")
+            if (statusCode == StatusCode.OK) {
 
-                    // Update database with fetched subjects
-                    profileViewModel.upsertSubject(subjectAndTeacherList!!)
+                // Update database with fetched subjects
+                profileViewModel.upsertSubject(subjectAndTeacherList!!)
 
-                    // Create a list with ids of fetched subjects
-                    profileViewModel.createSubjectsIdsList(
-                        subjectAndTeacherList, FetchedListType.NEW.type
-                    )
-                }
+                // Create a list with ids of fetched subjects
+                profileViewModel.createSubjectsIdsList(
+                    subjectAndTeacherList, FetchedListType.NEW
+                )
+            } else {
+                val errorMessage = statusCode.message("Subjects")
+                Log.w(TAG, errorMessage)
             }
         }
 
         profileViewModel.fetchedProfileAttendance.observe(viewLifecycleOwner) { response ->
-
-            /**
-             * Response codes ->
-             * 204: No [ProfileAttendance]
-             * 200: Got [ProfileAttendance]
-             * 500: Server failure response
-             * 503: Service is unavailable
-             */
-
-            val responseCode = response.keys.first()
+            val statusCode = response.keys.first()
             val profileAttendanceList = response.values.first()
-            val textTemplate = "Fetched profile attendance: "
 
-            when (responseCode) {
-                204 -> Log.i(TAG, "$textTemplate Haven't got any profile attendance ($responseCode)")
-                503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
-                500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
-                200 -> {
-                    Log.i(TAG, "Trying to update database with fetched profile attendance...")
+            if (statusCode == StatusCode.OK) {
+                Log.i(TAG, "Trying to update database with fetched profile attendance...")
 
-                    // Update database with fetched subjects
-                    profileViewModel.upsertProfileAttendance(profileAttendanceList!!)
+                // Update database with fetched subjects
+                profileViewModel.upsertProfileAttendance(profileAttendanceList!!)
 
-                    // Create a list with ids of fetched subjects
-                    profileViewModel.createProfileAttendanceIdsList(
-                        profileAttendanceList, FetchedListType.NEW.type
-                    )
+                // Create a list with ids of fetched subjects
+                profileViewModel.createProfileAttendanceIdsList(
+                    profileAttendanceList, FetchedListType.NEW
+                )
 
-                    // Prevent from endless updates
-                    profileViewModel.fetchedProfileAttendance.removeObservers(viewLifecycleOwner)
-                }
+                // Prevent from endless updates
+                profileViewModel.fetchedProfileAttendance.removeObservers(viewLifecycleOwner)
+            } else {
+                val errorMessage = statusCode.message("Profile attendance")
+                Log.w(TAG, errorMessage)
             }
         }
         postponeEnterTransition()
@@ -167,7 +143,7 @@ class ProfileFragment : Fragment() {
     private fun updateUI(subjectAndTeacherList: List<SubjectAndTeacher>) {
         // Create a list of queried subjects ids
         profileViewModel.createSubjectsIdsList(
-            subjectAndTeacherList, FetchedListType.OLD.type
+            subjectAndTeacherList, FetchedListType.OLD
         )
 
         adapter = DisciplineAdapter(subjectAndTeacherList)

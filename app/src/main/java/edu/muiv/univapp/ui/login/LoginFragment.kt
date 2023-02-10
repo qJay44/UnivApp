@@ -137,14 +137,6 @@ class LoginFragment : Fragment() {
 
         loginViewModel.responseCode.observe(viewLifecycleOwner) { statusCode ->
             when (statusCode) {
-                /**
-                 * [statusCode] ->
-                 * 204: Invalid credentials
-                 * 200: Valid credentials, sign-in user
-                 * 500: Server failure response
-                 * 503: Service is unavailable
-                 */
-
                 204 -> showToast("Логин или пароль введены неправильно")
                 200 -> startActivity(Intent(activity, NavigationActivity::class.java))
                 500 -> showToast("Произошла неизвестная ошибка, попробуйте позже")

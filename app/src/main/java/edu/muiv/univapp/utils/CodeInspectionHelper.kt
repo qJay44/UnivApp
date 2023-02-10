@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package edu.muiv.univapp.utils
 
 import android.util.Log

@@ -3,6 +3,7 @@ package edu.muiv.univapp.ui.navigation.schedule
 import android.util.Log
 import androidx.lifecycle.*
 import edu.muiv.univapp.api.CoreDatabaseFetcher
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.FetchedListType
@@ -28,7 +29,7 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleForStudent = MutableLiveData<String>()
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val _dayFromTo = MutableLiveData<String>()
-    private val _scheduleFetched = MutableLiveData<Map<Int, List<ScheduleWithSubjectAndTeacher>?>>()
+    private val _scheduleFetched = MutableLiveData<Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>>()
 
     ////////////////////////
 
@@ -54,7 +55,7 @@ class ScheduleListViewModel : ViewModel() {
     val dayFromTo: LiveData<String>
         get() = _dayFromTo
 
-    val fetchedSchedule: LiveData<Map<Int, List<ScheduleWithSubjectAndTeacher>?>>
+    val fetchedSchedule: LiveData<Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>>
         get() = _scheduleFetched
 
     /////////////////////////////////////
@@ -109,16 +110,16 @@ class ScheduleListViewModel : ViewModel() {
         }
     }
 
-    fun createScheduleIdList(scheduleList: List<ScheduleWithSubjectAndTeacher>, type: Int) {
+    fun createScheduleIdList(scheduleList: List<ScheduleWithSubjectAndTeacher>, type: FetchedListType) {
         viewModelScope.launch {
             when (type) {
                 // The list from API call
-                FetchedListType.NEW.type -> {
+                FetchedListType.NEW -> {
                     listDiff.newList = scheduleList.map { it.id }
                     univRepository.deleteScheduleById(listDiff.deleteList)
                 }
                 // The list from the app database
-                FetchedListType.OLD.type -> {
+                FetchedListType.OLD -> {
                     listDiff.oldList = scheduleList.map { it.id }
                     fetchSchedule()
                 }

@@ -16,6 +16,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.utils.AsyncCell
@@ -134,7 +135,7 @@ class ScheduleListFragment : Fragment() {
                 schedules?.let {
                     updateUI(schedules)
                     // Create a list of queried schedule ids
-                    scheduleListViewModel.createScheduleIdList(schedules, FetchedListType.OLD.type)
+                    scheduleListViewModel.createScheduleIdList(schedules, FetchedListType.OLD)
                 }
             }
         } else {
@@ -142,39 +143,28 @@ class ScheduleListFragment : Fragment() {
                 schedules?.let {
                     updateUI(schedules)
                     // Create a list of queried schedule ids
-                    scheduleListViewModel.createScheduleIdList(schedules, FetchedListType.OLD.type)
+                    scheduleListViewModel.createScheduleIdList(schedules, FetchedListType.OLD)
                 }
             }
         }
 
         scheduleListViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
-            /**
-             * Response codes ->
-             * 204: No [ScheduleWithSubjectAndTeacher]
-             * 200: Got [ScheduleWithSubjectAndTeacher]
-             * 500: Server failure response
-             * 503: Service is unavailable
-             */
-
-            val responseCode = response.keys.first()
+            val statusCode = response.keys.first()
             val scheduleList = response.values.first()
-            val textTemplate = "Fetched schedules: "
 
-            when (responseCode) {
-                204 -> Log.i(TAG, "$textTemplate Haven't got any schedule ($responseCode)")
-                503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
-                500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
-                200 -> {
-                    Log.i(TAG, "Trying to update database with fetched notifications...")
+            if (statusCode == StatusCode.OK) {
+                Log.i(TAG, "Trying to update database with fetched notifications...")
 
-                    // Update database with fetched schedule
-                    scheduleListViewModel.upsertSchedule(scheduleList!!)
+                // Update database with fetched schedule
+                scheduleListViewModel.upsertSchedule(scheduleList!!)
 
-                    // Create a list with ids of fetched schedule
-                    scheduleListViewModel.createScheduleIdList(
-                        scheduleList, FetchedListType.NEW.type
-                    )
-                }
+                // Create a list with ids of fetched schedule
+                scheduleListViewModel.createScheduleIdList(
+                    scheduleList, FetchedListType.NEW
+                )
+            } else {
+                val errorMessage = statusCode.message("Schedule")
+                Log.w(TAG, errorMessage)
             }
         }
 
@@ -263,12 +253,12 @@ class ScheduleListFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             return when (viewType) {
-                HolderViewType.HEADER.type -> {
+                HolderViewType.HEADER.ordinal -> {
                     ScheduleHeaderHolder(
                         HeaderItemCell(parent.context).apply { inflate() }
                     )
                 }
-                HolderViewType.DEFAULT.type -> {
+                HolderViewType.DEFAULT.ordinal -> {
                     ScheduleDefaultHolder(
                         DefaultItemCell(parent.context).apply { inflate() }
                     )
@@ -299,8 +289,8 @@ class ScheduleListFragment : Fragment() {
         override fun getItemViewType(position: Int): Int {
             // Which holder to create
             return when (scheduleAllBooleans.elementAt(position)) {
-                true  -> HolderViewType.HEADER.type
-                false -> HolderViewType.DEFAULT.type
+                true  -> HolderViewType.HEADER.ordinal
+                false -> HolderViewType.DEFAULT.ordinal
             }
         }
 
@@ -380,8 +370,8 @@ class ScheduleListFragment : Fragment() {
     private class ScheduleHeaderHolder(view: View) : RecyclerView.ViewHolder(view)
     private class ScheduleDefaultHolder(view: View) : RecyclerView.ViewHolder(view)
 
-    private enum class HolderViewType(val type: Int) {
-        HEADER(0),
-        DEFAULT(1)
+    private enum class HolderViewType {
+        HEADER,
+        DEFAULT
     }
 }

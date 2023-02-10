@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.api.CoreDatabaseFetcher
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
@@ -35,7 +36,7 @@ class ScheduleViewModel : ViewModel() {
     private val scheduleIdLiveData = MutableLiveData<UUID>()
     private val subjectLiveData = MutableLiveData<UUID>()
 
-    private val _fetchedScheduleAttendanceForStudent = MutableLiveData<Map<Int, ScheduleAttendance?>>()
+    private val _fetchedScheduleAttendanceForStudent = MutableLiveData<Map<StatusCode, ScheduleAttendance?>>()
     private val _upsertAttendanceStatus = MutableLiveData<Int>()
     private val _fetchForTeacherStatus = MutableLiveData<String>()
     private val _updateScheduleStatus = MutableLiveData<Int>()
@@ -121,7 +122,7 @@ class ScheduleViewModel : ViewModel() {
             univRepository.getSubjectById(id)
         }
 
-    val fetchedScheduleAttendanceForStudent: LiveData<Map<Int, ScheduleAttendance?>>
+    val fetchedScheduleAttendanceForStudent: LiveData<Map<StatusCode, ScheduleAttendance?>>
         get() = _fetchedScheduleAttendanceForStudent
 
     val upsertAttendanceStatus: LiveData<Int>
@@ -151,17 +152,15 @@ class ScheduleViewModel : ViewModel() {
         if (UserDataHolder.isServerOnline) {
             if (isTeacher) {
                 univApi.fetchScheduleAttendanceForTeacher(scheduleID.toString()) { response ->
-                    val responseCode = response.keys.first()
+                    val statusCode = response.keys.first()
                     val scheduleAttendance = response.values.first()
 
-                    when (responseCode) {
-                        200 -> {
-                            univRepository.upsertScheduleAttendance(scheduleAttendance!!)
-                            _fetchForTeacherStatus.value = "Upserting ${scheduleAttendance.size} for teacher"
-                        }
-                        else -> {
-                            _fetchForTeacherStatus.value = "Invalid code for upserting ($responseCode)"
-                        }
+                    if (statusCode == StatusCode.OK) {
+                        univRepository.upsertScheduleAttendance(scheduleAttendance!!)
+                        _fetchForTeacherStatus.value = "Upserting ${scheduleAttendance.size} for teacher"
+                    }
+                    else {
+                        _fetchForTeacherStatus.value = "Invalid code for upserting ($statusCode)"
                     }
                 }
             } else {

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import edu.muiv.univapp.R
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.databinding.FragmentNotificationsListBinding
 import edu.muiv.univapp.utils.FetchedListType
 
@@ -75,33 +76,22 @@ class NotificationListFragment : Fragment() {
                 }
             }
             notificationListViewModel.fetchedNotifications.observe(viewLifecycleOwner) { response ->
-
-                /**
-                 * Response codes ->
-                 * 204: No [Notification]
-                 * 200: Got [Notification]
-                 * 500: Server failure response
-                 * 503: Service is unavailable
-                 */
-
-                val responseCode = response.keys.first()
+                val statusCode = response.keys.first()
                 val notifications = response.values.first()
-                val textTemplate = "Fetched notifications: "
-                when (responseCode) {
-                    204 -> Log.i(TAG, "$textTemplate Haven't got any notifications ($responseCode)")
-                    503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
-                    500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
-                    200 -> {
-                        Log.i(TAG, "Trying to update database with fetched notifications...")
 
-                        // Update database with fetched notifications
-                        notificationListViewModel.upsertNotifications(notifications!!)
+                if (statusCode == StatusCode.OK) {
+                    Log.i(TAG, "Trying to update database with fetched notifications...")
 
-                        // Create a list with ids of fetched notifications
-                        notificationListViewModel.createNotificationsIdList(
-                            notifications, FetchedListType.NEW.type
-                        )
-                    }
+                    // Update database with fetched notifications
+                    notificationListViewModel.upsertNotifications(notifications!!)
+
+                    // Create a list with ids of fetched notifications
+                    notificationListViewModel.createNotificationsIdList(
+                        notifications, FetchedListType.NEW
+                    )
+                } else {
+                    val errorMessage = statusCode.message("Notifications")
+                    Log.w(TAG, errorMessage)
                 }
             }
         }
@@ -120,7 +110,7 @@ class NotificationListFragment : Fragment() {
 
         // Create a list of queried notifications ids
         notificationListViewModel.createNotificationsIdList(
-            notifications, FetchedListType.OLD.type
+            notifications, FetchedListType.OLD
         )
 
         // Appearance of the items

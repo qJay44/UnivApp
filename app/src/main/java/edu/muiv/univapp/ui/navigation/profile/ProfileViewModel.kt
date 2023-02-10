@@ -2,6 +2,7 @@ package edu.muiv.univapp.ui.navigation.profile
 
 import androidx.lifecycle.*
 import edu.muiv.univapp.api.CoreDatabaseFetcher
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.utils.FetchedListType
 import edu.muiv.univapp.utils.TwoListsDifferenceString
@@ -20,8 +21,8 @@ class ProfileViewModel : ViewModel() {
 
     private val groupName = MutableLiveData<String>()
     private val _profileAttendance = MutableLiveData<UUID>()
-    private val _subjectsFetched = MutableLiveData<Map<Int, List<SubjectAndTeacher>?>>()
-    private val _profileAttendanceFetched = MutableLiveData<Map<Int, List<ProfileAttendance>?>>()
+    private val _subjectsFetched = MutableLiveData<Map<StatusCode, List<SubjectAndTeacher>?>>()
+    private val _profileAttendanceFetched = MutableLiveData<Map<StatusCode, List<ProfileAttendance>?>>()
 
     ////////////////////////
 
@@ -52,10 +53,10 @@ class ProfileViewModel : ViewModel() {
             univRepository.getSubjectsAndTeachers(groupName)
         }
 
-    val fetchedSubjects: LiveData<Map<Int, List<SubjectAndTeacher>?>>
+    val fetchedSubjects: LiveData<Map<StatusCode, List<SubjectAndTeacher>?>>
         get() = _subjectsFetched
 
-    val fetchedProfileAttendance: LiveData<Map<Int, List<ProfileAttendance>?>>
+    val fetchedProfileAttendance: LiveData<Map<StatusCode, List<ProfileAttendance>?>>
         get() = _profileAttendanceFetched
 
     /////////////////////////////////////
@@ -82,17 +83,17 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun createSubjectsIdsList(subjectAndTeacherList: List<SubjectAndTeacher>, type: Int) {
+    fun createSubjectsIdsList(subjectAndTeacherList: List<SubjectAndTeacher>, type: FetchedListType) {
         viewModelScope.launch {
             when (type) {
                 // The list from API call
-                FetchedListType.NEW.type -> {
+                FetchedListType.NEW -> {
                     listDiffSubjects.newList = subjectAndTeacherList.map { it.subjectID }
                     univRepository.deleteSubjectsById(listDiffSubjects.deleteList)
 
                 }
                 // The list from the app database
-                FetchedListType.OLD.type -> {
+                FetchedListType.OLD -> {
                     listDiffSubjects.oldList = subjectAndTeacherList.map { it.subjectID }
                     fetchProfileSubjects()
                 }
@@ -100,16 +101,16 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun createProfileAttendanceIdsList(profileAttendanceList: List<ProfileAttendance>, type: Int) {
+    fun createProfileAttendanceIdsList(profileAttendanceList: List<ProfileAttendance>, type: FetchedListType) {
         viewModelScope.launch {
             when (type) {
                 // The list from API call
-                FetchedListType.NEW.type -> {
+                FetchedListType.NEW -> {
                     listDiffScheduleAttendance.newList = profileAttendanceList.map { it.id }
                     univRepository.deleteProfileAttendanceById(listDiffScheduleAttendance.deleteList)
                 }
                 // The list from the app database
-                FetchedListType.OLD.type -> {
+                FetchedListType.OLD -> {
                     listDiffScheduleAttendance.oldList = profileAttendanceList.map { it.id }
                     fetchProfileAttendance()
                 }

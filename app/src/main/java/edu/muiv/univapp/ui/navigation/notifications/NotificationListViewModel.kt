@@ -2,6 +2,7 @@ package edu.muiv.univapp.ui.navigation.notifications
 
 import androidx.lifecycle.*
 import edu.muiv.univapp.api.CoreDatabaseFetcher
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.utils.FetchedListType
 import edu.muiv.univapp.utils.TwoListsDifferenceString
@@ -19,12 +20,12 @@ class NotificationListViewModel : ViewModel() {
 
     private val _notificationsForStudent = MutableLiveData<List<String>>()
     private val _notificationsForTeacher = MutableLiveData<List<String>>()
-    private val _notificationsFetched = MutableLiveData<Map<Int, List<Notification>?>>()
+    private val _notificationsFetched = MutableLiveData<Map<StatusCode, List<Notification>?>>()
 
     val isTeacher: Boolean
         get() = user.groupName == null
 
-    val fetchedNotifications: LiveData<Map<Int, List<Notification>?>>
+    val fetchedNotifications: LiveData<Map<StatusCode, List<Notification>?>>
         get() = _notificationsFetched
 
     val notificationsForStudent: LiveData<List<Notification>> =
@@ -62,16 +63,16 @@ class NotificationListViewModel : ViewModel() {
         }
     }
 
-    fun createNotificationsIdList(notifications: List<Notification>, type: Int) {
+    fun createNotificationsIdList(notifications: List<Notification>, type: FetchedListType) {
         viewModelScope.launch {
             when (type) {
                 // The list from API call
-                FetchedListType.NEW.type -> {
+                FetchedListType.NEW -> {
                     listDiff.newList = notifications.map { it.id }
                     univRepository.deleteNotificationsById(listDiff.deleteList)
                 }
                 // The list from the app database
-                FetchedListType.OLD.type -> {
+                FetchedListType.OLD -> {
                     listDiff.oldList = notifications.map { it.id }
                     fetchNotifications()
                 }

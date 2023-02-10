@@ -18,14 +18,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.nio.charset.Charset
 import java.util.UUID
 
-/**
-* Response codes ->
-* 204: Response is OK but no content
-* 200: Response is OK
-* 503: Service is unavailable
-* 500: Unexpected fail
-*/
-
 class CoreDatabaseFetcher private constructor() {
 
     companion object {
@@ -60,7 +52,7 @@ class CoreDatabaseFetcher private constructor() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    fun fetchUser(login: Login, callback: (Int) -> Unit) {
+    fun fetchUser(login: Login, callback: (StatusCode) -> Unit) {
 
         // POST body
         val loginResponse = LoginResponse(
@@ -74,29 +66,29 @@ class CoreDatabaseFetcher private constructor() {
                 val responseBody = response.body()
                 if (responseBody != null) {
                     if (responseBody.id == "") {
-                        callback.invoke(204)
+                        callback.invoke(StatusCode.NO_CONTENT)
                         Log.i(TAG, "onResponse: response has no content (fetchUser)")
                     } else {
-                        callback.invoke(200)
+                        callback.invoke(StatusCode.OK)
                         UserDataHolder.initialize(responseBody)
                         Log.i(TAG, "onResponse: OK (fetchUser)")
                     }
                 } else {
-                    callback.invoke(503)
+                    callback.invoke(StatusCode.SERVICE_UNAVAILABLE)
                     Log.w(TAG, "onResponse: responseBody is null (fetchUser)")
                 }
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Log.e(TAG, "onFailure: fetch fail (fetchUser)", t)
-                callback.invoke(500)
+                callback.invoke(StatusCode.INTERNAL_SERVER_ERROR)
             }
         })
     }
 
     //================== GET requests ==================//
 
-    fun fetchNotifications(group: String, callback: (Map<Int, List<Notification>?>) -> Unit) {
+    fun fetchNotifications(group: String, callback: (Map<StatusCode, List<Notification>?>) -> Unit) {
         val request = coreDatabaseApi.fetchNotifications(group)
         request.enqueue(DefaultGetRequest<List<Notification>>(
             callback, true, "fetchNotification"))
@@ -105,7 +97,7 @@ class CoreDatabaseFetcher private constructor() {
     fun fetchSchedule(
         group: String? = null,
         teacherId: UUID? = null,
-        callback: (Map<Int, List<ScheduleWithSubjectAndTeacher>?>) -> Unit
+        callback: (Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>) -> Unit
     ) {
         val request = if (teacherId == null) {
             coreDatabaseApi.fetchSchedule(group!!)
@@ -117,13 +109,13 @@ class CoreDatabaseFetcher private constructor() {
             callback, true, "fetchSchedule"))
     }
 
-    fun fetchProfileSubjects(group: String, callback: (Map<Int, List<SubjectAndTeacher>?>) -> Unit) {
+    fun fetchProfileSubjects(group: String, callback: (Map<StatusCode, List<SubjectAndTeacher>?>) -> Unit) {
         val request = coreDatabaseApi.fetchProfileSubjects(group)
         request.enqueue(DefaultGetRequest<List<SubjectAndTeacher>>(
             callback, true, "fetchProfileSubjects"))
     }
 
-    fun fetchProfileAttendance(userId: String, callback: (Map<Int, List<ProfileAttendance>?>) -> Unit) {
+    fun fetchProfileAttendance(userId: String, callback: (Map<StatusCode, List<ProfileAttendance>?>) -> Unit) {
         val request = coreDatabaseApi.fetchProfileAttendance(userId)
         request.enqueue(DefaultGetRequest<List<ProfileAttendance>>(
             callback, true, "fetchProfileAttendance"))
@@ -132,7 +124,7 @@ class CoreDatabaseFetcher private constructor() {
     fun fetchScheduleAttendanceForStudent(
         scheduleId: String,
         studentId: String,
-        callback: (Map<Int, ScheduleAttendance?>) -> Unit
+        callback: (Map<StatusCode, ScheduleAttendance?>) -> Unit
     ) {
         val params = hashMapOf("scheduleId" to scheduleId, "studentId" to studentId)
         val request = coreDatabaseApi.fetchScheduleAttendanceForStudent(params)
@@ -142,7 +134,7 @@ class CoreDatabaseFetcher private constructor() {
 
     fun fetchScheduleAttendanceForTeacher(
         scheduleId: String,
-        callback: (Map<Int, List<ScheduleAttendanceForTeacherResponse>?>) -> Unit
+        callback: (Map<StatusCode, List<ScheduleAttendanceForTeacherResponse>?>) -> Unit
     ) {
         val request = coreDatabaseApi.fetchScheduleAttendanceForTeacher(scheduleId)
         request.enqueue(DefaultGetRequest<List<ScheduleAttendanceForTeacherResponse>>(
@@ -188,7 +180,7 @@ class CoreDatabaseFetcher private constructor() {
     //==================================================//
 
     private class DefaultGetRequest<T> (
-        private val callback: (Map<Int, T?>) -> Unit,
+        private val callback: (Map<StatusCode, T?>) -> Unit,
         private val isList  : Boolean,
         private val funcName: String
         ) : Callback<T> {
@@ -205,21 +197,21 @@ class CoreDatabaseFetcher private constructor() {
                 }
 
                 if (hasContent) {
-                    callback.invoke(mapOf(200 to responseBody))
+                    callback.invoke(mapOf(StatusCode.OK to responseBody))
                     Log.i(TAG, "onResponse: OK ($funcName)")
                 } else {
-                    callback.invoke(mapOf(204 to null))
+                    callback.invoke(mapOf(StatusCode.NO_CONTENT to null))
                     Log.i(TAG, "onResponse: response has no content ($funcName)")
                 }
             } else {
-                callback.invoke(mapOf(503 to null))
+                callback.invoke(mapOf(StatusCode.SERVICE_UNAVAILABLE to null))
                 Log.w(TAG, "onResponse: responseBody is null ($funcName)")
             }
         }
 
         override fun onFailure(call: Call<T>, t: Throwable) {
             Log.e(TAG, "onFailure: ($funcName)", t)
-            callback.invoke(mapOf(500 to null))
+            callback.invoke(mapOf(StatusCode.INTERNAL_SERVER_ERROR to null))
         }
     }
 

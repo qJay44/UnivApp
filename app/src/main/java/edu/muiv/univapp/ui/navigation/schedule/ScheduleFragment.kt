@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import edu.muiv.univapp.R
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.databinding.FragmentScheduleBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
@@ -142,34 +143,20 @@ class ScheduleFragment : Fragment() {
                     }
                 } else {
                     scheduleViewModel.fetchedScheduleAttendanceForStudent.observe(viewLifecycleOwner) { response ->
-                        /**
-                         * Response codes ->
-                         * 204: No [ScheduleAttendance]
-                         * 200: Got [ScheduleAttendance]
-                         * 500: Server failure response
-                         * 503: Service is unavailable
-                         */
-
-                        val responseCode = response.keys.first()
+                        val statusCode = response.keys.first()
                         val scheduleAttendance = response.values.first()
-                        val textTemplate = "Fetched schedule attendance: "
 
-                        // TODO: enum class for status codes
-                        // TODO: refactor other enums
+                        if (statusCode == StatusCode.OK) {
+                            Log.i(
+                                TAG,
+                                "Trying to update database with fetched schedule attendance..."
+                            )
 
-                        when (responseCode) {
-                            204 -> Log.i(TAG, "$textTemplate Haven't got any schedule attendance ($responseCode)")
-                            503 -> Log.w(TAG, "$textTemplate Server isn't working ($responseCode)")
-                            500 -> Log.e(TAG, "$textTemplate Got unexpected fail ($responseCode)")
-                            200 -> {
-                                Log.i(
-                                    TAG,
-                                    "Trying to update database with fetched schedule attendance..."
-                                )
-
-                                // Update database with fetched schedule attendance
-                                scheduleViewModel.upsertAttendance(scheduleAttendance!!)
-                            }
+                            // Update database with fetched schedule attendance
+                            scheduleViewModel.upsertAttendance(scheduleAttendance!!)
+                        } else {
+                            val errorMessage = statusCode.message("Schedule attendance")
+                            Log.w(TAG, errorMessage)
                         }
                     }
                 }

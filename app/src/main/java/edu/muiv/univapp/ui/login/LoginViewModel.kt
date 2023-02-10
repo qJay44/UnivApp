@@ -38,7 +38,7 @@ class LoginViewModel : ViewModel() {
         login.isTeacher = isTeacher
 
         univAPI.fetchUser(login) { statusCode ->
-            _responseStatusCode.value = statusCode
+            _responseStatusCode.value = statusCode.code
         }
     }
 
