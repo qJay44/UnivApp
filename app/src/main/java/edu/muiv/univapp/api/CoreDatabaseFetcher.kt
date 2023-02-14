@@ -1,6 +1,5 @@
 package edu.muiv.univapp.api
 
-import android.util.Base64
 import android.util.Log
 import edu.muiv.univapp.ui.login.Login
 import edu.muiv.univapp.ui.navigation.notifications.Notification
@@ -15,7 +14,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.nio.charset.Charset
 import java.util.UUID
 
 class CoreDatabaseFetcher private constructor() {
@@ -36,6 +34,7 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     private val coreDatabaseApi: CoreDatabaseApi
+    private val encryptor by lazy { Encryptor() }
 
     init {
         val retrofit = Retrofit.Builder()
@@ -46,17 +45,11 @@ class CoreDatabaseFetcher private constructor() {
         coreDatabaseApi = retrofit.create(CoreDatabaseApi::class.java)
     }
 
-    private fun encodeString(login: String, password: String): String {
-        val byteArray = ("$login:$password").toByteArray(Charset.forName("UTF-8"))
-
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
-    }
-
     fun fetchUser(login: Login, callback: (StatusCode) -> Unit) {
 
         // POST body
         val loginResponse = LoginResponse(
-            token = encodeString(login.username, login.password),
+            token = encryptor.encrypt("${login.username}:${login.password}"),
             isTeacher = login.isTeacher
         )
 
@@ -84,6 +77,8 @@ class CoreDatabaseFetcher private constructor() {
                 callback.invoke(StatusCode.INTERNAL_SERVER_ERROR)
             }
         })
+
+        encryptor.reset()
     }
 
     //================== GET requests ==================//
