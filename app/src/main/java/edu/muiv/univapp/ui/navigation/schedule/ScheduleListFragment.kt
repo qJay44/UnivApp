@@ -12,9 +12,11 @@ import androidx.annotation.FontRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.databinding.FragmentScheduleListBinding
@@ -31,6 +33,7 @@ class ScheduleListFragment : Fragment() {
 
     companion object {
         private const val TAG = "ScheduleListFragment"
+        private const val LAST_SCHEDULE = "lastSchedule"
     }
 
     private var _binding: FragmentScheduleListBinding? = null
@@ -153,7 +156,7 @@ class ScheduleListFragment : Fragment() {
             val scheduleList = response.values.first()
 
             if (statusCode == StatusCode.OK) {
-                Log.i(TAG, "Trying to update database with fetched notifications...")
+                Log.i(TAG, "Updating database with fetched notifications")
 
                 // Update database with fetched schedule
                 scheduleListViewModel.upsertSchedule(scheduleList!!)
@@ -162,6 +165,16 @@ class ScheduleListFragment : Fragment() {
                 scheduleListViewModel.createScheduleIdList(
                     scheduleList, FetchedListType.NEW
                 )
+
+                lifecycleScope.launch {
+                    val sp = requireContext().getSharedPreferences(LAST_SCHEDULE, Context.MODE_PRIVATE)
+                    val editor = sp.edit()
+                    val gson = Gson()
+                    val json = gson.toJson(scheduleList.map { it.id })
+
+                    editor.putString("schedule", json)
+                    editor.apply()
+                }
             } else {
                 val errorMessage = statusCode.message("Schedule")
                 Log.w(TAG, errorMessage)
