@@ -54,4 +54,7 @@
     <string name="patch_top">вверхная плашка</string>
     <string name="text_login_title">РАСПИСАНИЕ ЗАНЯТИЙ</string>
     <string name="no_schedule_text">Расписание отсутствует</string>
+    <string name="notification_channel_name">Schedule</string>
+    <string name="new_schedule_title">New Schedule</string>
+    <string name="new_schedule_text">You have a new schedule.</string>
 </resources>

@@ -1,5 +1,7 @@
 package edu.muiv.univapp.ui.login
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -7,8 +9,10 @@ import edu.muiv.univapp.R
 
 class LoginActivity : AppCompatActivity(), LoginFragmentChoice.Callbacks {
 
-    private companion object {
+    companion object {
         private const val TAG = ".LoginActivity"
+
+        fun newIntent(context: Context): Intent = Intent(context, LoginActivity::class.java)
     }
 
     private var lastCallbackParam: Boolean? = null

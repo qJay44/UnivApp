@@ -1,7 +1,9 @@
 package edu.muiv.univapp.ui.navigation.schedule
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -9,6 +11,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.FontRes
+import androidx.core.app.ActivityCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
 import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.api.StatusCode
@@ -25,15 +29,18 @@ import edu.muiv.univapp.ui.navigation.schedule.utils.AsyncCell
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
 import edu.muiv.univapp.ui.navigation.schedule.utils.WeekChangeAnimationListener
 import edu.muiv.univapp.utils.FetchedListType
+import edu.muiv.univapp.utils.PollWorker
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ScheduleListFragment : Fragment() {
 
     companion object {
         private const val TAG = "ScheduleListFragment"
         private const val LAST_SCHEDULE = "lastSchedule"
+        private const val POLL_WORK = "pollWork"
     }
 
     private var _binding: FragmentScheduleListBinding? = null
@@ -55,6 +62,7 @@ class ScheduleListFragment : Fragment() {
 
         if (savedInstanceState == null) {
             scheduleListViewModel.loadCalendar()
+            setPollingWorker()
         }
     }
 
@@ -169,8 +177,7 @@ class ScheduleListFragment : Fragment() {
                 lifecycleScope.launch {
                     val sp = requireContext().getSharedPreferences(LAST_SCHEDULE, Context.MODE_PRIVATE)
                     val editor = sp.edit()
-                    val gson = Gson()
-                    val json = gson.toJson(scheduleList.map { it.id })
+                    val json = Gson().toJson(scheduleList.map { it.id })
 
                     editor.putString("schedule", json)
                     editor.apply()
@@ -228,6 +235,28 @@ class ScheduleListFragment : Fragment() {
             rvSchedule.scheduleLayoutAnimation()
         } else {
             Log.e(TAG, "attachAdapter: Adapter wasn't initialized")
+        }
+    }
+
+    private fun setPollingWorker() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.UNMETERED)
+                .build()
+            val periodicRequest = PeriodicWorkRequest
+                .Builder(PollWorker::class.java, 15, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .build()
+            WorkManager.getInstance().enqueueUniquePeriodicWork(POLL_WORK,
+                ExistingPeriodicWorkPolicy.KEEP,
+                periodicRequest)
+
+        } else {
+            Log.w(TAG, "doWork: no permission to send notification")
         }
     }
 
