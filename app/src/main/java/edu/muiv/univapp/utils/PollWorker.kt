@@ -1,15 +1,12 @@
 package edu.muiv.univapp.utils
 
-import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
+import android.content.Intent
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
@@ -28,6 +25,10 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
         private const val TAG = "PollWorker"
         private const val PREFS_NAME = "USER_INFO"
         private const val LAST_SCHEDULE = "lastSchedule"
+        const val ACTION_SHOW_NOTIFICATION = "edu.muiv.univapp.utils.SHOW_NOTIFICATION"
+        const val PERMISSION_SHOW_NOTIFICATION = "edu.muiv.univapp.PRIVATE"
+        const val REQUEST_CODE = "requestCode"
+        const val NOTIFICATION = "notification"
     }
 
     private val userLoaded by lazy { loadUserPrefs() }
@@ -36,7 +37,7 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
 
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun doWork(): Result {
-        if (UserDataHolder.isServerOnline && userLoaded && checkNotificationsPermission()) {
+        if (UserDataHolder.isServerOnline && userLoaded) {
             val user = UserDataHolder.get().user
 
             listDiff.oldList = getSchedulePrefs() ?: emptyList()
@@ -76,9 +77,7 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
                         .setAutoCancel(true)
                         .build()
 
-                    val notificationManager = NotificationManagerCompat.from(context)
-
-                    notificationManager.notify(0, notification)
+                    showBackgroundNotification(notification)
                 } else {
                     Log.i(TAG, "doWork: No new schedule")
                 }
@@ -111,14 +110,12 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
         }
     }
 
-    private fun checkNotificationsPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED)
-        } else {
-            true
+    private fun showBackgroundNotification(notification: Notification) {
+        val intent = Intent(ACTION_SHOW_NOTIFICATION).apply {
+            putExtra(REQUEST_CODE, 0)
+            putExtra(NOTIFICATION, notification)
         }
+
+        context.sendOrderedBroadcast(intent, PERMISSION_SHOW_NOTIFICATION)
     }
 }
