@@ -1,4 +1,4 @@
-package edu.muiv.univapp.ui.navigation.schedule.utils
+package edu.muiv.univapp.utils
 
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
 import androidx.fragment.app.Fragment
-import edu.muiv.univapp.utils.PollWorker
 
 abstract class VisibleFragment : Fragment() {
     companion object {

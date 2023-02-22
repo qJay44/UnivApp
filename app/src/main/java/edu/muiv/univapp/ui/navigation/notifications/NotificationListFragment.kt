@@ -1,5 +1,6 @@
 package edu.muiv.univapp.ui.navigation.notifications
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,21 +9,29 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.TextView
 import androidx.core.view.children
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.*
+import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.databinding.FragmentNotificationsListBinding
+import edu.muiv.univapp.utils.VisibleFragment
 import edu.muiv.univapp.utils.FetchedListType
+import edu.muiv.univapp.utils.PollWorker
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
-class NotificationListFragment : Fragment() {
+class NotificationListFragment : VisibleFragment() {
 
     companion object {
         private const val TAG = "NotificationLF"
+        private const val LAST_UNIV_NOTIFICATION = "lastUnivNotification"
+        private const val POLL_WORK = "pollWorkUnivNotification"
     }
 
     private var _binding: FragmentNotificationsListBinding? = null
@@ -41,6 +50,7 @@ class NotificationListFragment : Fragment() {
 
         if (savedInstanceState == null) {
             notificationListViewModel.loadNotifications()
+            setPollingWorker()
         }
     }
 
@@ -89,6 +99,15 @@ class NotificationListFragment : Fragment() {
                     notificationListViewModel.createNotificationsIdList(
                         notifications, FetchedListType.NEW
                     )
+
+                    lifecycleScope.launch {
+                        val sp = requireContext().getSharedPreferences(LAST_UNIV_NOTIFICATION, Context.MODE_PRIVATE)
+                        val editor = sp.edit()
+                        val json = Gson().toJson(notifications.map { it.id })
+
+                        editor.putString("univNotification", json)
+                        editor.apply()
+                    }
                 } else {
                     val errorMessage = statusCode.message("Notifications")
                     Log.w(TAG, errorMessage)
@@ -131,6 +150,22 @@ class NotificationListFragment : Fragment() {
 
         // Allow animations to play
         startPostponedEnterTransition()
+    }
+
+    private fun setPollingWorker() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .build()
+        val periodicRequest = PeriodicWorkRequest
+            .Builder(PollWorker::class.java, 15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+            POLL_WORK,
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicRequest
+        )
     }
 
     private inner class NotificationAdapter

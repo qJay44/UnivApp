@@ -23,7 +23,7 @@ import edu.muiv.univapp.databinding.FragmentScheduleListBinding
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.ui.navigation.schedule.utils.AsyncCell
 import edu.muiv.univapp.ui.navigation.schedule.utils.OnTouchListenerRecyclerView
-import edu.muiv.univapp.ui.navigation.schedule.utils.VisibleFragment
+import edu.muiv.univapp.utils.VisibleFragment
 import edu.muiv.univapp.ui.navigation.schedule.utils.WeekChangeAnimationListener
 import edu.muiv.univapp.utils.FetchedListType
 import edu.muiv.univapp.utils.PollWorker
@@ -36,7 +36,7 @@ class ScheduleListFragment : VisibleFragment() {
     companion object {
         private const val TAG = "ScheduleListFragment"
         private const val LAST_SCHEDULE = "lastSchedule"
-        private const val POLL_WORK = "pollWork"
+        private const val POLL_WORK = "pollWorkSchedule"
     }
 
     private var _binding: FragmentScheduleListBinding? = null
