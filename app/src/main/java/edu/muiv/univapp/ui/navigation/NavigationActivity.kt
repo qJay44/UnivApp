@@ -34,7 +34,6 @@ class NavigationActivity : AppCompatActivity() {
     private lateinit var navView: BottomNavigationView
     private lateinit var navController: NavController
 
-    private var pressedOnce = false
     private var selectedItem = R.id.navigation_schedule_list
     private var isLoggingOut = false
 
@@ -65,6 +64,10 @@ class NavigationActivity : AppCompatActivity() {
         // Set selected item that associate with start destination
         navView.selectedItemId = selectedItem
 
+        // Hide profile fragment if user is a teacher
+        val navMenuItem = navView.menu.findItem(R.id.navigation_profile)
+        navMenuItem.isVisible = UserDataHolder.get().user.groupName != null
+
         navView.setOnItemSelectedListener { item ->
             selectFragment(item)
             true
@@ -73,13 +76,15 @@ class NavigationActivity : AppCompatActivity() {
         // Logout on double back //
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            private var pressedOnce = false
+
             override fun handleOnBackPressed() {
                 if (navController.currentDestination?.id == R.id.navigation_schedule) {
                     navController.popBackStack()
                     return
                 }
                 if (pressedOnce) {
-                    // Make sure not to clear preferences if user in offline mode
+                    // Make sure do not clear preferences if user in offline mode
                     isLoggingOut = UserDataHolder.isServerOnline
                     UserDataHolder.uninitialize()
                     finish()
