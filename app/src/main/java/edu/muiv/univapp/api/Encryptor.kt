@@ -7,7 +7,7 @@ import java.security.MessageDigest
 class Encryptor {
     private val hash by lazy { sha256() }
     private var hashCharPos = 0
-    private var encryptedString: String = ""
+    private var encryptedString = ""
 
     companion object {
         private const val ENCRYPT_KEY = "NotObviousEncryptKey"
@@ -33,9 +33,8 @@ class Encryptor {
     fun encrypt(input: String): String {
         for (char in input) {
             if (hashCharPos >= hash.length - 1) hashCharPos = 0
-            hashCharPos++
 
-            val hashChar = hash[hashCharPos]
+            val hashChar = hash[++hashCharPos]
             val encryptedCharCode = char.code + hashChar.code
             val encryptedChar = encryptedCharCode.toChar()
             encryptedString += encryptedChar
