@@ -20,8 +20,8 @@ object Encryptor {
         return hexString.uppercase()
     }
 
-    private fun encodeString(input: String): String {
-        val byteArray = input.toByteArray(Charset.forName("UTF-8"))
+    private fun encodeString(): String {
+        val byteArray = encryptedString.toByteArray(Charset.forName("UTF-8"))
 
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
@@ -39,7 +39,7 @@ object Encryptor {
             encryptedString += encryptedChar
         }
 
-        val encodedString = encodeString(encryptedString)
+        val encodedString = encodeString()
 
         // Reset vars
         hashCharPos = 0
