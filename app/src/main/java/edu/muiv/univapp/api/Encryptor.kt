@@ -4,47 +4,47 @@ import android.util.Base64
 import java.nio.charset.Charset
 import java.security.MessageDigest
 
-class Encryptor {
-    private val hash by lazy { sha256() }
+object Encryptor {
+    private const val ENCRYPT_KEY = "NotObviousEncryptKey"
+    private val HASH by lazy { sha256() }
     private var hashCharPos = 0
     private var encryptedString = ""
 
-    companion object {
-        private const val ENCRYPT_KEY = "NotObviousEncryptKey"
+    private fun sha256(): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        val bytes = ENCRYPT_KEY.toByteArray()
+        val digest = md.digest(bytes)
+        val hexString = digest.fold("") { str, it -> str + "%02x".format(it) }
 
-        private fun encodeString(input: String): String {
-            val byteArray = input.toByteArray(Charset.forName("UTF-8"))
+        // Convert the string to upper case since "1C" uses upper case too
+        return hexString.uppercase()
+    }
 
-            return Base64.encodeToString(byteArray, Base64.DEFAULT)
-        }
+    private fun encodeString(input: String): String {
+        val byteArray = input.toByteArray(Charset.forName("UTF-8"))
 
-        private fun sha256(): String {
-            val md = MessageDigest.getInstance("SHA-256")
-            val bytes = ENCRYPT_KEY.toByteArray()
-            val digest = md.digest(bytes)
-
-            return digest.fold("") { str, it -> str + "%02x".format(it) }
-        }
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
     /**
-     * Returns [encryptedString] encoded in Base64
+     * Returns encrypted string encoded in Base64
      */
     fun encrypt(input: String): String {
         for (char in input) {
-            if (hashCharPos >= hash.length - 1) hashCharPos = 0
+            if (hashCharPos >= HASH.length - 1) hashCharPos = 0
 
-            val hashChar = hash[++hashCharPos]
+            val hashChar = HASH[hashCharPos++]
             val encryptedCharCode = char.code + hashChar.code
             val encryptedChar = encryptedCharCode.toChar()
             encryptedString += encryptedChar
         }
 
-        return encodeString(encryptedString)
-    }
+        val encodedString = encodeString(encryptedString)
 
-    fun reset() {
+        // Reset vars
         hashCharPos = 0
         encryptedString = ""
+
+        return encodedString
     }
 }

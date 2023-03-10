@@ -34,7 +34,6 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     private val coreDatabaseApi: CoreDatabaseApi
-    private val encryptor by lazy { Encryptor() }
 
     init {
         val retrofit = Retrofit.Builder()
@@ -49,9 +48,10 @@ class CoreDatabaseFetcher private constructor() {
 
         // POST body
         val loginResponse = LoginResponse(
-            token = encryptor.encrypt("${login.username}:${login.password}"),
+            token = Encryptor.encrypt("${login.username}:${login.password}"),
             isTeacher = login.isTeacher
         )
+        Log.i(TAG, "fetchUser: token: ${loginResponse.token}")
 
         val request = coreDatabaseApi.fetchUser(loginResponse)
         request.enqueue(object : Callback<LoginResponse> {
@@ -77,8 +77,6 @@ class CoreDatabaseFetcher private constructor() {
                 callback.invoke(StatusCode.INTERNAL_SERVER_ERROR)
             }
         })
-
-        encryptor.reset()
     }
 
     //================== GET requests ==================//
