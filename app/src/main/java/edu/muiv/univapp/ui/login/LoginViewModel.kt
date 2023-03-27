@@ -5,8 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.muiv.univapp.api.CoreDatabaseFetcher
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.login.utils.DatabaseTestDataBuilder
+import edu.muiv.univapp.utils.UserDataHolder
 
 class LoginViewModel : ViewModel() {
 
@@ -15,9 +17,9 @@ class LoginViewModel : ViewModel() {
     private val univRepository by lazy { UnivRepository.get() }
     private val univAPI by lazy { CoreDatabaseFetcher.get() }
 
-    private val _responseStatusCode = MutableLiveData<Int>()
+    private val _responseStatusCode = MutableLiveData<StatusCode>()
 
-    val responseCode: LiveData<Int>
+    val responseCode: LiveData<StatusCode>
         get() = _responseStatusCode
 
     val usernameTW get() = loginTW.usernameTW
@@ -35,10 +37,14 @@ class LoginViewModel : ViewModel() {
     }
 
     fun loadUser(isTeacher: Boolean) {
-        login.isTeacher = isTeacher
+        if (UserDataHolder.isServerOnline) {
+            login.isTeacher = isTeacher
 
-        univAPI.fetchUser(login) { statusCode ->
-            _responseStatusCode.value = statusCode.code
+            univAPI.fetchUser(login) { statusCode ->
+                _responseStatusCode.value = statusCode
+            }
+        } else {
+            _responseStatusCode.value = StatusCode.SERVICE_UNAVAILABLE
         }
     }
 

@@ -37,9 +37,9 @@ class ScheduleViewModel : ViewModel() {
     private val subjectLiveData = MutableLiveData<UUID>()
 
     private val _fetchedScheduleAttendanceForStudent = MutableLiveData<Map<StatusCode, ScheduleAttendance?>>()
-    private val _upsertAttendanceStatus = MutableLiveData<Int>()
+    private val _upsertAttendanceStatus = MutableLiveData<StatusCode>()
     private val _fetchForTeacherStatus = MutableLiveData<String>()
-    private val _updateScheduleStatus = MutableLiveData<Int>()
+    private val _updateScheduleStatus = MutableLiveData<StatusCode>()
 
     ////////////////////////
 
@@ -125,13 +125,13 @@ class ScheduleViewModel : ViewModel() {
     val fetchedScheduleAttendanceForStudent: LiveData<Map<StatusCode, ScheduleAttendance?>>
         get() = _fetchedScheduleAttendanceForStudent
 
-    val upsertAttendanceStatus: LiveData<Int>
+    val upsertAttendanceStatus: LiveData<StatusCode>
         get() = _upsertAttendanceStatus
 
     val fetchForTeacherStatus: LiveData<String>
         get() = _fetchForTeacherStatus
 
-    val updateScheduleStatus: LiveData<Int>
+    val updateScheduleStatus: LiveData<StatusCode>
         get() = _updateScheduleStatus
 
     /////////////////////

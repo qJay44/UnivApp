@@ -137,7 +137,7 @@ class CoreDatabaseFetcher private constructor() {
     //==================================================//
     //================== PUT requests ==================//
 
-    fun updateScheduleAttendance(scheduleAttendance: ScheduleAttendance, callback: (Int) -> Unit) {
+    fun updateScheduleAttendance(scheduleAttendance: ScheduleAttendance, callback: (StatusCode) -> Unit) {
         val request = coreDatabaseApi.updateScheduleAttendance(scheduleAttendance)
         request.enqueue(object : Callback<ScheduleAttendance> {
             override fun onResponse(
@@ -145,27 +145,27 @@ class CoreDatabaseFetcher private constructor() {
                 response: Response<ScheduleAttendance>
             ) {
                 Log.i(TAG, "onResponse: OK (updateScheduleAttendance)")
-                callback.invoke(response.code())
+                callback.invoke(StatusCode.OK)
             }
 
             override fun onFailure(call: Call<ScheduleAttendance>, t: Throwable) {
                 Log.e(TAG, "onFailure: Schedule attendance update fail", t)
-                callback.invoke(500)
+                callback.invoke(StatusCode.INTERNAL_SERVER_ERROR)
             }
         })
     }
 
-    fun updateSchedule(schedule: Schedule, callback: (Int) -> Unit) {
+    fun updateSchedule(schedule: Schedule, callback: (StatusCode) -> Unit) {
         val request = coreDatabaseApi.updateSchedule(schedule)
         request.enqueue(object : Callback<Schedule> {
             override fun onResponse(call: Call<Schedule>, response: Response<Schedule>) {
                 Log.i(TAG, "onResponse: OK (updateSchedule)")
-                callback.invoke(response.code())
+                callback.invoke(StatusCode.OK)
             }
 
             override fun onFailure(call: Call<Schedule>, t: Throwable) {
                 Log.e(TAG, "onFailure: Schedule update fail", t)
-                callback.invoke(500)
+                callback.invoke(StatusCode.INTERNAL_SERVER_ERROR)
             }
         })
     }

@@ -195,16 +195,16 @@ class ScheduleFragment : Fragment() {
         // Update schedule attendance status
         scheduleViewModel.upsertAttendanceStatus.observe(viewLifecycleOwner) { responseCode ->
             when (responseCode) {
-                200 -> Log.i(TAG, "Update response: Successfully updated schedule attendance")
-                500 -> Log.e(TAG, "Update response: Schedule attendance update failed")
+                StatusCode.OK -> Log.i(TAG, "Update response: Successfully updated schedule attendance")
+                else -> Log.e(TAG, "Update response: Schedule attendance update failed")
             }
         }
 
         // Update schedule attendance status
         scheduleViewModel.updateScheduleStatus.observe(viewLifecycleOwner) { responseCode ->
             when (responseCode) {
-                200 -> Log.i(TAG, "Update response: Successfully updated schedule")
-                500 -> Log.e(TAG, "Update response: Schedule update failed")
+                StatusCode.OK -> Log.i(TAG, "Update response: Successfully updated schedule")
+                else -> Log.e(TAG, "Update response: Schedule update failed")
             }
         }
 

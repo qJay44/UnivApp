@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import edu.muiv.univapp.R
 import edu.muiv.univapp.api.LoginResponse
+import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.ui.navigation.NavigationActivity
 import edu.muiv.univapp.utils.UserDataHolder
 
@@ -136,11 +137,11 @@ class LoginFragment : Fragment() {
         // Sign-in process //
 
         loginViewModel.responseCode.observe(viewLifecycleOwner) { statusCode ->
-            when (statusCode) {
-                204 -> showToast("Логин или пароль введены неправильно")
-                200 -> startActivity(Intent(activity, NavigationActivity::class.java))
-                500 -> showToast("Произошла неизвестная ошибка, попробуйте позже")
-                503 -> showToast("Сервер не доступен, попробуйте позже")
+            when (statusCode!!) {
+                StatusCode.NO_CONTENT -> showToast("Логин или пароль введены неправильно")
+                StatusCode.OK -> startActivity(Intent(activity, NavigationActivity::class.java))
+                StatusCode.INTERNAL_SERVER_ERROR -> showToast("Произошла неизвестная ошибка, попробуйте позже")
+                StatusCode.SERVICE_UNAVAILABLE -> showToast("Сервер не доступен, попробуйте позже")
             }
             btnSingIn.startAnimation(btnAnimationFadeIn)
             btnSingIn.isEnabled = true
