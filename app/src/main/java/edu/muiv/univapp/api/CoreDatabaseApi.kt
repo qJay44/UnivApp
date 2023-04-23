@@ -37,8 +37,8 @@ interface CoreDatabaseApi {
     fun fetchScheduleAttendanceForTeacher(@Query("scheduleId") scheduleId: String): Call<List<ScheduleAttendanceForTeacherResponse>>
 
     @PUT("v1/schedule/attendance/update")
-    fun updateScheduleAttendance(@Body scheduleAttendance: ScheduleAttendance): Call<ScheduleAttendance>
+    fun updateScheduleAttendance(@Body scheduleAttendance: ScheduleAttendance): Call<Unit>
 
     @PUT("v1/schedule/update")
-    fun updateSchedule(@Body schedule: Schedule): Call<Schedule>
+    fun updateSchedule(@Body schedule: Schedule): Call<Unit>
 }
