@@ -25,7 +25,7 @@ interface CoreDatabaseApi {
     fun fetchSchedule(@Query("teacherId") teacherId: UUID): Call<List<ScheduleWithSubjectAndTeacher>>
 
     @GET("v1/profile/subjects/")
-    fun fetchProfileSubjects(@Query("group") groupName: String): Call<List<SubjectAndTeacher>>
+    fun fetchProfileSubjects(@Query("groupName") groupName: String): Call<List<SubjectAndTeacher>>
 
     @GET("v1/profile/attendance/")
     fun fetchProfileAttendance(@Query("userId") userId: String): Call<List<ProfileAttendance>>

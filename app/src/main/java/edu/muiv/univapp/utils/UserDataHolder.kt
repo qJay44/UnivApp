@@ -5,26 +5,30 @@ import edu.muiv.univapp.api.LoginResponse
 import edu.muiv.univapp.ui.login.LoginResult
 import java.net.URL
 import java.util.*
+import java.util.concurrent.Executors
 
 class UserDataHolder private constructor(val user: LoginResult){
 
     companion object {
+        const val BASE_URL = "https://852f-176-195-6-134.eu.ngrok.io/"
         private const val TAG = "UserDataHolder"
-        private val URL = URL("http://localhost:3000")
+        private val URL = URL(BASE_URL)
         private var INSTANCE: UserDataHolder? = null
+        private val executor = Executors.newSingleThreadExecutor()
 
         val isServerOnline: Boolean
             get() {
                 return try {
-                    URL.openConnection().apply {
-                        connectTimeout = 3000
-                        connect()
+                    executor.execute {
+                        URL.openConnection().apply {
+                            connectTimeout = 3000
+                            connect()
+                        }
+                        Log.i(TAG, "isServerOnline: true")
                     }
-                    Log.i(TAG, "isServerOnline: true")
-
                     true
                 } catch (e: Exception) {
-                    Log.i(TAG, "isServerOnline: false")
+                    Log.e(TAG, "Connection check fail", e)
                     false
                 }
             }

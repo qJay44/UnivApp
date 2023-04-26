@@ -37,7 +37,7 @@ class CoreDatabaseFetcher private constructor() {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://localhost:3000/univ/hs/UnivAPI/")
+            .baseUrl("${UserDataHolder.BASE_URL}/univ/hs/UnivAPI/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
