@@ -58,7 +58,6 @@
         app:layout_constraintEnd_toEndOf="@id/rectUnder"
         app:layout_constraintBottom_toBottomOf="@id/rectUnder" />
 
-
     <EditText
         android:id="@+id/etUsername"
         android:layout_width="250dp"

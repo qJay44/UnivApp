@@ -29,7 +29,6 @@
         android:contentDescription="@string/next_week_btn"
         android:minWidth="@dimen/arrow_size"
         android:minHeight="@dimen/arrow_size"
-        android:rotationX="180"
         android:rotationY="180"
         android:src="@drawable/ic_arrow_left"
         app:layout_constraintBottom_toBottomOf="@id/tvWeekDays"

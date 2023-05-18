@@ -16,7 +16,7 @@ import java.util.UUID
 
 @Dao
 interface UnivDAO {
-    // Do not forget: place " " at the end if there is new line comes after
+    // Do not forget: place " " at the end if there is a new line comes after
 
     @Query("SELECT * FROM teacher WHERE id IN (:IDs)")
     fun getTeachersByIDs(IDs: Array<UUID>): LiveData<Array<Teacher>>

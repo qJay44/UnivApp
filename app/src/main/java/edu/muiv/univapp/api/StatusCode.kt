@@ -1,6 +1,6 @@
 package edu.muiv.univapp.api
 
-enum class StatusCode(val code: Int) : StatusCodeMessage {
+enum class StatusCode(val code: Int) {
     /**
      * Response codes ->
      * 200: Response is OK
@@ -29,6 +29,8 @@ enum class StatusCode(val code: Int) : StatusCodeMessage {
             return String.format(MSG_TEMPLATE, objName, "Server isn't working", code)
         }
     };
+
+    abstract fun message(objName: String): String
 
     companion object {
         private const val MSG_TEMPLATE = "Fetched %s: %s (%d)"
