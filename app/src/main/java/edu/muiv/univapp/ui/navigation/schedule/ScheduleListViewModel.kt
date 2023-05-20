@@ -135,6 +135,8 @@ class ScheduleListViewModel : ViewModel() {
         if (dayIndex == -1) {
             Log.e("ScheduleListFragmentVM", "dateString: $dateString")
             Log.e("ScheduleListFragmentVM", "Days: ${days.toList()}")
+
+            return ScheduleWeekDay.MONDAY.dayName
         }
 
         return ScheduleWeekDay.getDayNameByIndex(dayIndex)

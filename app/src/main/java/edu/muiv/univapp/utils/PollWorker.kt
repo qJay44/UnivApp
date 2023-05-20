@@ -105,7 +105,6 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
         Log.i(TAG, "createScheduleNotification: oldList: ${listDiff.oldList}")
 
         if (user.groupName != null)
-            // TODO: Notifications for teacher
             univAPI.fetchNotifications(user.groupName) { response ->
                 val statusCode = response.keys.first()
                 val notificationList = response.values.first()
