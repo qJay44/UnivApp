@@ -124,8 +124,6 @@ class UnivRepository private constructor(context: Context){
                         teacherName,
                         teacherSurname,
                         teacherPatronymic,
-                        "",
-                        ""
                     )
                     univDAO.upsertTeacher(tch)
 
@@ -158,7 +156,15 @@ class UnivRepository private constructor(context: Context){
                         subjectExamType
                     )
 
+                    val teacher = Teacher(
+                        UUID.fromString(teacherID),
+                        teacherName,
+                        teacherSurname,
+                        teacherPatronymic,
+                    )
+
                     univDAO.upsertSubject(subject)
+                    univDAO.upsertTeacher(teacher)
                 }
             }
         }

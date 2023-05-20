@@ -23,6 +23,7 @@ import edu.muiv.univapp.databinding.FragmentNotificationsListBinding
 import edu.muiv.univapp.utils.VisibleFragment
 import edu.muiv.univapp.utils.FetchedListType
 import edu.muiv.univapp.utils.PollWorker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
@@ -90,7 +91,7 @@ class NotificationListFragment : VisibleFragment() {
                 val notifications = response.values.first()
 
                 if (statusCode == StatusCode.OK) {
-                    Log.i(TAG, "Trying to update database with fetched notifications...")
+                    Log.i(TAG, "Updating database with fetched notifications...")
 
                     // Update database with fetched notifications
                     notificationListViewModel.upsertNotifications(notifications!!)
@@ -100,7 +101,7 @@ class NotificationListFragment : VisibleFragment() {
                         notifications, FetchedListType.NEW
                     )
 
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(Dispatchers.Default) {
                         val sp = requireContext().getSharedPreferences(LAST_UNIV_NOTIFICATION, Context.MODE_PRIVATE)
                         val editor = sp.edit()
                         val json = Gson().toJson(notifications.map { it.id })

@@ -426,8 +426,6 @@ object DatabaseTestDataBuilder {
                             name = randArrayElement(names),
                             surname = randArrayElement(surnames),
                             patronymic = randArrayElement(patronymics),
-                            login = "stud${studentList.size + 1}",
-                            password = "1",
                             groupName = currentGroupName,
                             course = currCourse.toString(),
                             semester = currSemester.toString()
@@ -441,8 +439,6 @@ object DatabaseTestDataBuilder {
                             name = randArrayElement(names),
                             surname = randArrayElement(surnames),
                             patronymic = randArrayElement(patronymics),
-                            login = "teach${teacherList.size + 1}",
-                            password = "1",
                         )
                     teacherList += teacher
 

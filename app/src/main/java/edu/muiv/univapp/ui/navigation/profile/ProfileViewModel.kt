@@ -5,15 +5,16 @@ import edu.muiv.univapp.api.CoreDatabaseFetcher
 import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.utils.FetchedListType
-import edu.muiv.univapp.utils.TwoListsDifferenceString
+import edu.muiv.univapp.utils.TwoStringListsDifference
 import edu.muiv.univapp.utils.UserDataHolder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ProfileViewModel : ViewModel() {
     private val univApi by lazy { CoreDatabaseFetcher.get() }
-    private val listDiffSubjects by lazy { TwoListsDifferenceString() }
-    private val listDiffScheduleAttendance by lazy { TwoListsDifferenceString() }
+    private val listDiffSubjects by lazy { TwoStringListsDifference() }
+    private val listDiffScheduleAttendance by lazy { TwoStringListsDifference() }
     private val univRepository = UnivRepository.get()
     private val user = UserDataHolder.get().user
 
@@ -64,7 +65,6 @@ class ProfileViewModel : ViewModel() {
     private fun fetchProfileSubjects() {
         // Only if online and didn't fetch yet
         if (UserDataHolder.isServerOnline && _subjectsFetched.value == null) {
-            // TODO: Create version for teacher
             user.groupName?.let {
                 univApi.fetchProfileSubjects(it) { response ->
                     _subjectsFetched.value = response
@@ -76,7 +76,6 @@ class ProfileViewModel : ViewModel() {
     private fun fetchProfileAttendance() {
         // Only if online and didn't fetch yet
         if (UserDataHolder.isServerOnline && _profileAttendanceFetched.value == null) {
-            // TODO: Create version for teacher
             univApi.fetchProfileAttendance(user.id.toString()) { response ->
                 _profileAttendanceFetched.value = response
             }
@@ -84,7 +83,7 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun createSubjectsIdsList(subjectAndTeacherList: List<SubjectAndTeacher>, type: FetchedListType) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             when (type) {
                 // The list from API call
                 FetchedListType.NEW -> {
@@ -102,7 +101,7 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun createProfileAttendanceIdsList(profileAttendanceList: List<ProfileAttendance>, type: FetchedListType) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             when (type) {
                 // The list from API call
                 FetchedListType.NEW -> {
@@ -129,15 +128,12 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun loadProfileProperties(profileAttendanceList: List<ProfileAttendance>) {
+        visitAmount = 0
         scheduleAllSize = profileAttendanceList.size
 
         for (scheduleVisit in profileAttendanceList) {
             if (scheduleVisit.visited) visitAmount++
         }
-    }
-
-    fun resetVisitAmount() {
-        visitAmount = 0
     }
 
     fun upsertSubject(subjectAndTeacherList: List<SubjectAndTeacher>) {

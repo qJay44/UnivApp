@@ -3,32 +3,28 @@ package edu.muiv.univapp.utils
 import android.util.Log
 import edu.muiv.univapp.api.LoginResponse
 import edu.muiv.univapp.ui.login.LoginResult
-import java.net.URL
-import java.util.*
-import java.util.concurrent.Executors
+import java.util.UUID
 
 class UserDataHolder private constructor(val user: LoginResult){
 
     companion object {
-        const val BASE_URL = "https://852f-176-195-6-134.eu.ngrok.io/"
+        private const val CORE_ADDRESS = "57a3-46-242-10-66.ngrok-free.app"
         private const val TAG = "UserDataHolder"
-        private val URL = URL(BASE_URL)
         private var INSTANCE: UserDataHolder? = null
-        private val executor = Executors.newSingleThreadExecutor()
+        const val BASE_URL = "https://$CORE_ADDRESS"
 
         val isServerOnline: Boolean
             get() {
                 return try {
-                    executor.execute {
-                        URL.openConnection().apply {
-                            connectTimeout = 3000
-                            connect()
-                        }
-                        Log.i(TAG, "isServerOnline: true")
-                    }
-                    true
+                    val proc = Runtime.getRuntime().exec("ping -c 1 $CORE_ADDRESS")
+                    proc.waitFor()
+
+                    val res = proc.exitValue() == 0
+                    Log.i(TAG, "isServerOnline: $res")
+
+                    res
                 } catch (e: Exception) {
-                    Log.e(TAG, "Connection check fail", e)
+                    Log.e(TAG, "isServerOnline: false", e)
                     false
                 }
             }

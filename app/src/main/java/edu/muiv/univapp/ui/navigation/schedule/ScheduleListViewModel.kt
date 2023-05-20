@@ -7,8 +7,9 @@ import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.database.UnivRepository
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.FetchedListType
-import edu.muiv.univapp.utils.TwoListsDifferenceString
+import edu.muiv.univapp.utils.TwoStringListsDifference
 import edu.muiv.univapp.utils.UserDataHolder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -18,7 +19,7 @@ class ScheduleListViewModel : ViewModel() {
     private val user     by lazy { UserDataHolder.get().user }
     private val calendar by lazy { Calendar.getInstance() }
     private val univAPI  by lazy { CoreDatabaseFetcher.get() }
-    private val listDiff by lazy { TwoListsDifferenceString() }
+    private val listDiff by lazy { TwoStringListsDifference() }
     private val univRepository = UnivRepository.get()
 
     private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
@@ -111,7 +112,7 @@ class ScheduleListViewModel : ViewModel() {
     }
 
     fun createScheduleIdList(scheduleList: List<ScheduleWithSubjectAndTeacher>, type: FetchedListType) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             when (type) {
                 // The list from API call
                 FetchedListType.NEW -> {

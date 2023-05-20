@@ -36,7 +36,7 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
 
     private val userLoaded by lazy { loadUserPrefs() }
     private val univAPI    by lazy { CoreDatabaseFetcher.get() }
-    private val listDiff   by lazy { TwoListsDifferenceString() }
+    private val listDiff   by lazy { TwoStringListsDifference() }
 
     override fun doWork(): Result {
         if (UserDataHolder.isServerOnline && userLoaded) {

@@ -1,6 +1,6 @@
 package edu.muiv.univapp.utils
 
-class TwoListsDifferenceString {
+class TwoStringListsDifference {
     lateinit var newList: List<String>
     lateinit var oldList: List<String>
     val deleteList by lazy { compareLists() }

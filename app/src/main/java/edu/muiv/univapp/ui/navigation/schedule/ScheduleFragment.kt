@@ -149,7 +149,7 @@ class ScheduleFragment : Fragment() {
                         if (statusCode == StatusCode.OK) {
                             Log.i(
                                 TAG,
-                                "Trying to update database with fetched schedule attendance..."
+                                "Updating database with fetched schedule attendance"
                             )
 
                             // Update database with fetched schedule attendance

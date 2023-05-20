@@ -170,7 +170,7 @@ class ScheduleListFragment : VisibleFragment() {
                     scheduleList, FetchedListType.NEW
                 )
 
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.Default) {
                     val sp = requireContext().getSharedPreferences(LAST_SCHEDULE, Context.MODE_PRIVATE)
                     val editor = sp.edit()
                     val json = Gson().toJson(scheduleList.map { it.id })

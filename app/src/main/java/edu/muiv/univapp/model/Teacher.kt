@@ -11,6 +11,4 @@ data class Teacher(
     val name      : String,
     val surname   : String,
     val patronymic: String,
-    val login     : String,
-    val password  : String,
 )

@@ -22,7 +22,7 @@ import edu.muiv.univapp.utils.FetchedListType
 class ProfileFragment : Fragment() {
 
     companion object {
-        private const val TAG = "ProfileFragmentList"
+        private const val TAG = "ProfileFragment"
     }
 
     private var _binding: FragmentProfileBinding? = null
@@ -42,8 +42,6 @@ class ProfileFragment : Fragment() {
         if (savedInstanceState == null) {
             profileViewModel.loadSubjects()
             profileViewModel.loadProfileAttendance()
-        } else {
-            profileViewModel.resetVisitAmount()
         }
     }
 
@@ -115,7 +113,7 @@ class ProfileFragment : Fragment() {
             val profileAttendanceList = response.values.first()
 
             if (statusCode == StatusCode.OK) {
-                Log.i(TAG, "Trying to update database with fetched profile attendance...")
+                Log.i(TAG, "Updating database with fetched profile attendances")
 
                 // Update database with fetched subjects
                 profileViewModel.upsertProfileAttendance(profileAttendanceList!!)
