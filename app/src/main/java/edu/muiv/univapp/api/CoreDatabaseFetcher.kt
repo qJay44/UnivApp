@@ -9,6 +9,8 @@ import edu.muiv.univapp.ui.navigation.schedule.model.Schedule
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import edu.muiv.univapp.utils.UserDataHolder
+import okhttp3.Credentials
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,8 +38,21 @@ class CoreDatabaseFetcher private constructor() {
     private val coreDatabaseApi: CoreDatabaseApi
 
     init {
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                var request = chain.request()
+                request = request.newBuilder().header(
+                    "Authorization",
+                    Credentials.basic("Запросы", "", Charsets.UTF_8)
+                ).build()
+
+                chain.proceed(request)
+            }
+            .build()
+
         val retrofit = Retrofit.Builder()
             .baseUrl("${UserDataHolder.BASE_URL}/univ/hs/UnivAPI/")
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

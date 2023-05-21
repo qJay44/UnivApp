@@ -96,7 +96,7 @@ class ProfileFragment : Fragment() {
             if (statusCode == StatusCode.OK) {
 
                 // Update database with fetched subjects
-                profileViewModel.upsertSubject(subjectAndTeacherList!!)
+                profileViewModel.upsertSubjectAndTeacher(subjectAndTeacherList!!)
 
                 // Create a list with ids of fetched subjects
                 profileViewModel.createSubjectsIdsList(

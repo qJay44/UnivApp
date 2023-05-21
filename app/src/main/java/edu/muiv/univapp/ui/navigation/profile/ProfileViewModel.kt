@@ -136,8 +136,8 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun upsertSubject(subjectAndTeacherList: List<SubjectAndTeacher>) {
-        univRepository.upsertSubject(subjectAndTeacherList)
+    fun upsertSubjectAndTeacher(subjectAndTeacherList: List<SubjectAndTeacher>) {
+        univRepository.upsertSubjectAndTeacher(subjectAndTeacherList)
     }
 
     fun upsertProfileAttendance(profileAttendanceList: List<ProfileAttendance>) {

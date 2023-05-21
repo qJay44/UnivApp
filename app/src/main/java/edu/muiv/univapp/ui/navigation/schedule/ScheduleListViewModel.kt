@@ -98,6 +98,7 @@ class ScheduleListViewModel : ViewModel() {
 
     private fun fetchSchedule() {
         // Only if online and didn't fetch yet
+        // TODO: clear _scheduleFetched value on a new week and tvNoSchedule click
         if (UserDataHolder.isServerOnline && _scheduleFetched.value == null) {
             if (isTeacher) {
                 univAPI.fetchSchedule(teacherId = user.id) { response ->

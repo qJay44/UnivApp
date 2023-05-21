@@ -92,7 +92,7 @@ class LoginFragmentChoice : Fragment() {
     override fun onResume() {
         super.onResume()
         if (loadUserPrefs() && UserDataHolder.isServerOnline) {
-            Log.i(TAG, "Authorising the user...")
+            Log.i(TAG, "Authorising user")
             val intent = Intent(requireActivity(), NavigationActivity::class.java)
             startActivity(intent)
         } else {

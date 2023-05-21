@@ -83,7 +83,10 @@ class ScheduleListFragment : VisibleFragment() {
         )
 
         ibPrevWeek = binding.ibPrevWeek
-        ibPrevWeek.setOnClickListener { rvSchedule.startAnimation(ibPrevWeekAnimation) }
+        ibPrevWeek.setOnClickListener {
+            rvSchedule.startAnimation(ibPrevWeekAnimation)
+            scheduleListViewModel.createScheduleIdList(emptyList(), FetchedListType.OLD)
+        }
 
         // Next week animation
         val ibNextWeekAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
@@ -92,10 +95,16 @@ class ScheduleListFragment : VisibleFragment() {
         )
 
         ibNextWeek = binding.ibNextWeek
-        ibNextWeek.setOnClickListener { rvSchedule.startAnimation(ibNextWeekAnimation) }
+        ibNextWeek.setOnClickListener {
+            rvSchedule.startAnimation(ibNextWeekAnimation)
+            scheduleListViewModel.createScheduleIdList(emptyList(), FetchedListType.OLD)
+        }
 
         tvWeekDays = binding.tvWeekDays
         tvNoSchedule = binding.tvNoSchedule
+        tvNoSchedule.setOnClickListener {
+            scheduleListViewModel.createScheduleIdList(emptyList(), FetchedListType.OLD)
+        }
 
         // Swipes //
 

@@ -144,7 +144,7 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
-    fun upsertSubject(subjectAndTeacherList: List<SubjectAndTeacher>) {
+    fun upsertSubjectAndTeacher(subjectAndTeacherList: List<SubjectAndTeacher>) {
         executor.execute {
             for (st in subjectAndTeacherList) {
                 with(st) {
