@@ -122,7 +122,13 @@ interface UnivDAO {
     fun upsertNotifications(notifications: Notification)
 
     @Upsert
+    fun upsertNotifications(notifications: List<Notification>)
+
+    @Upsert
     fun upsertSchedule(schedule: Schedule)
+
+    @Upsert
+    fun upsertSchedule(schedule: List<Schedule>)
 
     @Upsert
     fun upsertTeacher(teacher: Teacher)
@@ -131,5 +137,35 @@ interface UnivDAO {
     fun upsertSubject(subject: Subject)
 
     @Upsert
+    fun upsertSubject(subjects: List<Subject>)
+
+    @Upsert
     fun upsertProfileAttendance(profileAttendance: ProfileAttendance)
+
+    @Upsert
+    fun upsertProfileAttendance(profileAttendance: List<ProfileAttendance>)
+
+    @Transaction
+    fun deleteAndUpsertSchedule(deleteList: List<String>, scheduleList: List<Schedule>) {
+        deleteScheduleById(deleteList)
+        upsertSchedule(scheduleList)
+    }
+
+    @Transaction
+    fun deleteAndUpsertNotifications(deleteList: List<String>, notifications: List<Notification>) {
+        deleteNotificationsById(deleteList)
+        upsertNotifications(notifications)
+    }
+
+    @Transaction
+    fun deleteAndUpsertSubjects(deleteList: List<String>, subjects: List<Subject>) {
+        deleteSubjectsById(deleteList)
+        upsertSubject(subjects)
+    }
+
+    @Transaction
+    fun deleteAndUpsertProfileAttendance(deleteList: List<String>, profileAttendances: List<ProfileAttendance>) {
+        deleteSubjectsById(deleteList)
+        upsertProfileAttendance(profileAttendances)
+    }
 }

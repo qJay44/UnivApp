@@ -60,8 +60,8 @@ class ScheduleViewModel : ViewModel() {
                 set(Calendar.SECOND, 0)
             }
 
-            val currentDateMillis = calendarToday.time.time
-            val scheduleDateMillis = calendarSchedule.time.time
+            val currentDateMillis = calendarToday.timeInMillis
+            val scheduleDateMillis = calendarSchedule.timeInMillis
             val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000 // milliseconds
 
             return when {

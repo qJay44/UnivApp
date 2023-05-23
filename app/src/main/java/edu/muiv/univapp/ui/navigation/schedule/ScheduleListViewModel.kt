@@ -31,6 +31,7 @@ class ScheduleListViewModel : ViewModel() {
     private val scheduleForTeacher = MutableLiveData<UUID>()
     private val _dayFromTo = MutableLiveData<String>()
     private val _scheduleFetched = MutableLiveData<Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>>()
+    private var needNewWeekFetch = false
 
     ////////////////////////
 
@@ -56,7 +57,7 @@ class ScheduleListViewModel : ViewModel() {
     val dayFromTo: LiveData<String>
         get() = _dayFromTo
 
-    val fetchedSchedule: LiveData<Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>>
+    val fetchedSchedule: LiveData<Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>?>
         get() = _scheduleFetched
 
     /////////////////////////////////////
@@ -82,6 +83,8 @@ class ScheduleListViewModel : ViewModel() {
     }
 
     private fun loadDays() {
+        needNewWeekFetch = true
+
         for (i in days.indices) {
             days[i] = originalDateFormat.format(calendar.time)
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -97,9 +100,9 @@ class ScheduleListViewModel : ViewModel() {
     }
 
     private fun fetchSchedule() {
-        // Only if online and didn't fetch yet
-        // TODO: clear _scheduleFetched value on a new week and tvNoSchedule click
-        if (UserDataHolder.isServerOnline && _scheduleFetched.value == null) {
+        // Only if online and didn't fetch yet or new week
+        if (UserDataHolder.isServerOnline && (_scheduleFetched.value == null || needNewWeekFetch)) {
+            needNewWeekFetch = false
             if (isTeacher) {
                 univAPI.fetchSchedule(teacherId = user.id) { response ->
                     _scheduleFetched.value = response
@@ -112,13 +115,23 @@ class ScheduleListViewModel : ViewModel() {
         }
     }
 
-    fun createScheduleIdList(scheduleList: List<ScheduleWithSubjectAndTeacher>, type: FetchedListType) {
+    fun createScheduleIdList(
+        scheduleList: List<ScheduleWithSubjectAndTeacher>,
+        type: FetchedListType,
+    ) {
         viewModelScope.launch(Dispatchers.Default) {
             when (type) {
                 // The list from API call
                 FetchedListType.NEW -> {
                     listDiff.newList = scheduleList.map { it.id }
-                    univRepository.deleteScheduleById(listDiff.deleteList)
+
+                    val diffLists = listDiff.compareLists()
+                    val deleteList = diffLists["delete"]
+                    val upserteList = scheduleList.filter {
+                        it.id in diffLists["upsert"]!!
+                    }
+
+                    univRepository.deleteAndUpsertSchedule(deleteList!!, upserteList)
                 }
                 // The list from the app database
                 FetchedListType.OLD -> {
@@ -170,9 +183,5 @@ class ScheduleListViewModel : ViewModel() {
         // Add one week
         calendar.add(Calendar.WEEK_OF_MONTH, 1)
         loadDays()
-    }
-
-    fun upsertSchedule(scheduleList: List<ScheduleWithSubjectAndTeacher>) {
-        univRepository.upsertSchedule(scheduleList)
     }
 }

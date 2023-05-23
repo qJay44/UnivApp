@@ -56,30 +56,6 @@ class UnivRepository private constructor(context: Context){
     fun getSubjectsAndTeachers(groupName: String): LiveData<List<SubjectAndTeacher>> = univDAO.getSubjectsAndTeachersByGroupName(groupName)
     fun getProfileAttendance(userID: UUID): LiveData<List<ProfileAttendance>> = univDAO.getProfileAttendance(userID)
 
-    fun deleteScheduleById(idList: List<String>) {
-        executor.execute {
-            univDAO.deleteScheduleById(idList)
-        }
-    }
-
-    fun deleteNotificationsById(idList: List<String>) {
-        executor.execute {
-            univDAO.deleteNotificationsById(idList)
-        }
-    }
-
-    fun deleteSubjectsById(idList: List<String>) {
-        executor.execute {
-            univDAO.deleteSubjectsById(idList)
-        }
-    }
-
-    fun deleteProfileAttendanceById(idList: List<String>) {
-        executor.execute {
-            univDAO.deleteProfileAttendanceById(idList)
-        }
-    }
-
     fun upsertScheduleAttendance(scheduleAttendance: ScheduleAttendance) {
         executor.execute {
             univDAO.upsertScheduleAttendance(scheduleAttendance)
@@ -108,16 +84,16 @@ class UnivRepository private constructor(context: Context){
         }
     }
 
-    fun upsertNotifications(notifications: List<Notification>) {
+    fun updateScheduleNotes(schedule: Schedule) {
         executor.execute {
-            for (notification in notifications)
-                univDAO.upsertNotifications(notification)
+            univDAO.updateScheduleNotes(schedule)
         }
     }
 
-    fun upsertSchedule(scheduleList: List<ScheduleWithSubjectAndTeacher>) {
+    fun deleteAndUpsertSchedule(deleteList: List<String>, upsertList: List<ScheduleWithSubjectAndTeacher>) {
         executor.execute {
-            for (scheduleWithSubjectAndTeacher in scheduleList) {
+            val scheduleList = mutableListOf<Schedule>()
+            for (scheduleWithSubjectAndTeacher in upsertList) {
                 with(scheduleWithSubjectAndTeacher) {
                     val tch = Teacher(
                         UUID.fromString(teacherID),
@@ -125,6 +101,7 @@ class UnivRepository private constructor(context: Context){
                         teacherSurname,
                         teacherPatronymic,
                     )
+
                     univDAO.upsertTeacher(tch)
 
                     val sch = Schedule(
@@ -138,16 +115,34 @@ class UnivRepository private constructor(context: Context){
                         UUID.fromString(subjectID),
                         UUID.fromString(teacherID)
                     )
-                    univDAO.upsertSchedule(sch)
+
+                    scheduleList += sch
                 }
             }
+            univDAO.deleteAndUpsertSchedule(deleteList, scheduleList)
         }
     }
 
-    fun upsertSubjectAndTeacher(subjectAndTeacherList: List<SubjectAndTeacher>) {
+    fun deleteAndUpsertNotifications(deleteList: List<String>, upsertList: List<Notification>) {
         executor.execute {
-            for (st in subjectAndTeacherList) {
-                with(st) {
+            univDAO.deleteAndUpsertNotifications(deleteList, upsertList)
+        }
+    }
+
+    fun deleteAndUpsertSubjects(deleteList: List<String>, upsertList: List<SubjectAndTeacher>) {
+        executor.execute {
+            val subjects = mutableListOf<Subject>()
+            for (subjectAndTeacher in upsertList) {
+                with(subjectAndTeacher) {
+                    val teacher = Teacher(
+                        UUID.fromString(teacherID),
+                        teacherName,
+                        teacherSurname,
+                        teacherPatronymic,
+                    )
+
+                    univDAO.upsertTeacher(teacher)
+
                     val subject = Subject(
                         subjectID,
                         subjectName,
@@ -156,30 +151,17 @@ class UnivRepository private constructor(context: Context){
                         subjectExamType
                     )
 
-                    val teacher = Teacher(
-                        UUID.fromString(teacherID),
-                        teacherName,
-                        teacherSurname,
-                        teacherPatronymic,
-                    )
-
-                    univDAO.upsertSubject(subject)
-                    univDAO.upsertTeacher(teacher)
+                    subjects += subject
                 }
             }
+
+            univDAO.deleteAndUpsertSubjects(deleteList, subjects)
         }
     }
 
-    fun upsertProfileAttendance(profileAttendanceList: List<ProfileAttendance>) {
+    fun deleteAndUpsertProfileAttendance(deleteList: List<String>, profileAttendances: List<ProfileAttendance>) {
         executor.execute {
-            for (pa in profileAttendanceList)
-                univDAO.upsertProfileAttendance(pa)
-        }
-    }
-
-    fun updateScheduleNotes(schedule: Schedule) {
-        executor.execute {
-            univDAO.updateScheduleNotes(schedule)
+            univDAO.deleteAndUpsertProfileAttendance(deleteList, profileAttendances)
         }
     }
 

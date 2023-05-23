@@ -88,8 +88,14 @@ class ProfileViewModel : ViewModel() {
                 // The list from API call
                 FetchedListType.NEW -> {
                     listDiffSubjects.newList = subjectAndTeacherList.map { it.subjectID }
-                    univRepository.deleteSubjectsById(listDiffSubjects.deleteList)
 
+                    val diffLists = listDiffSubjects.compareLists()
+                    val deleteList = diffLists["delete"]
+                    val upsertList = subjectAndTeacherList.filter {
+                        it.subjectID in diffLists["upsert"]!!
+                    }
+
+                    univRepository.deleteAndUpsertSubjects(deleteList!!, upsertList)
                 }
                 // The list from the app database
                 FetchedListType.OLD -> {
@@ -106,7 +112,14 @@ class ProfileViewModel : ViewModel() {
                 // The list from API call
                 FetchedListType.NEW -> {
                     listDiffScheduleAttendance.newList = profileAttendanceList.map { it.id }
-                    univRepository.deleteProfileAttendanceById(listDiffScheduleAttendance.deleteList)
+
+                    val diffLists = listDiffScheduleAttendance.compareLists()
+                    val deleteList = diffLists["delete"]
+                    val upserteList = profileAttendanceList.filter {
+                        it.id in diffLists["upsert"]!!
+                    }
+
+                    univRepository.deleteAndUpsertProfileAttendance(deleteList!!, upserteList)
                 }
                 // The list from the app database
                 FetchedListType.OLD -> {
@@ -134,13 +147,5 @@ class ProfileViewModel : ViewModel() {
         for (scheduleVisit in profileAttendanceList) {
             if (scheduleVisit.visited) visitAmount++
         }
-    }
-
-    fun upsertSubjectAndTeacher(subjectAndTeacherList: List<SubjectAndTeacher>) {
-        univRepository.upsertSubjectAndTeacher(subjectAndTeacherList)
-    }
-
-    fun upsertProfileAttendance(profileAttendanceList: List<ProfileAttendance>) {
-        univRepository.upsertProfileAttendance(profileAttendanceList)
     }
 }

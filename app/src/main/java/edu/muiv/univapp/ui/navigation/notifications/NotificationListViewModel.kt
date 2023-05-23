@@ -68,7 +68,13 @@ class NotificationListViewModel : ViewModel() {
                 // The list from API call
                 FetchedListType.NEW -> {
                     listDiff.newList = notifications.map { it.id }
-                    univRepository.deleteNotificationsById(listDiff.deleteList)
+
+                    val diffLists = listDiff.compareLists()
+                    val deleteList = diffLists["delete"]
+                    val upserteList = notifications.filter {
+                        it.id in diffLists["upsert"]!!
+                    }
+                    univRepository.deleteAndUpsertNotifications(deleteList!!, upserteList)
                 }
                 // The list from the app database
                 FetchedListType.OLD -> {
@@ -100,9 +106,5 @@ class NotificationListViewModel : ViewModel() {
             _notificationsForTeacher.value = previousMonthDays + currentMonthDays
         else
             _notificationsForStudent.value = previousMonthDays + currentMonthDays
-    }
-
-    fun upsertNotifications(notifications: List<Notification>) {
-        univRepository.upsertNotifications(notifications)
     }
 }

@@ -93,12 +93,9 @@ class NotificationListFragment : VisibleFragment() {
                 if (statusCode == StatusCode.OK) {
                     Log.i(TAG, "Updating database with fetched notifications...")
 
-                    // Update database with fetched notifications
-                    notificationListViewModel.upsertNotifications(notifications!!)
-
                     // Create a list with ids of fetched notifications
                     notificationListViewModel.createNotificationsIdList(
-                        notifications, FetchedListType.NEW
+                        notifications!!, FetchedListType.NEW
                     )
 
                     lifecycleScope.launch(Dispatchers.Default) {

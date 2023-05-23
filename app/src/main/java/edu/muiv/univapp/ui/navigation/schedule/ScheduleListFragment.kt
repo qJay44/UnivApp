@@ -83,10 +83,7 @@ class ScheduleListFragment : VisibleFragment() {
         )
 
         ibPrevWeek = binding.ibPrevWeek
-        ibPrevWeek.setOnClickListener {
-            rvSchedule.startAnimation(ibPrevWeekAnimation)
-            scheduleListViewModel.createScheduleIdList(emptyList(), FetchedListType.OLD)
-        }
+        ibPrevWeek.setOnClickListener { rvSchedule.startAnimation(ibPrevWeekAnimation) }
 
         // Next week animation
         val ibNextWeekAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
@@ -95,16 +92,10 @@ class ScheduleListFragment : VisibleFragment() {
         )
 
         ibNextWeek = binding.ibNextWeek
-        ibNextWeek.setOnClickListener {
-            rvSchedule.startAnimation(ibNextWeekAnimation)
-            scheduleListViewModel.createScheduleIdList(emptyList(), FetchedListType.OLD)
-        }
+        ibNextWeek.setOnClickListener { rvSchedule.startAnimation(ibNextWeekAnimation) }
 
         tvWeekDays = binding.tvWeekDays
         tvNoSchedule = binding.tvNoSchedule
-        tvNoSchedule.setOnClickListener {
-            scheduleListViewModel.createScheduleIdList(emptyList(), FetchedListType.OLD)
-        }
 
         // Swipes //
 
@@ -165,18 +156,15 @@ class ScheduleListFragment : VisibleFragment() {
         }
 
         scheduleListViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
-            val statusCode = response.keys.first()
+            val statusCode = response!!.keys.first()
             val scheduleList = response.values.first()
 
             if (statusCode == StatusCode.OK) {
-                Log.i(TAG, "Updating database with fetched notifications")
-
-                // Update database with fetched schedule
-                scheduleListViewModel.upsertSchedule(scheduleList!!)
+                Log.i(TAG, "Updating database with fetched schedule")
 
                 // Create a list with ids of fetched schedule
                 scheduleListViewModel.createScheduleIdList(
-                    scheduleList, FetchedListType.NEW
+                    scheduleList!!, FetchedListType.NEW
                 )
 
                 lifecycleScope.launch(Dispatchers.Default) {

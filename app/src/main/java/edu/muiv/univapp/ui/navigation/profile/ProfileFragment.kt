@@ -95,12 +95,9 @@ class ProfileFragment : Fragment() {
 
             if (statusCode == StatusCode.OK) {
 
-                // Update database with fetched subjects
-                profileViewModel.upsertSubjectAndTeacher(subjectAndTeacherList!!)
-
                 // Create a list with ids of fetched subjects
                 profileViewModel.createSubjectsIdsList(
-                    subjectAndTeacherList, FetchedListType.NEW
+                    subjectAndTeacherList!!, FetchedListType.NEW
                 )
             } else {
                 val errorMessage = statusCode.message("Subjects")
@@ -115,12 +112,9 @@ class ProfileFragment : Fragment() {
             if (statusCode == StatusCode.OK) {
                 Log.i(TAG, "Updating database with fetched profile attendances")
 
-                // Update database with fetched subjects
-                profileViewModel.upsertProfileAttendance(profileAttendanceList!!)
-
                 // Create a list with ids of fetched subjects
                 profileViewModel.createProfileAttendanceIdsList(
-                    profileAttendanceList, FetchedListType.NEW
+                    profileAttendanceList!!, FetchedListType.NEW
                 )
 
                 // Prevent from endless updates

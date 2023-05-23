@@ -72,7 +72,7 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
         }
 
         try {
-            if (listDiff.deleteList.isNotEmpty()) {
+            if (listDiff.compareLists().isNotEmpty()) {
                 Log.i(TAG, "doWork: Got a new schedule")
 
                 val intent = LoginActivity.newIntent(context)
@@ -114,7 +114,7 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
             }
 
         try {
-            if (listDiff.deleteList.isNotEmpty()) {
+            if (listDiff.compareLists().isNotEmpty()) {
                 Log.i(TAG, "doWork: Got new notifications")
 
                 val intent = LoginActivity.newIntent(context)
