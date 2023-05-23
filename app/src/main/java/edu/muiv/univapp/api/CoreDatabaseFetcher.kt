@@ -104,14 +104,23 @@ class CoreDatabaseFetcher private constructor() {
     }
 
     fun fetchSchedule(
-        group: String? = null,
+        group    : String? = null,
         teacherId: UUID? = null,
+        dateStart: String? = null,
+        dateEnd  : String? = null,
         callback: (Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>) -> Unit
     ) {
+        val params = hashMapOf(
+            "group" to group,
+            "teacherId" to teacherId.toString(),
+            "dateStart" to dateStart,
+            "dateEnd" to dateEnd
+        )
+
         val request = if (teacherId == null) {
-            coreDatabaseApi.fetchSchedule(group!!)
+            coreDatabaseApi.fetchSchedule(params)
         } else {
-            coreDatabaseApi.fetchSchedule(teacherId)
+            coreDatabaseApi.fetchSchedule(params)
         }
 
         request.enqueue(DefaultGetRequest<List<ScheduleWithSubjectAndTeacher>>(

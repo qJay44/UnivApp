@@ -8,7 +8,6 @@ import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleAttendance
 import edu.muiv.univapp.ui.navigation.schedule.model.ScheduleWithSubjectAndTeacher
 import retrofit2.Call
 import retrofit2.http.*
-import java.util.UUID
 
 interface CoreDatabaseApi {
 
@@ -19,10 +18,7 @@ interface CoreDatabaseApi {
     fun fetchNotifications(@Query("group") group: String): Call<List<Notification>>
 
     @GET("v1/schedule/")
-    fun fetchSchedule(@Query("group") group: String): Call<List<ScheduleWithSubjectAndTeacher>>
-
-    @GET("v1/schedule/")
-    fun fetchSchedule(@Query("teacherId") teacherId: UUID): Call<List<ScheduleWithSubjectAndTeacher>>
+    fun fetchSchedule(@QueryMap params: Map<String, String?>): Call<List<ScheduleWithSubjectAndTeacher>>
 
     @GET("v1/profile/subjects/")
     fun fetchProfileSubjects(@Query("groupName") groupName: String): Call<List<SubjectAndTeacher>>

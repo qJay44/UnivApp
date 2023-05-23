@@ -248,15 +248,17 @@ class ScheduleListFragment : VisibleFragment() {
     }
 
     // The Adapter
-    private inner class ScheduleAdapter(
-        private val scheduleForUserList: List<ScheduleWithSubjectAndTeacher>
+    private inner class ScheduleAdapter(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>
         ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        private val scheduleAllBooleans: List<Boolean>
+        private val scheduleList: List<ScheduleWithSubjectAndTeacher>
+        private val scheduleHolderTypeOrder: List<HolderViewType>
 
         init {
+            val scheduleList = mutableListOf<ScheduleWithSubjectAndTeacher>()
+            val scheduleHolderTypeOrder = mutableListOf<HolderViewType>()
+
             var currentWeekDay = ""
-            val listWithBooleans: MutableList<Boolean> = mutableListOf()
 
             /**
              * Create schedule holder as header
@@ -264,14 +266,18 @@ class ScheduleListFragment : VisibleFragment() {
              * or only default holder
              */
             for (schedule in scheduleForUserList) {
-                if (schedule.date != currentWeekDay)
-                    listWithBooleans += true
+                if (schedule.date != currentWeekDay) {
+                    scheduleHolderTypeOrder += HolderViewType.HEADER
+                    scheduleList += schedule
+                }
 
-                listWithBooleans += false
+                scheduleHolderTypeOrder += HolderViewType.DEFAULT
+                scheduleList += schedule
                 currentWeekDay = schedule.date
             }
 
-            scheduleAllBooleans = listWithBooleans.toList()
+            this.scheduleList = scheduleList.toList()
+            this.scheduleHolderTypeOrder = scheduleHolderTypeOrder.toList()
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -291,7 +297,7 @@ class ScheduleListFragment : VisibleFragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val scheduleForUser = scheduleForUserList.elementAt(position)
+            val scheduleForUser = scheduleList.elementAt(position)
             when (holder) {
                 is ScheduleHeaderHolder -> {
                     setupHeaderViewHolder(
@@ -307,14 +313,11 @@ class ScheduleListFragment : VisibleFragment() {
             }
         }
 
-        override fun getItemCount(): Int = scheduleForUserList.size
+        override fun getItemCount(): Int = scheduleList.size
 
         override fun getItemViewType(position: Int): Int {
             // Which holder to create
-            return when (scheduleAllBooleans.elementAt(position)) {
-                true  -> HolderViewType.HEADER.ordinal
-                false -> HolderViewType.DEFAULT.ordinal
-            }
+            return scheduleHolderTypeOrder.elementAt(position).ordinal
         }
 
         // Use this function when async layout inflater can't set fonts by itself
@@ -387,7 +390,7 @@ class ScheduleListFragment : VisibleFragment() {
 
         ////////////////////////////////////
 
-        fun getScheduleByPosition(pos: Int) = scheduleForUserList.elementAt(pos)
+        fun getScheduleByPosition(pos: Int) = scheduleList.elementAt(pos)
     }
 
     private class ScheduleHeaderHolder(view: View) : RecyclerView.ViewHolder(view)
