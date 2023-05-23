@@ -8,7 +8,7 @@ import java.util.UUID
 class UserDataHolder private constructor(val user: LoginResult){
 
     companion object {
-        private const val CORE_ADDRESS = "6dbe-176-195-25-170.ngrok-free.app"
+        private const val CORE_ADDRESS = "8dbd-46-242-10-66.ngrok-free.app"
         private const val TAG = "UserDataHolder"
         private var INSTANCE: UserDataHolder? = null
         const val BASE_URL = "https://$CORE_ADDRESS"

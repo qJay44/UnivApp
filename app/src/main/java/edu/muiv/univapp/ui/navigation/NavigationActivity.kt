@@ -66,7 +66,7 @@ class NavigationActivity : AppCompatActivity() {
 
         // Hide profile fragment if user is a teacher
         val navMenuItem = navView.menu.findItem(R.id.navigation_profile)
-        navMenuItem.isVisible = UserDataHolder.get().user.groupName != null
+        navMenuItem.isVisible = navigationViewModel.groupName != null
 
         navView.setOnItemSelectedListener { item ->
             selectFragment(item)

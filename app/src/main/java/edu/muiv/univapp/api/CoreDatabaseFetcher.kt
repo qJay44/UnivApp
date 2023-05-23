@@ -72,18 +72,19 @@ class CoreDatabaseFetcher private constructor() {
         request.enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 val responseBody = response.body()
+                val responseInfo = "${response.code()} - ${response.message()}"
                 if (responseBody != null) {
                     if (responseBody.id == "") {
                         callback.invoke(StatusCode.NO_CONTENT)
-                        Log.i(TAG, "onResponse: response has no content (fetchUser)")
+                        Log.i(TAG, "onResponse: response has no content (fetchUser): $responseInfo")
                     } else {
                         callback.invoke(StatusCode.OK)
                         UserDataHolder.initialize(responseBody)
-                        Log.i(TAG, "onResponse: OK (fetchUser)")
+                        Log.i(TAG, "onResponse: OK (fetchUser): $responseInfo")
                     }
                 } else {
                     callback.invoke(StatusCode.SERVICE_UNAVAILABLE)
-                    Log.w(TAG, "onResponse: responseBody is null (fetchUser)")
+                    Log.w(TAG, "onResponse: responseBody is null (fetchUser): $responseInfo")
                 }
             }
 
@@ -195,6 +196,7 @@ class CoreDatabaseFetcher private constructor() {
 
         override fun onResponse(call: Call<T>, response: Response<T>) {
             val responseBody = response.body()
+            val responseInfo = "${response.code()} - ${response.message()}"
             if (responseBody != null) {
                 val hasContent = if (isList) {
                     val useAsList = responseBody as List<*>
@@ -206,14 +208,14 @@ class CoreDatabaseFetcher private constructor() {
 
                 if (hasContent) {
                     callback.invoke(mapOf(StatusCode.OK to responseBody))
-                    Log.i(TAG, "onResponse: OK ($funcName)")
+                    Log.i(TAG, "onResponse: OK ($funcName): $responseInfo")
                 } else {
                     callback.invoke(mapOf(StatusCode.NO_CONTENT to null))
-                    Log.i(TAG, "onResponse: response has no content ($funcName)")
+                    Log.i(TAG, "onResponse: response has no content ($funcName): $responseInfo")
                 }
             } else {
                 callback.invoke(mapOf(StatusCode.SERVICE_UNAVAILABLE to null))
-                Log.w(TAG, "onResponse: responseBody is null ($funcName)")
+                Log.w(TAG, "onResponse: responseBody is null ($funcName): $responseInfo")
             }
         }
 

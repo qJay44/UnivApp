@@ -260,35 +260,29 @@ class ScheduleListFragment : VisibleFragment() {
     }
 
     // The Adapter
-    private inner class ScheduleAdapter(scheduleForUserList: List<ScheduleWithSubjectAndTeacher>)
-        : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private inner class ScheduleAdapter(
+        private val scheduleForUserList: List<ScheduleWithSubjectAndTeacher>
+        ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        private val scheduleAll: List<ScheduleWithSubjectAndTeacher>
         private val scheduleAllBooleans: List<Boolean>
 
         init {
             var currentWeekDay = ""
-            val listWithSchedules: MutableList<ScheduleWithSubjectAndTeacher> = mutableListOf()
             val listWithBooleans: MutableList<Boolean> = mutableListOf()
 
+            /**
+             * Create schedule holder as header
+             * and then the same schedule as default holder
+             * or only default holder
+             */
             for (schedule in scheduleForUserList) {
-                if (schedule.date != currentWeekDay) {
-                    // Create schedule holder as header
-                    listWithSchedules += schedule
+                if (schedule.date != currentWeekDay)
                     listWithBooleans += true
 
-                    // and then the same schedule as default holder
-                    listWithSchedules += schedule
-                    listWithBooleans += false
-                } else {
-                    // Create only default holder
-                    listWithSchedules += schedule
-                    listWithBooleans += false
-                }
+                listWithBooleans += false
                 currentWeekDay = schedule.date
             }
 
-            scheduleAll = listWithSchedules.toList()
             scheduleAllBooleans = listWithBooleans.toList()
         }
 
@@ -309,7 +303,7 @@ class ScheduleListFragment : VisibleFragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val scheduleForUser = scheduleAll.elementAt(position)
+            val scheduleForUser = scheduleForUserList.elementAt(position)
             when (holder) {
                 is ScheduleHeaderHolder -> {
                     setupHeaderViewHolder(
@@ -325,7 +319,7 @@ class ScheduleListFragment : VisibleFragment() {
             }
         }
 
-        override fun getItemCount(): Int = scheduleAll.size
+        override fun getItemCount(): Int = scheduleForUserList.size
 
         override fun getItemViewType(position: Int): Int {
             // Which holder to create
@@ -405,7 +399,7 @@ class ScheduleListFragment : VisibleFragment() {
 
         ////////////////////////////////////
 
-        fun getScheduleByPosition(pos: Int) = scheduleAll.elementAt(pos)
+        fun getScheduleByPosition(pos: Int) = scheduleForUserList.elementAt(pos)
     }
 
     private class ScheduleHeaderHolder(view: View) : RecyclerView.ViewHolder(view)
