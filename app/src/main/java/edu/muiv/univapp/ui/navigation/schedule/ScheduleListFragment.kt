@@ -156,7 +156,7 @@ class ScheduleListFragment : VisibleFragment() {
         }
 
         scheduleListViewModel.fetchedSchedule.observe(viewLifecycleOwner) { response ->
-            val statusCode = response!!.keys.first()
+            val statusCode = response.keys.first()
             val scheduleList = response.values.first()
 
             if (statusCode == StatusCode.OK) {

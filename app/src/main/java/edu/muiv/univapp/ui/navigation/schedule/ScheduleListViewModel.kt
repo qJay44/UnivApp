@@ -57,7 +57,7 @@ class ScheduleListViewModel : ViewModel() {
     val dayFromTo: LiveData<String>
         get() = _dayFromTo
 
-    val fetchedSchedule: LiveData<Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>?>
+    val fetchedSchedule: LiveData<Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>>
         get() = _scheduleFetched
 
     /////////////////////////////////////
