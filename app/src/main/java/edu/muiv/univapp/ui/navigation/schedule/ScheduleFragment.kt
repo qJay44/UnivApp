@@ -120,6 +120,12 @@ class ScheduleFragment : Fragment() {
                     dialogFragment.show(parentFragmentManager, null)
                 }
             }
+
+            if (UserDataHolder.isServerOnline) {
+                scheduleViewModel.fetchForTeacherStatus.observe(viewLifecycleOwner) { result ->
+                    Log.i(TAG, "Fetch for teacher: $result")
+                }
+            }
         } else {
             // For student
             scheduleViewModel.scheduleAttendanceLiveData.observe(viewLifecycleOwner) {
@@ -137,27 +143,21 @@ class ScheduleFragment : Fragment() {
             }
 
             if (UserDataHolder.isServerOnline) {
-                if (scheduleViewModel.isTeacher) {
-                    scheduleViewModel.fetchForTeacherStatus.observe(viewLifecycleOwner) { result ->
-                        Log.i(TAG, "Fetch for teacher: $result")
-                    }
-                } else {
-                    scheduleViewModel.fetchedScheduleAttendanceForStudent.observe(viewLifecycleOwner) { response ->
-                        val statusCode = response.keys.first()
-                        val scheduleAttendance = response.values.first()
+                scheduleViewModel.fetchedScheduleAttendanceForStudent.observe(viewLifecycleOwner) { response ->
+                    val statusCode = response.keys.first()
+                    val scheduleAttendance = response.values.first()
 
-                        if (statusCode == StatusCode.OK) {
-                            Log.i(
-                                TAG,
-                                "Updating database with fetched schedule attendance"
-                            )
+                    if (statusCode == StatusCode.OK) {
+                        Log.i(
+                            TAG,
+                            "Updating database with fetched schedule attendance"
+                        )
 
-                            // Update database with fetched schedule attendance
-                            scheduleViewModel.upsertAttendance(scheduleAttendance!!)
-                        } else {
-                            val errorMessage = statusCode.message("Schedule attendance")
-                            Log.w(TAG, errorMessage)
-                        }
+                        // Update database with fetched schedule attendance
+                        scheduleViewModel.upsertAttendance(scheduleAttendance!!)
+                    } else {
+                        val errorMessage = statusCode.message("Schedule attendance")
+                        Log.w(TAG, errorMessage)
                     }
                 }
             }

@@ -104,11 +104,19 @@ class ScheduleListViewModel : ViewModel() {
         if (UserDataHolder.isServerOnline && (_scheduleFetched.value == null || needNewWeekFetch)) {
             needNewWeekFetch = false
             if (isTeacher) {
-                univAPI.fetchSchedule(teacherId = user.id) { response ->
+                univAPI.fetchSchedule(
+                    teacherId = user.id,
+                    dateStart = days.first(),
+                    dateEnd = days.last()
+                ) { response ->
                     _scheduleFetched.value = response
                 }
             } else {
-                univAPI.fetchSchedule(user.groupName!!) { response ->
+                univAPI.fetchSchedule(
+                    user.groupName!!,
+                    dateStart = days.first(),
+                    dateEnd = days.last()
+                ) { response ->
                     _scheduleFetched.value = response
                 }
             }
