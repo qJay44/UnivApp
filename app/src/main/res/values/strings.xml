@@ -51,7 +51,7 @@
     <string name="user_current_subjects">Дисциплины в текущем семестре</string>
     <string name="user_subject_details_example">Блощук А.А. | Экзамен</string>
     <string name="title_profile">Profile</string>
-    <string name="patch_top">вверхная плашка</string>
+    <string name="patch_top">верхняя плашка</string>
     <string name="text_login_title">РАСПИСАНИЕ ЗАНЯТИЙ</string>
     <string name="no_schedule_text">Расписание отсутствует</string>
     <string name="schedule_channel_name">Schedule</string>

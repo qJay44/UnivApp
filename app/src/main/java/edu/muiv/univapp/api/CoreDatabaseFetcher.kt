@@ -106,22 +106,21 @@ class CoreDatabaseFetcher private constructor() {
     fun fetchSchedule(
         group    : String? = null,
         teacherId: UUID? = null,
-        dateStart: String? = null,
-        dateEnd  : String? = null,
-        callback: (Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>) -> Unit
+        dateStart: String,
+        dateEnd  : String,
+        callback : (Map<StatusCode, List<ScheduleWithSubjectAndTeacher>?>) -> Unit
     ) {
         val params = hashMapOf(
-            "group" to group,
-            "teacherId" to teacherId.toString(),
             "dateStart" to dateStart,
             "dateEnd" to dateEnd
         )
 
-        val request = if (teacherId == null) {
-            coreDatabaseApi.fetchSchedule(params)
-        } else {
-            coreDatabaseApi.fetchSchedule(params)
-        }
+        if (group != null)
+            params["group"] = group
+        else
+            params["teacherId"] = teacherId!!.toString()
+
+        val request = coreDatabaseApi.fetchSchedule(params)
 
         request.enqueue(DefaultGetRequest<List<ScheduleWithSubjectAndTeacher>>(
             callback, true, "fetchSchedule"))
@@ -211,8 +210,12 @@ class CoreDatabaseFetcher private constructor() {
                     val useAsList = responseBody as List<*>
                     useAsList.isNotEmpty()
                 } else {
-                    val useAsObject = responseBody as GenericResponse
-                    useAsObject.id != ""
+                    try {
+                        val useAsObject = responseBody as GenericResponse
+                        useAsObject.id != ""
+                    } catch (e: ClassCastException) {
+                        false
+                    }
                 }
 
                 if (hasContent) {
@@ -234,5 +237,5 @@ class CoreDatabaseFetcher private constructor() {
         }
     }
 
-    private data class GenericResponse(val id: String)
+    private data class GenericResponse(val id: String? = null)
 }

@@ -18,7 +18,7 @@ interface CoreDatabaseApi {
     fun fetchNotifications(@Query("group") group: String): Call<List<Notification>>
 
     @GET("v1/schedule/")
-    fun fetchSchedule(@QueryMap params: Map<String, String?>): Call<List<ScheduleWithSubjectAndTeacher>>
+    fun fetchSchedule(@QueryMap params: Map<String, String>): Call<List<ScheduleWithSubjectAndTeacher>>
 
     @GET("v1/profile/subjects/")
     fun fetchProfileSubjects(@Query("groupName") groupName: String): Call<List<SubjectAndTeacher>>
