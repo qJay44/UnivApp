@@ -32,7 +32,8 @@ interface UnivDAO {
         "FROM Schedule " +
         "INNER JOIN Subject ON schedule.subjectID=subject.id " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
-        "WHERE subject.groupName=:groupName AND date IN (:days)"
+        "WHERE subject.groupName=:groupName AND date IN (:days) " +
+        "ORDER BY date, timeStart"
     )
     fun getScheduleForWeek(groupName: String, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
@@ -43,7 +44,9 @@ interface UnivDAO {
         "FROM Schedule " +
         "INNER JOIN Subject ON schedule.subjectID=subject.id " +
         "INNER JOIN Teacher ON subject.teacherID=teacher.id " +
-        "WHERE schedule.teacherID=:teacherIdParam AND date IN (:days) GROUP BY date, timeStart"
+        "WHERE schedule.teacherID=:teacherIdParam AND date IN (:days) " +
+        "GROUP BY date, timeStart " +
+        "ORDER BY date, timeStart"
     )
     fun getScheduleForWeek(teacherIdParam: UUID, days: List<String>): LiveData<List<ScheduleWithSubjectAndTeacher>>
 
