@@ -121,7 +121,7 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
-            if (UserDataHolder.isServerOnline) {
+            if (UserDataHolder.isInternetAvailable) {
                 scheduleViewModel.fetchForTeacherStatus.observe(viewLifecycleOwner) { result ->
                     Log.i(TAG, "Fetch for teacher: $result")
                 }
@@ -142,7 +142,7 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
-            if (UserDataHolder.isServerOnline) {
+            if (UserDataHolder.isInternetAvailable) {
                 scheduleViewModel.fetchedScheduleAttendanceForStudent.observe(viewLifecycleOwner) { response ->
                     val statusCode = response.keys.first()
                     val scheduleAttendance = response.values.first()

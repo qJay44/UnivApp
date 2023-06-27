@@ -37,7 +37,7 @@ class LoginViewModel : ViewModel() {
     }
 
     fun loadUser(isTeacher: Boolean) {
-        if (UserDataHolder.isServerOnline) {
+        if (UserDataHolder.isInternetAvailable) {
             login.isTeacher = isTeacher
 
             univAPI.fetchUser(login) { statusCode ->

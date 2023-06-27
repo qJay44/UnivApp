@@ -53,7 +53,7 @@ class NotificationListViewModel : ViewModel() {
 
     private fun fetchNotifications() {
         // Only if online and didn't fetch yet
-        if (UserDataHolder.isServerOnline && _notificationsFetched.value == null) {
+        if (UserDataHolder.isInternetAvailable && _notificationsFetched.value == null) {
             if (!isTeacher) {
                 univAPI.fetchNotifications(user.groupName!!) { response ->
                     _notificationsFetched.value = response

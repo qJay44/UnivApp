@@ -65,7 +65,7 @@ class ScheduleViewModel : ViewModel() {
             val minTimeDifference = MIN_TIME_DIFFERENCE * 60 * 1000 // milliseconds
 
             return when {
-                !UserDataHolder.isServerOnline -> AttendanceStatus.OFFLINE.status
+                !UserDataHolder.isInternetAvailable -> AttendanceStatus.OFFLINE.status
                 currentDateMillis > scheduleDateMillis -> AttendanceStatus.LATE.status
                 scheduleDateMillis - currentDateMillis <= minTimeDifference -> AttendanceStatus.ALLOWED.status
                 else -> AttendanceStatus.EARLY.status
@@ -149,7 +149,7 @@ class ScheduleViewModel : ViewModel() {
         else
             scheduleToStudentLiveData.value = idMap
 
-        if (UserDataHolder.isServerOnline) {
+        if (UserDataHolder.isInternetAvailable) {
             if (isTeacher) {
                 univApi.fetchScheduleAttendanceForTeacher(scheduleID.toString()) { response ->
                     val statusCode = response.keys.first()

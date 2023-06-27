@@ -18,6 +18,9 @@ import edu.muiv.univapp.api.LoginResponse
 import edu.muiv.univapp.api.StatusCode
 import edu.muiv.univapp.ui.login.LoginActivity
 import edu.muiv.univapp.ui.login.LoginResult
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class PollWorker(private val context: Context, workerParams: WorkerParameters)
     : Worker(context, workerParams) {
@@ -34,12 +37,15 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
         const val NOTIFICATION = "notification"
     }
 
+    private val calendar = Calendar.getInstance()
     private val userLoaded by lazy { loadUserPrefs() }
     private val univAPI    by lazy { CoreDatabaseFetcher.get() }
     private val listDiff   by lazy { TwoStringListsDifference() }
+    private val originalDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE)
+    private val days: Array<String> = Array(7) { it.toString() }
 
     override fun doWork(): Result {
-        if (UserDataHolder.isServerOnline && userLoaded) {
+        if (UserDataHolder.isInternetAvailable && userLoaded) {
             val user = UserDataHolder.get().user
 
             createScheduleNotification(user)
@@ -49,12 +55,26 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
         return Result.success()
     }
 
+    private fun loadDays() {
+        for (i in days.indices) {
+            days[i] = originalDateFormat.format(calendar.time)
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        // Subtract extra added day
+        calendar.add(Calendar.DAY_OF_MONTH, -1)
+    }
+
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun createScheduleNotification(user: LoginResult) {
+        loadDays()
         listDiff.oldList = getPrefs(LAST_SCHEDULE, "schedule") ?: emptyList()
 
         if (user.groupName != null) {
-            univAPI.fetchSchedule(group = user.groupName) { response ->
+            univAPI.fetchSchedule(
+                group = user.groupName,
+                dateStart = days.first(),
+                dateEnd = days.last()
+            ) { response ->
                 val statusCode = response.keys.first()
                 val scheduleList = response.values.first()
 
@@ -62,7 +82,11 @@ class PollWorker(private val context: Context, workerParams: WorkerParameters)
                     listDiff.newList = scheduleList!!.map { it.id }
             }
         } else {
-            univAPI.fetchSchedule(teacherId = user.id) { response ->
+            univAPI.fetchSchedule(
+                teacherId = user.id,
+                dateStart = days.first(),
+                dateEnd = days.last()
+            ) { response ->
                 val statusCode = response.keys.first()
                 val scheduleList = response.values.first()
 

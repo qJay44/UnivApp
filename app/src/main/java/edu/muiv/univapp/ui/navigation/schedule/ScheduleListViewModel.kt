@@ -101,7 +101,7 @@ class ScheduleListViewModel : ViewModel() {
 
     private fun fetchSchedule() {
         // Only if online and didn't fetch yet or new week
-        if (UserDataHolder.isServerOnline && (_scheduleFetched.value == null || needNewWeekFetch)) {
+        if (UserDataHolder.isInternetAvailable && (_scheduleFetched.value == null || needNewWeekFetch)) {
             needNewWeekFetch = false
             if (isTeacher) {
                 univAPI.fetchSchedule(
